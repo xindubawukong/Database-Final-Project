@@ -1,5 +1,5 @@
 #include "bazel_example/lib/hello-time.h"
-#include "bazel_example/main/hello-greet.h"
+#include "hello-greet.h"
 #include <iostream>
 #include <string>
 
