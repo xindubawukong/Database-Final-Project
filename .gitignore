@@ -1,0 +1,7 @@
+bazel-bin
+bazel-code
+bazel-genfiles
+bazel-out
+bazel-testlogs
+.vscode
+.DS_Store
