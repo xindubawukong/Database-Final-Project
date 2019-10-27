@@ -1,7 +1,7 @@
-#include "bazel_example/lib/hello-time.h"
-#include "hello-greet.h"
 #include <iostream>
 #include <string>
+#include "bazel_example/lib/hello-time.h"
+#include "hello-greet.h"
 
 int main(int argc, char** argv) {
   std::string who = "world";
