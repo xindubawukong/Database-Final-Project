@@ -11,7 +11,7 @@ RM_Record::RM_Record() {
 }
 
 RM_Record::~RM_Record() {
-  // delete[] data_;
+  delete[] data_;
 }
 
 int RM_Record::Set(int length, char* data, RID rid) {
