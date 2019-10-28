@@ -7,8 +7,8 @@
 #include <unistd.h>
 #include <iostream>
 #include <string>
-#include "../utils/pagedef.h"
 #include "../utils/MyBitMap.h"
+#include "../utils/pagedef.h"
 
 namespace filesystem {
 
@@ -143,7 +143,7 @@ class FileManager {
     delete tm;
     delete fm;
   }
-  
+
   ~FileManager() { this->shutdown(); }
 };
 

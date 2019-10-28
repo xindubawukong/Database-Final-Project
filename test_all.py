@@ -1,5 +1,11 @@
 import os
 
-os.system('bazel test bazel_example/main:all --test_output=streamed')
-print('\n')
-os.system('bazel test recordmanager:all --test_output=streamed')
+all_bazel_tests = [
+  'bazel_example/main:all',
+  'recordmanager:all',
+]
+
+for test in all_bazel_tests:
+  inst = 'bazel test ' + test + ' --test_output=streamed'
+  os.system(inst)
+  print('')

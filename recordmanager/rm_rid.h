@@ -9,10 +9,12 @@ class RID {
   ~RID();
   RID(int page_num, int slotNum);
 
-  void Set(int page_num, int slot_num);
+  int Set(int page_num, int slot_num);
 
   int GetPageNum(int& page_num) const;
   int GetSlotNum(int& slot_num) const;
+
+  friend bool operator ==(const RID& a, const RID& b);
 
  private:
   bool initialized_;

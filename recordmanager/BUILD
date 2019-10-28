@@ -8,11 +8,32 @@ cc_library(
   visibility = ["//visibility:public"],
 )
 
+cc_library(
+  name = "rm_record",
+  srcs = ["rm_record.cc"],
+  hdrs = ["rm_record.h"],
+  deps = [
+    "//:return_code",
+    ":rm_rid",
+  ]
+)
+
 cc_test(
   name = "rm_rid_test",
   srcs = ["rm_rid_test.cc"],
   deps = [
     "@gtest//:gtest_main",
     ":rm_rid",
+    "//:return_code",
+  ]
+)
+
+cc_test(
+  name = "rm_record_test",
+  srcs = ["rm_record_test.cc"],
+  deps = [
+    "@gtest//:gtest_main",
+    ":rm_record",
+    "//:return_code",
   ]
 )
