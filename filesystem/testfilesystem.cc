@@ -64,6 +64,8 @@ int main() {
     cout << b[0] << ":" << b[1] << endl;
     bpm->access(index);
   }
+  cout << "file ID 1: " << fileID << endl;
+  cout << "file Id 2: " << f2 << endl;
   //程序结束前可以调用BufPageManager的某个函数将缓存中的内容写回
   //具体的函数大家可以看看ppt或者程序的注释
   bpm->close();

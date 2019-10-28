@@ -25,7 +25,9 @@ struct BufPageManager {
    * 缓存页面数组
    */
   BufType* addr;
+
   BufType allocMem() { return new unsigned int[(PAGE_SIZE >> 2)]; }
+
   BufType fetchPage(int typeID, int pageID, int& index) {
     BufType b;
     index = replace->find();
@@ -66,6 +68,7 @@ struct BufPageManager {
     }
     return b;
   }
+
   /*
    * @函数名getPage
    * @参数fileID:文件id
@@ -90,6 +93,7 @@ struct BufPageManager {
       return b;
     }
   }
+
   /*
    * @函数名access
    * @参数index:缓存页面数组中的下标，用来表示一个缓存页面
@@ -102,6 +106,7 @@ struct BufPageManager {
     replace->access(index);
     last = index;
   }
+
   /*
    * @函数名markDirty
    * @参数index:缓存页面数组中的下标，用来表示一个缓存页面
@@ -112,6 +117,7 @@ struct BufPageManager {
     dirty[index] = true;
     access(index);
   }
+
   /*
    * @函数名release
    * @参数index:缓存页面数组中的下标，用来表示一个缓存页面
@@ -122,6 +128,7 @@ struct BufPageManager {
     replace->free(index);
     hash->remove(index);
   }
+
   /*
    * @函数名writeBack
    * @参数index:缓存页面数组中的下标，用来表示一个缓存页面
@@ -137,6 +144,7 @@ struct BufPageManager {
     replace->free(index);
     hash->remove(index);
   }
+
   /*
    * @函数名close
    * 功能:将所有缓存页面归还给缓存管理器，归还前需要根据脏页标记决定是否写到对应的文件页面中
@@ -146,6 +154,7 @@ struct BufPageManager {
       writeBack(i);
     }
   }
+
   /*
    * @函数名getKey
    * @参数index:缓存页面数组中的下标，用来指定一个缓存页面
@@ -155,6 +164,7 @@ struct BufPageManager {
   void getKey(int index, int& fileID, int& pageID) {
     hash->getKeys(index, fileID, pageID);
   }
+  
   /*
    * 构造函数
    * @参数fm:文件管理器，缓存管理器需要利用文件管理器与磁盘进行交互

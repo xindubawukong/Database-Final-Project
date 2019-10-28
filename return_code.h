@@ -1,0 +1,9 @@
+#ifndef RETURN_CODE_H
+#define RETURN_CODE_H
+
+#define NO_ERROR 0
+
+#define RM_ERROR 101
+#define RM_RID_NOT_INITIALIZED_ERROR 102
+
+#endif  // RETURN_CODE_H

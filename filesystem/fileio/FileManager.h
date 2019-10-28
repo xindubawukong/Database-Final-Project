@@ -9,22 +9,18 @@
 #include <string>
 #include "../utils/pagedef.h"
 #include "../utils/MyBitMap.h"
-// using namespace std;
 
 namespace filesystem {
 
 class FileManager {
  private:
-  // FileTable* ftable;
   int fd[MAX_FILE_NUM];
   MyBitMap* fm;
   MyBitMap* tm;
   int _createFile(const char* name) {
-    // test bazel output path
     // char buff[1000];
     // getcwd(buff, 1000);
     // std::cout << "当前路径是："<<buff<<"\n";
-
     FILE* f = fopen(name, "a+");
     if (f == NULL) {
       std::cout << "fail" << std::endl;
@@ -33,6 +29,7 @@ class FileManager {
     fclose(f);
     return 0;
   }
+
   int _openFile(const char* name, int fileID) {
     int f = open(name, O_RDWR);
     if (f == -1) {
@@ -50,6 +47,7 @@ class FileManager {
     fm = new MyBitMap(MAX_FILE_NUM, 1);
     tm = new MyBitMap(MAX_TYPE_NUM, 1);
   }
+
   /*
    * @函数名writePage
    * @参数fileID:文件id，用于区别已经打开的文件
@@ -71,6 +69,7 @@ class FileManager {
     error = write(f, (void*)b, PAGE_SIZE);
     return 0;
   }
+
   /*
    * @函数名readPage
    * @参数fileID:文件id，用于区别已经打开的文件
@@ -93,6 +92,7 @@ class FileManager {
     error = read(f, (void*)b, PAGE_SIZE);
     return 0;
   }
+
   /*
    * @函数名closeFile
    * @参数fileID:用于区别已经打开的文件
@@ -105,6 +105,7 @@ class FileManager {
     close(f);
     return 0;
   }
+
   /*
    * @函数名createFile
    * @参数name:文件名
@@ -115,6 +116,7 @@ class FileManager {
     _createFile(name);
     return true;
   }
+
   /*
    * @函数名openFile
    * @参数name:文件名
@@ -128,16 +130,20 @@ class FileManager {
     _openFile(name, fileID);
     return true;
   }
+
   int newType() {
     int t = tm->findLeftOne();
     tm->setBit(t, 0);
     return t;
   }
+
   void closeType(int typeID) { tm->setBit(typeID, 1); }
+
   void shutdown() {
     delete tm;
     delete fm;
   }
+  
   ~FileManager() { this->shutdown(); }
 };
 
