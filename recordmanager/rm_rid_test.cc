@@ -2,7 +2,7 @@
 #include "rm_rid.h"
 #include "return_code.h"
 
-using recordmanager::RID;
+namespace recordmanager {
 
 TEST(TestRid, SimpleTest) {
   RID rid1;
@@ -28,3 +28,5 @@ TEST(TestRid, SimpleTest) {
   rid3.Set(1, 2);
   EXPECT_TRUE(rid2 == rid3);
 }
+
+}  // namespace recordmanager

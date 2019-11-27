@@ -1,4 +1,14 @@
 cc_library(
+  name = "rm",
+  srcs = ["rm.cc"],
+  hdrs = ["rm.h"],
+  deps = [
+    "//:return_code",
+  ],
+  visibility = ["//visibility:public"],
+)
+
+cc_library(
   name = "rm_rid",
   srcs = ["rm_rid.cc"],
   hdrs = ["rm_rid.h"],
@@ -15,6 +25,16 @@ cc_library(
   deps = [
     "//:return_code",
     ":rm_rid",
+  ]
+)
+
+cc_test(
+  name = "rm_test",
+  srcs = ["rm_test.cc"],
+  deps = [
+    "@gtest//:gtest_main",
+    ":rm",
+    "//:return_code",
   ]
 )
 
