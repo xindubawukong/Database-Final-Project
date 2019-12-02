@@ -4,4 +4,8 @@
 
 namespace recordmanager {
 
+TEST(TestPrintError, SimpleTest) {
+  RM_PrintError(1);
+}
+
 }  // namespace recordmanager
