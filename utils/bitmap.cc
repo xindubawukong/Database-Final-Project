@@ -6,8 +6,8 @@
 
 namespace utils {
 
-BitMap::BitMap(unsigned int* addr, int length) {
-  addr_ = addr;
+BitMap::BitMap(void* addr, int length) {
+  addr_ = (unsigned int*)addr;
   length_ = length;
   if (length % 32 > 0) {
     fprintf(stderr, "BitMap length must be a multiple of 32.");

@@ -7,3 +7,13 @@ cc_library(
   ],
   visibility = ["//visibility:public"],
 )
+
+cc_test(
+  name = "bitmap_test",
+  srcs = ["bitmap_test.cc"],
+  deps = [
+    "@gtest//:gtest_main",
+    ":bitmap",
+    "//:return_code",
+  ]
+)

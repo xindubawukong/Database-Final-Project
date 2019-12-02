@@ -7,7 +7,7 @@ namespace utils {
 
 class BitMap {
  public:
-  BitMap(unsigned int* addr, int length);
+  BitMap(void* addr, int length);
 
   int SetZero(int pos);
 
