@@ -5,8 +5,9 @@
 namespace utils {
 
 TEST(TestBitMap, SimpleTest) {
-  char a[100];
-  BitMap* bitmap = new BitMap(&a, 100 * 8);
+  int a[100];
+  for (int i = 0; i < 100; i++) a[i] = 0;
+  BitMap* bitmap = new BitMap(&a, 100 * 32);
   int x;
   EXPECT_EQ(bitmap->Get(23, x), NO_ERROR);
   EXPECT_EQ(x, 0);
@@ -17,6 +18,7 @@ TEST(TestBitMap, SimpleTest) {
   EXPECT_EQ(bitmap->Get(23, x), NO_ERROR);
   EXPECT_EQ(x, 0);
   EXPECT_FALSE(bitmap->IsFull());
+  EXPECT_EQ(bitmap->FindFirstZeroPosition(), 0);
   delete bitmap;
 }
 

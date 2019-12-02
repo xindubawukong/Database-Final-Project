@@ -50,7 +50,7 @@ int BitMap::FindFirstZeroPosition() {
     int x = *p;
     if (x != all_one_) {
       for (int i = 0; i < 32; i++) {
-        if (x & (1 << i)) {
+        if ((x & (1 << i)) == 0) {
           return num + i;
         }
       }
