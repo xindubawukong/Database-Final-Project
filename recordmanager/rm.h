@@ -28,6 +28,19 @@ class RM_FileHandle {
   int UpdateRecord(const RM_Record& rec);
 
   int ForcePages();
+
+ private:
+  static const int kBitMapStartPosition;
+  static const int kBitMapLength;
+  static const int kRecordStartPosition;
+  static const int kRecordNumEachPage;
+  static const int kRecordLength;
+
+  std::string file_name_;
+  int record_size_;
+  filesystem::FileManager* fm_;
+  filesystem::BufPageManager* bpm_;
+  int file_id_;
 };
 
 class RM_Manager {
@@ -47,7 +60,7 @@ class RM_Manager {
  private:
   filesystem::FileManager* fm_;
   filesystem::BufPageManager* bpm_;
-  std::unordered_map<std::string, int> fn_to_size_;
+  std::unordered_map<std::string, int> fn_to_rs_;  // file_name -> record_size
 };
 
 }  // namespace recordmanager

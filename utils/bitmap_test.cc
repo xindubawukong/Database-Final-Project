@@ -22,4 +22,17 @@ TEST(TestBitMap, SimpleTest) {
   delete bitmap;
 }
 
+TEST(TestBitMap, TestStrangeLength) {
+  int a[100];
+  for (int i = 0; i < 100; i++) a[i] = 0;
+  BitMap* bitmap = new BitMap(&a, 100);
+  for (int i = 0; i < 100; i++) {
+    EXPECT_EQ(bitmap->SetOne(i), NO_ERROR);
+  }
+  EXPECT_EQ(bitmap->FindFirstZeroPosition(), 100);
+  EXPECT_TRUE(bitmap->IsFull());
+  EXPECT_EQ(bitmap->SetZero(33), NO_ERROR);
+  EXPECT_EQ(bitmap->FindFirstZeroPosition(), 33);
+}
+
 }  // namespace utils

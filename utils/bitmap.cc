@@ -1,6 +1,7 @@
 #include "bitmap.h"
 
 #include <cstdio>
+#include <algorithm>
 
 #include "return_code.h"
 
@@ -9,9 +10,6 @@ namespace utils {
 BitMap::BitMap(void* addr, int length) {
   addr_ = (unsigned int*)addr;
   length_ = length;
-  if (length % 32 > 0) {
-    fprintf(stderr, "BitMap length must be a multiple of 32.");
-  }
 }
 
 int BitMap::SetZero(int pos) {
@@ -49,7 +47,8 @@ int BitMap::FindFirstZeroPosition() {
   while (num < length_) {
     int x = *p;
     if (x != all_one_) {
-      for (int i = 0; i < 32; i++) {
+      int up = std::min(length_ - num, 32);
+      for (int i = 0; i < up; i++) {
         if ((x & (1 << i)) == 0) {
           return num + i;
         }
@@ -65,7 +64,14 @@ bool BitMap::IsFull() {
   unsigned int* p = addr_;
   int num = 0;
   while (num < length_) {
-    if ((*p) != all_one_) return false;
+    if (num + 32 > length_) {
+      int n = length_ - num;
+      unsigned int tmp = (1 << n) - 1;
+      if (((*p) & tmp) != tmp) return false;
+    }
+    else {
+      if ((*p) != all_one_) return false;
+    }
     p++;
     num += 32;
   }

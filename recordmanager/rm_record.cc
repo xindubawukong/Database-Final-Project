@@ -1,5 +1,7 @@
-#include <cstring>
 #include "rm_record.h"
+
+#include <cstring>
+
 #include "../return_code.h"
 
 namespace recordmanager {
