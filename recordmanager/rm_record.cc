@@ -22,19 +22,19 @@ int RM_Record::Set(int length, char* data, RID rid) {
   data_ = new char[length]();
   std::memcpy(data_, data, length);
   rid_ = rid;
-  return 0;
+  return NO_ERROR;
 }
 
 int RM_Record::GetData(char*& p) const {
   if (data_ == nullptr) return RM_RECORD_NOT_INITIALIZED_ERROR;
   p = data_;
-  return 0;
+  return NO_ERROR;
 }
 
 int RM_Record::GetRid(RID& rid) const {
   if (data_ == nullptr) return RM_RECORD_NOT_INITIALIZED_ERROR;
   rid = rid_;
-  return 0;
+  return NO_ERROR;
 }
 
 }  // namespace recordmanager

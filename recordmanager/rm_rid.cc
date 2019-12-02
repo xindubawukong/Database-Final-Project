@@ -20,19 +20,19 @@ int RID::Set(int page_num, int slot_num) {
   initialized_ = true;
   page_num_ = page_num;
   slot_num_ = slot_num;
-  return 0;
+  return NO_ERROR;
 }
 
 int RID::GetPageNum(int& page_num) const {
   if (!initialized_) return RM_RID_NOT_INITIALIZED_ERROR;
   page_num = page_num_;
-  return 0;
+  return NO_ERROR;
 }
 
 int RID::GetSlotNum(int& slot_num) const {
   if (!initialized_) return RM_RID_NOT_INITIALIZED_ERROR;
   slot_num = slot_num_;
-  return 0;
+  return NO_ERROR;
 }
 
 bool operator ==(const RID& a, const RID& b)  {

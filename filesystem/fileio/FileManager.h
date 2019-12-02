@@ -21,7 +21,7 @@ class FileManager {
     // char buff[1000];
     // getcwd(buff, 1000);
     // std::cout << "当前路径是："<<buff<<"\n";
-    FILE* f = fopen(name, "a+");
+    FILE* f = fopen(name, "w+");
     if (f == NULL) {
       std::cout << "fail" << std::endl;
       return -1;

@@ -4,6 +4,9 @@ cc_library(
   hdrs = ["rm.h"],
   deps = [
     "//:return_code",
+    "//filesystem:filesystem",
+    ":rm_rid",
+    ":rm_record",
   ],
   visibility = ["//visibility:public"],
 )
