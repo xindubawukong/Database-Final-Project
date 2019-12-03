@@ -31,9 +31,7 @@ int RM_FileHandle::GetRecord(const RID& rid, RM_Record& rec) const {
   int index;
   auto addr = bpm_->getPage(file_id_, page_num, index);
   bpm_->access(index);
-  int bitmap_offset = kBitMapStartPosition / 4;
-  int bitmap_length = kBitMapLength * 8;
-  utils::BitMap bitmap(addr + bitmap_offset, bitmap_length);
+  utils::BitMap bitmap(addr + kBitMapStartPosition / 4, kBitMapLength * 8);
   int exist;
   if ((rc = bitmap.Get(slot_num, exist))) return rc;
   if (exist == 0) return RM_FILEHANDLE_RECORD_NOT_FOUND_ERROR;
@@ -44,36 +42,95 @@ int RM_FileHandle::GetRecord(const RID& rid, RM_Record& rec) const {
   return NO_ERROR;
 }
 
-int RM_FileHandle::InsertRecord(const char* pdata, RID& rid) {
+int RM_FileHandle::InsertRecord(const char* data, RID& rid) {
   if (bpm_ == nullptr) return RM_FILEHANDLE_NOT_INITIALIZED_ERROR;
+
   int rc;
+
   int index;
   auto addr = bpm_->getPage(file_id_, /*page_num=*/0, index);
   bpm_->access(index);
   utils::BitMap page_bitmap(addr + kPageBitMapStartPosition / 4, kMaxPageNum);
   int page = page_bitmap.FindFirstZeroPosition();
+
   addr = bpm_->getPage(file_id_, page, index);
   bpm_->access(index);
-  int bitmap_offset = kBitMapStartPosition / 4;
-  int bitmap_length = kBitMapLength * 8;
-  utils::BitMap bitmap(addr + bitmap_offset, bitmap_length);
+  utils::BitMap bitmap(addr + kBitMapStartPosition / 4, kBitMapLength * 8);
   int slot = bitmap.FindFirstZeroPosition();
   if ((rc = rid.Set(page, slot))) return rc;
   int record_offset = kRecordStartPosition / 4 + slot * kRecordMaxLength / 4;
-  std::memcpy(addr + record_offset, pdata, record_size_);
+  std::memcpy(addr + record_offset, data, record_size_);
   bpm_->markDirty(index);
-  bitmap.SetOne(slot);
+  if ((rc = bitmap.SetOne(slot))) return rc;
+
   if (bitmap.IsFull()) {
     addr = bpm_->getPage(file_id_, /*page_num=*/0, index);
     bpm_->access(index);
     utils::BitMap page_bitmap(addr + kPageBitMapStartPosition / 4, kMaxPageNum);
-    page_bitmap.SetOne(page);
+    if ((rc = page_bitmap.SetOne(page))) return rc;
     bpm_->markDirty(index);
   }
   return NO_ERROR;
 }
 
 int RM_FileHandle::DeleteRecord(const RID& rid) {
+  if (bpm_ == nullptr) return RM_FILEHANDLE_NOT_INITIALIZED_ERROR;
+
+  int rc;
+
+  int page_num, slot_num;
+  if ((rc = rid.GetPageNum(page_num))) return rc;
+  if ((rc = rid.GetSlotNum(slot_num))) return rc;
+
+  int index;
+  auto addr = bpm_->getPage(file_id_, page_num, index);
+  bpm_->access(index);
+  utils::BitMap bitmap(addr + kBitMapStartPosition / 4, kBitMapLength * 8);
+  bool is_full_before_destroy = bitmap.IsFull();
+  int exist;
+  if ((rc = bitmap.Get(slot_num, exist))) return rc;
+  if (exist == 0) return RM_FILEHANDLE_RECORD_NOT_FOUND_ERROR;
+  if ((rc = bitmap.SetZero(slot_num))) return rc;
+  bpm_->markDirty(index);
+
+  if (is_full_before_destroy) {
+    addr = bpm_->getPage(file_id_, /*page_num=*/0, index);
+    bpm_->access(index);
+    utils::BitMap page_bitmap(addr + kPageBitMapStartPosition / 4, kMaxPageNum);
+    if ((rc = page_bitmap.SetZero(page_num))) return rc;
+    bpm_->markDirty(index);
+  }
+  return NO_ERROR;
+}
+
+int RM_FileHandle::UpdateRecord(const RM_Record& rec) {
+  if (bpm_ == nullptr) return RM_FILEHANDLE_NOT_INITIALIZED_ERROR;
+
+  int rc;
+
+  char* data;
+  RID rid;
+  if ((rc = rec.GetData(data))) return rc;
+  if ((rc = rec.GetRid(rid))) return rc;
+  int page_num, slot_num;
+  if ((rc = rid.GetPageNum(page_num))) return rc;
+  if ((rc = rid.GetSlotNum(slot_num))) return rc;
+
+  int index;
+  auto addr = bpm_->getPage(file_id_, page_num, index);
+  bpm_->access(index);
+  utils::BitMap bitmap(addr + kBitMapStartPosition / 4, kBitMapLength * 8);
+  int exist;
+  if ((rc = bitmap.Get(slot_num, exist))) return rc;
+  if (exist == 0) return RM_FILEHANDLE_RECORD_NOT_FOUND_ERROR;
+  int record_offset = kRecordStartPosition / 4 + slot_num * kRecordMaxLength / 4;
+  std::memcpy(addr + record_offset, data, record_size_);
+  bpm_->markDirty(index);
+  return NO_ERROR;
+}
+
+int RM_FileHandle::ForcePages() {
+  bpm_->close();
   return NO_ERROR;
 }
 
