@@ -7,6 +7,12 @@ namespace utils {
 
 class BitMap {
  public:
+  // The BitMap starts from 'addr', with 'length' bits.
+  //
+  // Notice that the BitMap may use a little more memory than 'length' in order
+  // to make it a multiply of 32. For example, if you create a BitMap with
+  // length=33, it may use 64 bits(2 unsigned int) from addr. But its
+  // correctness is not influenced by this feature.
   explicit BitMap(void* addr, int length);
 
   int SetZero(int pos);

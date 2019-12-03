@@ -1,5 +1,7 @@
 This project is the final project of Database class in Tsinghua University.
 
+Team member: 丁相允，尹一帆.
+
 The database is implemented in C++. Codes are build with <a href="https://www.bazel.build/">bazel</a>. Please follow the <a href="https://google.github.io/styleguide/cppguide.html">Google C++ Style Guide</a>.
 
 ## Usage
@@ -22,3 +24,8 @@ bazel test bazel_example/main:hello-greet_test  # run googletest
 bazel test bazel_example/main:hello-greet_test --test_output=streamed  # run googletest with output details
 ```
 
+### Run All Unit Tests
+
+```shell
+python3 test_all.py
+```
