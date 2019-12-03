@@ -61,6 +61,15 @@ int RM_FileHandle::InsertRecord(const char* pdata, RID& rid) {
   if ((rc = rid.Set(page, slot))) return rc;
   int record_offset = kRecordStartPosition / 4 + slot * kRecordMaxLength / 4;
   std::memcpy(addr + record_offset, pdata, record_size_);
+  bpm_->markDirty(index);
+  bitmap.SetOne(slot);
+  if (bitmap.IsFull()) {
+    addr = bpm_->getPage(file_id_, /*page_num=*/0, index);
+    bpm_->access(index);
+    utils::BitMap page_bitmap(addr + kPageBitMapStartPosition / 4, kMaxPageNum);
+    page_bitmap.SetOne(page);
+    bpm_->markDirty(index);
+  }
   return NO_ERROR;
 }
 
