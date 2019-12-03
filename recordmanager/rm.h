@@ -6,17 +6,26 @@
 
 #include "filesystem/bufmanager/BufPageManager.h"
 #include "filesystem/fileio/FileManager.h"
-#include "rm_rid.h"
 #include "rm_record.h"
+#include "rm_rid.h"
 
 namespace recordmanager {
 
 void RM_PrintError(int rc);
 
+//
+// The first page (page 0), bytes from 4096 to 8191 is a BitMap, indicating
+// wheather the 4096*8=32768 pages are full or not.
+//
+// From page 1, all pages are used to store records. In each of these pages,
+// bytes from 0 to 31 is a BitMap, indicating wheather the 32 record slots are
+// available. Bytes from 192 to 8191 are 32 record slots, and each record is
+// 250 bytes long.
+//
 class RM_FileHandle {
  public:
   RM_FileHandle();
-  
+
   ~RM_FileHandle();
 
   int GetRecord(const RID& rid, RM_Record& rec) const;
@@ -50,7 +59,7 @@ class RM_FileHandle {
 class RM_Manager {
  public:
   RM_Manager(filesystem::FileManager* fm, filesystem::BufPageManager* bpm);
-  
+
   ~RM_Manager();
 
   int CreateFile(const std::string& file_name, int record_size);
