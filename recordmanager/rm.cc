@@ -22,6 +22,19 @@ const int RM_FileHandle::kRecordMaxLength = 250;
 
 RM_FileHandle::RM_FileHandle() : fm_(nullptr), bpm_(nullptr) {}
 
+RM_FileHandle::~RM_FileHandle() {
+  ForcePages();
+}
+
+void RM_FileHandle::init(const std::string& file_name, int record_size, filesystem::FileManager* fm, filesystem::BufPageManager* bpm, int file_id) {
+  file_name_ = file_name;
+  record_size_ = record_size;
+  fm_ = fm;
+  bpm_ = bpm;
+  file_id_ = file_id;
+}
+
+
 int RM_FileHandle::GetRecord(const RID& rid, RM_Record& rec) const {
   if (bpm_ == nullptr) return RM_FILEHANDLE_NOT_INITIALIZED_ERROR;
   int rc;

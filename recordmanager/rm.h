@@ -19,14 +19,16 @@ void RM_PrintError(int rc);
 //
 // From page 1, all pages are used to store records. In each of these pages,
 // bytes from 0 to 31 is a BitMap, indicating wheather the 32 record slots are
-// available. Bytes from 192 to 8191 are 32 record slots, and each record is
-// 250 bytes long.
+// available. Bytes from 192 to 8191 are 32 record slots, and each record has
+// 250 bytes memory. The 'record_size' must not be larger than 250.
 //
 class RM_FileHandle {
  public:
   RM_FileHandle();
 
   ~RM_FileHandle();
+
+  void init(const std::string& file_name, int record_size, filesystem::FileManager* fm, filesystem::BufPageManager* bpm, int file_id);
 
   int GetRecord(const RID& rid, RM_Record& rec) const;
 
