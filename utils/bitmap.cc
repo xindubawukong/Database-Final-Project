@@ -7,6 +7,8 @@
 
 namespace utils {
 
+const unsigned int BitMap::all_one_ = 4294967295;
+
 BitMap::BitMap(void* addr, int length) {
   addr_ = (unsigned int*)addr;
   length_ = length;

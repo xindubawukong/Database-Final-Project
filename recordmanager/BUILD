@@ -5,6 +5,7 @@ cc_library(
   deps = [
     "//:return_code",
     "//filesystem:filesystem",
+    "//utils:bitmap",
     ":rm_rid",
     ":rm_record",
   ],

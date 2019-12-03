@@ -30,11 +30,15 @@ class RM_FileHandle {
   int ForcePages();
 
  private:
+  static const int kPageSize;
+  static const int kRecordSizePosition;
+  static const int kPageBitMapStartPosition;
+  static const int kMaxPageNum;
   static const int kBitMapStartPosition;
   static const int kBitMapLength;
   static const int kRecordStartPosition;
   static const int kRecordNumEachPage;
-  static const int kRecordLength;
+  static const int kRecordMaxLength;
 
   std::string file_name_;
   int record_size_;

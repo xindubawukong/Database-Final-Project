@@ -7,7 +7,7 @@ namespace utils {
 
 class BitMap {
  public:
-  BitMap(void* addr, int length);
+  explicit BitMap(void* addr, int length);
 
   int SetZero(int pos);
 
@@ -22,7 +22,8 @@ class BitMap {
  private:
   unsigned int* addr_;
   int length_;
-  const unsigned int all_one_ = 4294967295;
+
+  static const unsigned int all_one_;
 };
 
 }  // namespace utils
