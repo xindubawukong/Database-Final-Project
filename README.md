@@ -11,6 +11,8 @@ The database is implemented in C++. Codes are build with <a href="https://www.ba
 Directory `bazel_example` is an example to use Google bazel. Run the following code in the same path with `WORKSPACE` file:
 
 ```shell
+bazel clean  # clean cached build files
+
 bazel build bazel_example/main:all bazel_example/lib:all  # build in debug mode
 
 bazel build -c opt bazel_example/main:all bazel_example/lib:all  # build in optimization mode

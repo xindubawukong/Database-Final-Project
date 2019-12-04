@@ -39,6 +39,7 @@ TEST(TestRMFileHandle, SimpleTest) {
   char* data;
   EXPECT_EQ(record.GetData(data), NO_ERROR);
   EXPECT_EQ(std::memcmp(a, data, record_size), 0);
+  bpm->close();
 }
 
 }  // namespace recordmanager

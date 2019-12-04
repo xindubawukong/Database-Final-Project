@@ -64,6 +64,7 @@ int RM_FileHandle::InsertRecord(const char* data, RID& rid) {
   bpm_->access(index);
   utils::BitMap page_bitmap(addr + kPageBitMapStartPosition / 4, kMaxPageNum);
   int page = page_bitmap.FindFirstZeroPosition() + 1;
+  if (page > kMaxPageNum) return RM_FILEHANDLE_NO_EMPTY_POSITION_ERROR;
 
   addr = bpm_->getPage(file_id_, page, index);
   bpm_->access(index);
