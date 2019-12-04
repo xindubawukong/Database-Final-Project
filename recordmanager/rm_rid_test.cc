@@ -16,7 +16,7 @@ TEST(TestRid, SimpleTest) {
   rid1.GetSlotNum(x);
   EXPECT_EQ(x, 4);
 
-  EXPECT_EQ(rid1.Set(5, 6), RM_RID_MULTIPLE_SET_ERROR);
+  EXPECT_EQ(rid1.Set(5, 6), NO_ERROR);
 
   RID rid2(1, 2);
   rid2.GetPageNum(x);

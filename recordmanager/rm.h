@@ -28,7 +28,19 @@ class RM_FileHandle {
 
   ~RM_FileHandle();
 
-  void init(const std::string& file_name, int record_size, filesystem::FileManager* fm, filesystem::BufPageManager* bpm, int file_id);
+  static const int kPageSize;
+  static const int kRecordSizePosition;
+  static const int kPageBitMapStartPosition;
+  static const int kMaxPageNum;
+  static const int kBitMapStartPosition;
+  static const int kBitMapLength;
+  static const int kRecordStartPosition;
+  static const int kRecordNumEachPage;
+  static const int kRecordMaxLength;
+
+  void Init(const std::string& file_name, int record_size,
+            filesystem::FileManager* fm, filesystem::BufPageManager* bpm,
+            int file_id);
 
   int GetRecord(const RID& rid, RM_Record& rec) const;
 
@@ -41,16 +53,6 @@ class RM_FileHandle {
   int ForcePages();
 
  private:
-  static const int kPageSize;
-  static const int kRecordSizePosition;
-  static const int kPageBitMapStartPosition;
-  static const int kMaxPageNum;
-  static const int kBitMapStartPosition;
-  static const int kBitMapLength;
-  static const int kRecordStartPosition;
-  static const int kRecordNumEachPage;
-  static const int kRecordMaxLength;
-
   std::string file_name_;
   int record_size_;
   filesystem::FileManager* fm_;

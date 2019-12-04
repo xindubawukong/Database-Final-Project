@@ -16,7 +16,6 @@ class RM_Record {
   int GetRid(RID& rid) const;
 
  private:
-  bool initialized_;
   RID rid_;
   int length_;
   char* data_;

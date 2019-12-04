@@ -17,7 +17,6 @@ class RID {
   friend bool operator ==(const RID& a, const RID& b);
 
  private:
-  bool initialized_;
   int page_num_;
   int slot_num_;
 };

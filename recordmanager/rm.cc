@@ -22,18 +22,17 @@ const int RM_FileHandle::kRecordMaxLength = 250;
 
 RM_FileHandle::RM_FileHandle() : fm_(nullptr), bpm_(nullptr) {}
 
-RM_FileHandle::~RM_FileHandle() {
-  ForcePages();
-}
+RM_FileHandle::~RM_FileHandle() { ForcePages(); }
 
-void RM_FileHandle::init(const std::string& file_name, int record_size, filesystem::FileManager* fm, filesystem::BufPageManager* bpm, int file_id) {
+void RM_FileHandle::Init(const std::string& file_name, int record_size,
+                         filesystem::FileManager* fm,
+                         filesystem::BufPageManager* bpm, int file_id) {
   file_name_ = file_name;
   record_size_ = record_size;
   fm_ = fm;
   bpm_ = bpm;
   file_id_ = file_id;
 }
-
 
 int RM_FileHandle::GetRecord(const RID& rid, RM_Record& rec) const {
   if (bpm_ == nullptr) return RM_FILEHANDLE_NOT_INITIALIZED_ERROR;
@@ -64,7 +63,7 @@ int RM_FileHandle::InsertRecord(const char* data, RID& rid) {
   auto addr = bpm_->getPage(file_id_, /*page_num=*/0, index);
   bpm_->access(index);
   utils::BitMap page_bitmap(addr + kPageBitMapStartPosition / 4, kMaxPageNum);
-  int page = page_bitmap.FindFirstZeroPosition();
+  int page = page_bitmap.FindFirstZeroPosition() + 1;
 
   addr = bpm_->getPage(file_id_, page, index);
   bpm_->access(index);
@@ -80,7 +79,7 @@ int RM_FileHandle::InsertRecord(const char* data, RID& rid) {
     addr = bpm_->getPage(file_id_, /*page_num=*/0, index);
     bpm_->access(index);
     utils::BitMap page_bitmap(addr + kPageBitMapStartPosition / 4, kMaxPageNum);
-    if ((rc = page_bitmap.SetOne(page))) return rc;
+    if ((rc = page_bitmap.SetOne(page - 1))) return rc;
     bpm_->markDirty(index);
   }
   return NO_ERROR;
@@ -110,7 +109,7 @@ int RM_FileHandle::DeleteRecord(const RID& rid) {
     addr = bpm_->getPage(file_id_, /*page_num=*/0, index);
     bpm_->access(index);
     utils::BitMap page_bitmap(addr + kPageBitMapStartPosition / 4, kMaxPageNum);
-    if ((rc = page_bitmap.SetZero(page_num))) return rc;
+    if ((rc = page_bitmap.SetZero(page_num - 1))) return rc;
     bpm_->markDirty(index);
   }
   return NO_ERROR;
@@ -136,7 +135,8 @@ int RM_FileHandle::UpdateRecord(const RM_Record& rec) {
   int exist;
   if ((rc = bitmap.Get(slot_num, exist))) return rc;
   if (exist == 0) return RM_FILEHANDLE_RECORD_NOT_FOUND_ERROR;
-  int record_offset = kRecordStartPosition / 4 + slot_num * kRecordMaxLength / 4;
+  int record_offset =
+      kRecordStartPosition / 4 + slot_num * kRecordMaxLength / 4;
   std::memcpy(addr + record_offset, data, record_size_);
   bpm_->markDirty(index);
   return NO_ERROR;

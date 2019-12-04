@@ -19,7 +19,7 @@ TEST(TestRMRecord, SimpleTest) {
   RID rid2;
   EXPECT_EQ(rm_record.GetRid(rid2), 0);
   EXPECT_EQ(rid2, rid);
-  EXPECT_EQ(rm_record.Set(10, a, rid), RM_RECORD_MULTIPLE_SET_ERROR);
+  EXPECT_EQ(rm_record.Set(10, a, rid), NO_ERROR);
 }
 
 }  // namespace recordmanager
