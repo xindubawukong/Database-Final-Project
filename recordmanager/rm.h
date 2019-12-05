@@ -87,6 +87,15 @@ class RM_Manager {
   std::unordered_map<std::string, int> fn_to_rs_;  // file_name -> record_size
 };
 
+//
+// Example:
+//    RM_FileScan file_scan;
+//    file_scan.OpenScan(...);
+//    RM_Record record;
+//    while (file_scan.GetNextRecord(record) != EOF) {
+//      // Do something.
+//    }
+//
 class RM_FileScan {
  public:
   RM_FileScan();
