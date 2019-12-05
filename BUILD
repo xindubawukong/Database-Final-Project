@@ -3,3 +3,10 @@ cc_library(
   hdrs = ["return_code.h"],
   visibility = ["//visibility:public"],
 )
+
+cc_library(
+  name = "global",
+  hdrs = ["global.h"],
+  srcs = ["global.cc"],
+  visibility = ["//visibility:public"],
+)

@@ -1,13 +1,13 @@
 #include <cstring>
 
-#include "rm.h"
-#include "gtest/gtest.h"
 #include "../return_code.h"
+#include "gtest/gtest.h"
+#include "rm.h"
 
 namespace recordmanager {
 
-using filesystem::FileManager;
 using filesystem::BufPageManager;
+using filesystem::FileManager;
 
 TEST(TestPrintError, SimpleTest) {
   std::cout << "The following error is a test:" << std::endl;
@@ -23,8 +23,7 @@ TEST(TestRMFileHandle, SimpleTest) {
   fm->openFile(file_name.c_str(), file_id);
 
   RM_FileHandle file_handle;
-  int record_size = 10;
-  file_handle.Init(file_name, record_size, fm, bpm, file_id);
+  file_handle.Init(file_name, 10, fm, bpm, file_id);
   char a[] = "abcdefghij";
 
   RID rid;
@@ -32,13 +31,55 @@ TEST(TestRMFileHandle, SimpleTest) {
   int page_num, slot_num;
   EXPECT_EQ(rid.GetPageNum(page_num), NO_ERROR);
   EXPECT_EQ(rid.GetSlotNum(slot_num), NO_ERROR);
-  std::cout << "page_num: " << page_num << std::endl;
-  std::cout << "slot_num: " << slot_num << std::endl;
+  EXPECT_EQ(page_num, 1);
+  EXPECT_EQ(slot_num, 0);
+
   RM_Record record;
   EXPECT_EQ(file_handle.GetRecord(rid, record), NO_ERROR);
   char* data;
   EXPECT_EQ(record.GetData(data), NO_ERROR);
-  EXPECT_EQ(std::memcmp(a, data, record_size), 0);
+  EXPECT_EQ(std::memcmp(a, data, 10), 0);
+
+  for (int i = 0; i < 31; i++) {
+    EXPECT_EQ(file_handle.InsertRecord(a, rid), NO_ERROR);
+    EXPECT_EQ(rid.GetPageNum(page_num), NO_ERROR);
+    EXPECT_EQ(rid.GetSlotNum(slot_num), NO_ERROR);
+  }
+
+  EXPECT_EQ(file_handle.InsertRecord(a, rid), NO_ERROR);
+  EXPECT_EQ(rid.GetPageNum(page_num), NO_ERROR);
+  EXPECT_EQ(rid.GetSlotNum(slot_num), NO_ERROR);
+  EXPECT_EQ(page_num, 2);
+  EXPECT_EQ(slot_num, 0);
+
+  EXPECT_EQ(file_handle.GetRecord(rid, record), NO_ERROR);
+  EXPECT_EQ(record.GetData(data), NO_ERROR);
+  EXPECT_EQ(std::memcmp(a, data, 10), 0);
+
+  char b[] = "1234567890";
+  rid.Set(1, 17);
+  record.Set(10, b, rid);
+  file_handle.UpdateRecord(record);
+  RID rid2(1, 17);
+  RM_Record record2;
+  EXPECT_EQ(file_handle.GetRecord(rid2, record2), NO_ERROR);
+  EXPECT_EQ(record2.GetData(data), NO_ERROR);
+  EXPECT_EQ(std::memcmp(b, data, 10), 0);
+
+  rid.Set(1, 20);
+  file_handle.DeleteRecord(rid);
+  EXPECT_EQ(file_handle.GetRecord(rid, record),
+            RM_FILEHANDLE_RECORD_NOT_FOUND_ERROR);
+
+  EXPECT_EQ(file_handle.InsertRecord(b, rid2), NO_ERROR);
+  EXPECT_EQ(rid2.GetPageNum(page_num), NO_ERROR);
+  EXPECT_EQ(rid2.GetSlotNum(slot_num), NO_ERROR);
+  EXPECT_EQ(page_num, 1);
+  EXPECT_EQ(slot_num, 20);
+  EXPECT_EQ(file_handle.GetRecord(rid, record2), NO_ERROR);
+  EXPECT_EQ(record2.GetData(data), NO_ERROR);
+  EXPECT_EQ(std::memcmp(b, data, 10), 0);
+
   bpm->close();
 }
 

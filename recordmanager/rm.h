@@ -3,9 +3,11 @@
 
 #include <string>
 #include <unordered_map>
+#include <functional>
 
 #include "filesystem/bufmanager/BufPageManager.h"
 #include "filesystem/fileio/FileManager.h"
+#include "global.h"
 #include "rm_record.h"
 #include "rm_rid.h"
 
@@ -28,7 +30,6 @@ class RM_FileHandle {
 
   ~RM_FileHandle();
 
-  static const int kPageSize;
   static const int kRecordSizePosition;
   static const int kPageBitMapStartPosition;
   static const int kMaxPageNum;
@@ -51,6 +52,12 @@ class RM_FileHandle {
   int UpdateRecord(const RM_Record& rec);
 
   int ForcePages();
+
+  int GetFileID();
+
+  int GetNextNotEmptyPage(int from);
+
+  int GetNextNotEmptySlot(int page_num, int slot_num);
 
  private:
   std::string file_name_;
@@ -78,6 +85,29 @@ class RM_Manager {
   filesystem::FileManager* fm_;
   filesystem::BufPageManager* bpm_;
   std::unordered_map<std::string, int> fn_to_rs_;  // file_name -> record_size
+};
+
+class RM_FileScan {
+ public:
+  RM_FileScan();
+
+  ~RM_FileScan();
+
+  int OpenScan(RM_FileHandle* file_handle, AttrType attr_type, int attr_length, int attr_offset, CompOp comp_op, void* value);
+
+  int GetNextRecord(RM_Record& record);
+
+  int CloseScan();
+
+ private:
+  RM_FileHandle* file_handle_;
+  int attr_length_;
+  int attr_offset_;
+  void* value_;
+  std::function<bool(void*, void*, int)> check_;
+  RID current_;
+
+  static std::function<bool(void*, void*, int)> GetCheckFunction(AttrType attr_type, CompOp comp_op);
 };
 
 }  // namespace recordmanager

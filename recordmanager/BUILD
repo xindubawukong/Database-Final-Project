@@ -3,6 +3,7 @@ cc_library(
   srcs = ["rm.cc"],
   hdrs = ["rm.h"],
   deps = [
+    "//:global",
     "//:return_code",
     "//filesystem:filesystem",
     "//utils:bitmap",
