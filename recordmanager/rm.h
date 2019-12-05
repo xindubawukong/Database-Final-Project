@@ -1,9 +1,9 @@
 #ifndef RECORDMANAGER_RM_H
 #define RECORDMANAGER_RM_H
 
+#include <functional>
 #include <string>
 #include <unordered_map>
-#include <functional>
 
 #include "filesystem/bufmanager/BufPageManager.h"
 #include "filesystem/fileio/FileManager.h"
@@ -102,7 +102,8 @@ class RM_FileScan {
 
   ~RM_FileScan();
 
-  int OpenScan(RM_FileHandle* file_handle, AttrType attr_type, int attr_length, int attr_offset, CompOp comp_op, void* value);
+  int OpenScan(RM_FileHandle* file_handle, AttrType attr_type, int attr_length,
+               int attr_offset, CompOp comp_op, void* value);
 
   int GetNextRecord(RM_Record& record);
 
@@ -116,7 +117,8 @@ class RM_FileScan {
   std::function<bool(void*, void*, int)> check_;
   RID current_;
 
-  static std::function<bool(void*, void*, int)> GetCheckFunction(AttrType attr_type, CompOp comp_op);
+  static std::function<bool(void*, void*, int)> GetCheckFunction(
+      AttrType attr_type, CompOp comp_op);
 };
 
 }  // namespace recordmanager

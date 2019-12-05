@@ -147,15 +147,14 @@ int RM_FileHandle::ForcePages() {
   return NO_ERROR;
 }
 
-int RM_FileHandle::GetFileID() {
-  return file_id_;
-}
+int RM_FileHandle::GetFileID() { return file_id_; }
 
 int RM_FileHandle::GetNextNotEmptyPage(int from) {
   int index;
   auto addr = bpm_->getPage(file_id_, /*page_num=*/0, index);
   bpm_->access(index);
-  utils::BitMap page_bitmap(addr + kPageBitMapStartPosition / 4, kMaxPageNum - 1);
+  utils::BitMap page_bitmap(addr + kPageBitMapStartPosition / 4,
+                            kMaxPageNum - 1);
   for (int i = from + 1; i < kMaxPageNum; i++) {
     int x;
     page_bitmap.Get(i - 1, x);
@@ -176,7 +175,6 @@ int RM_FileHandle::GetNextNotEmptySlot(int page_num, int slot_num) {
   }
   return kRecordNumEachPage;
 }
-
 
 RM_Manager::RM_Manager(filesystem::FileManager* fm,
                        filesystem::BufPageManager* bpm)
@@ -200,7 +198,8 @@ int RM_Manager::DestroyFile(const std::string& file_name) {
   return NO_ERROR;
 }
 
-int RM_Manager::OpenFile(const std::string& file_name, RM_FileHandle& file_handle) {
+int RM_Manager::OpenFile(const std::string& file_name,
+                         RM_FileHandle& file_handle) {
   auto it = fn_to_rs_.find(file_name);
   if (it == fn_to_rs_.end()) {
     return RM_MANAGER_FILE_NOT_FOUND_ERROR;
@@ -219,7 +218,6 @@ int RM_Manager::CloseFile(RM_FileHandle& file_handle) {
   return NO_ERROR;
 }
 
-
 RM_FileScan::RM_FileScan() {
   file_handle_ = nullptr;
   attr_length_ = 0;
@@ -229,8 +227,11 @@ RM_FileScan::RM_FileScan() {
 
 RM_FileScan::~RM_FileScan() {}
 
-int RM_FileScan::OpenScan(RM_FileHandle* file_handle, AttrType attr_type, int attr_length, int attr_offset, CompOp comp_op, void* value) {
-  if ((attr_type == AttrType::INT || attr_type == AttrType::FLOAT) && attr_length != 4) {
+int RM_FileScan::OpenScan(RM_FileHandle* file_handle, AttrType attr_type,
+                          int attr_length, int attr_offset, CompOp comp_op,
+                          void* value) {
+  if ((attr_type == AttrType::INT || attr_type == AttrType::FLOAT) &&
+      attr_length != 4) {
     return RM_FILESCAN_INVALID_ATTR_LENGTH_ERROR;
   }
   file_handle_ = file_handle;
@@ -247,10 +248,13 @@ int RM_FileScan::GetNextRecord(RM_Record& record) {
   int page_num, slot_num;
   if ((rc = current_.GetPageNum(page_num))) return rc;
   if ((rc = current_.GetSlotNum(slot_num))) return rc;
-  for (int i = page_num; i < RM_FileHandle::kMaxPageNum; i = file_handle_->GetNextNotEmptyPage(i)) {
+  for (int i = page_num; i < RM_FileHandle::kMaxPageNum;
+       i = file_handle_->GetNextNotEmptyPage(i)) {
     int j = -1;
     if (i == page_num) j = slot_num;
-    for (j = file_handle_->GetNextNotEmptySlot(i, j); j < RM_FileHandle::kRecordNumEachPage; j = file_handle_->GetNextNotEmptySlot(i, j)) {
+    for (j = file_handle_->GetNextNotEmptySlot(i, j);
+         j < RM_FileHandle::kRecordNumEachPage;
+         j = file_handle_->GetNextNotEmptySlot(i, j)) {
       RID rid(i, j);
       RM_Record tmp;
       if ((rc = file_handle_->GetRecord(rid, tmp))) return rc;
@@ -275,88 +279,45 @@ int RM_FileScan::CloseScan() {
   return NO_ERROR;
 }
 
-std::function<bool(void*, void*, int)> RM_FileScan::GetCheckFunction(AttrType attr_type, CompOp comp_op) {
+std::function<bool(void*, void*, int)> RM_FileScan::GetCheckFunction(
+    AttrType attr_type, CompOp comp_op) {
   if (attr_type == AttrType::INT) {
-    std::function<int(void*)> f = [](void* x) -> int {
-      return *((int*)x);
-    };
+    std::function<int(void*)> f = [](void* x) -> int { return *((int*)x); };
     if (comp_op == CompOp::EQ_OP) {
-      return [&f](void* a, void* b, int) -> bool {
-        return f(a) == f(b);
-      };
+      return [&f](void* a, void* b, int) -> bool { return f(a) == f(b); };
+    } else if (comp_op == CompOp::LT_OP) {
+      return [&f](void* a, void* b, int) -> bool { return f(a) < f(b); };
+    } else if (comp_op == CompOp::GT_OP) {
+      return [&f](void* a, void* b, int) -> bool { return f(a) > f(b); };
+    } else if (comp_op == CompOp::LE_OP) {
+      return [&f](void* a, void* b, int) -> bool { return f(a) <= f(b); };
+    } else if (comp_op == CompOp::GE_OP) {
+      return [&f](void* a, void* b, int) -> bool { return f(a) >= f(b); };
+    } else if (comp_op == CompOp::NE_OP) {
+      return [&f](void* a, void* b, int) -> bool { return f(a) != f(b); };
+    } else {
+      return [](void*, void*, int) -> bool { return true; };
     }
-    else if (comp_op == CompOp::LT_OP) {
-      return [&f](void* a, void* b, int) -> bool {
-        return f(a) < f(b);
-      };
-    }
-    else if (comp_op == CompOp::GT_OP) {
-      return [&f](void* a, void* b, int) -> bool {
-        return f(a) > f(b);
-      };
-    }
-    else if (comp_op == CompOp::LE_OP) {
-      return [&f](void* a, void* b, int) -> bool {
-        return f(a) <= f(b);
-      };
-    }
-    else if (comp_op == CompOp::GE_OP) {
-      return [&f](void* a, void* b, int) -> bool {
-        return f(a) >= f(b);
-      };
-    }
-    else if (comp_op == CompOp::NE_OP) {
-      return [&f](void* a, void* b, int) -> bool {
-        return f(a) != f(b);
-      };
-    }
-    else {
-      return [](void*, void*, int) -> bool {
-        return true;
-      };
-    }
-  }
-  else if (attr_type == AttrType::FLOAT) {
+  } else if (attr_type == AttrType::FLOAT) {
     std::function<float(void*)> f = [](void* x) -> float {
       return *((float*)x);
     };
     if (comp_op == CompOp::EQ_OP) {
-      return [&f](void* a, void* b, int) -> bool {
-        return f(a) == f(b);
-      };
+      return [&f](void* a, void* b, int) -> bool { return f(a) == f(b); };
+    } else if (comp_op == CompOp::LT_OP) {
+      return [&f](void* a, void* b, int) -> bool { return f(a) < f(b); };
+    } else if (comp_op == CompOp::GT_OP) {
+      return [&f](void* a, void* b, int) -> bool { return f(a) > f(b); };
+    } else if (comp_op == CompOp::LE_OP) {
+      return [&f](void* a, void* b, int) -> bool { return f(a) <= f(b); };
+    } else if (comp_op == CompOp::GE_OP) {
+      return [&f](void* a, void* b, int) -> bool { return f(a) >= f(b); };
+    } else if (comp_op == CompOp::NE_OP) {
+      return [&f](void* a, void* b, int) -> bool { return f(a) != f(b); };
+    } else {
+      return [](void*, void*, int) -> bool { return true; };
     }
-    else if (comp_op == CompOp::LT_OP) {
-      return [&f](void* a, void* b, int) -> bool {
-        return f(a) < f(b);
-      };
-    }
-    else if (comp_op == CompOp::GT_OP) {
-      return [&f](void* a, void* b, int) -> bool {
-        return f(a) > f(b);
-      };
-    }
-    else if (comp_op == CompOp::LE_OP) {
-      return [&f](void* a, void* b, int) -> bool {
-        return f(a) <= f(b);
-      };
-    }
-    else if (comp_op == CompOp::GE_OP) {
-      return [&f](void* a, void* b, int) -> bool {
-        return f(a) >= f(b);
-      };
-    }
-    else if (comp_op == CompOp::NE_OP) {
-      return [&f](void* a, void* b, int) -> bool {
-        return f(a) != f(b);
-      };
-    }
-    else {
-      return [](void*, void*, int) -> bool {
-        return true;
-      };
-    }
-  }
-  else {  // attr_type == AttrType::STRING
+  } else {  // attr_type == AttrType::STRING
     if (comp_op == CompOp::EQ_OP) {
       return [](void* a, void* b, int length) -> bool {
         char* x = (char*)a;
@@ -368,8 +329,7 @@ std::function<bool(void*, void*, int)> RM_FileScan::GetCheckFunction(AttrType at
         }
         return true;
       };
-    }
-    else if (comp_op == CompOp::LT_OP) {
+    } else if (comp_op == CompOp::LT_OP) {
       return [](void* a, void* b, int length) -> bool {
         char* x = (char*)a;
         char* y = (char*)b;
@@ -381,8 +341,7 @@ std::function<bool(void*, void*, int)> RM_FileScan::GetCheckFunction(AttrType at
         }
         return false;
       };
-    }
-    else if (comp_op == CompOp::GT_OP) {
+    } else if (comp_op == CompOp::GT_OP) {
       return [](void* a, void* b, int length) -> bool {
         char* x = (char*)a;
         char* y = (char*)b;
@@ -394,8 +353,7 @@ std::function<bool(void*, void*, int)> RM_FileScan::GetCheckFunction(AttrType at
         }
         return false;
       };
-    }
-    else if (comp_op == CompOp::LE_OP) {
+    } else if (comp_op == CompOp::LE_OP) {
       return [](void* a, void* b, int length) -> bool {
         char* x = (char*)a;
         char* y = (char*)b;
@@ -407,8 +365,7 @@ std::function<bool(void*, void*, int)> RM_FileScan::GetCheckFunction(AttrType at
         }
         return true;
       };
-    }
-    else if (comp_op == CompOp::GE_OP) {
+    } else if (comp_op == CompOp::GE_OP) {
       return [](void* a, void* b, int length) -> bool {
         char* x = (char*)a;
         char* y = (char*)b;
@@ -420,8 +377,7 @@ std::function<bool(void*, void*, int)> RM_FileScan::GetCheckFunction(AttrType at
         }
         return true;
       };
-    }
-    else if (comp_op == CompOp::NE_OP) {
+    } else if (comp_op == CompOp::NE_OP) {
       return [](void* a, void* b, int length) -> bool {
         char* x = (char*)a;
         char* y = (char*)b;
@@ -432,11 +388,8 @@ std::function<bool(void*, void*, int)> RM_FileScan::GetCheckFunction(AttrType at
         }
         return false;
       };
-    }
-    else {
-      return [](void*, void*, int) -> bool {
-        return true;
-      };
+    } else {
+      return [](void*, void*, int) -> bool { return true; };
     }
   }
 }
