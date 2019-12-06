@@ -21,7 +21,7 @@ enum CompOp {
   NO_OP,
 };
 
-std::function<bool(void*, void*, int)> GetCheckFunction(
-      AttrType attr_type, CompOp comp_op);
+std::function<bool(void*, void*, int)> GetCheckFunction(AttrType attr_type,
+                                                        CompOp comp_op);
 
 #endif  // GLOBAL_H
