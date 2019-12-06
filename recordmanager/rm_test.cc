@@ -83,4 +83,20 @@ TEST(TestRMFileHandle, SimpleTest) {
   bpm->close();
 }
 
+TEST(TestRMManager, SimpleTest) {
+  FileManager* fm = new FileManager();
+  BufPageManager* bpm = new BufPageManager(fm);
+  RM_Manager rm_manager(fm, bpm);
+  RM_FileHandle file_handle;
+  std::string file_name = "test.txt";
+  EXPECT_EQ(rm_manager.OpenFile(file_name, file_handle),
+            RM_MANAGER_FILE_NOT_FOUND_ERROR);
+  EXPECT_EQ(rm_manager.CreateFile(file_name, 100), NO_ERROR);
+  EXPECT_EQ(rm_manager.OpenFile(file_name, file_handle), NO_ERROR);
+  EXPECT_EQ(rm_manager.CloseFile(file_handle), NO_ERROR);
+  EXPECT_EQ(rm_manager.DestroyFile(file_name), NO_ERROR);
+}
+
+TEST(TestRMFileScan, SimpleTest) {}
+
 }  // namespace recordmanager

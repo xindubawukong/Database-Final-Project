@@ -143,7 +143,7 @@ int RM_FileHandle::UpdateRecord(const RM_Record& rec) {
 }
 
 int RM_FileHandle::ForcePages() {
-  bpm_->close();
+  if (bpm_ != nullptr) bpm_->close();
   return NO_ERROR;
 }
 
@@ -179,6 +179,8 @@ int RM_FileHandle::GetNextNotEmptySlot(int page_num, int slot_num) {
 RM_Manager::RM_Manager(filesystem::FileManager* fm,
                        filesystem::BufPageManager* bpm)
     : fm_(fm), bpm_(bpm) {}
+
+RM_Manager::~RM_Manager() {}
 
 int RM_Manager::CreateFile(const std::string& file_name, int record_size) {
   if (fn_to_rs_.find(file_name) != fn_to_rs_.end()) {

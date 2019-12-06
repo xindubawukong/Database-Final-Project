@@ -69,7 +69,8 @@ class RM_FileHandle {
 
 class RM_Manager {
  public:
-  RM_Manager(filesystem::FileManager* fm, filesystem::BufPageManager* bpm);
+  explicit RM_Manager(filesystem::FileManager* fm,
+                      filesystem::BufPageManager* bpm);
 
   ~RM_Manager();
 
