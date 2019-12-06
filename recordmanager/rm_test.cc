@@ -83,6 +83,51 @@ TEST(TestRMFileHandle, SimpleTest) {
   bpm->close();
 }
 
+TEST(TestRMFileHandle, TestMoreData) {
+  FileManager* fm = new FileManager();
+  BufPageManager* bpm = new BufPageManager(fm);
+  std::string file_name = "test.txt";
+  fm->createFile(file_name.c_str());
+  int file_id;
+  fm->openFile(file_name.c_str(), file_id);
+
+  RM_FileHandle file_handle;
+  file_handle.Init(file_name, 200, fm, bpm, file_id);
+
+  for (int i = 0; i < 1000; i++) {
+    int a[50];
+    for (int j = 0; j < 50; j++) a[j] = i;
+    RID rid;
+    EXPECT_EQ(file_handle.InsertRecord((char*)a, rid), 0);
+    int page_num, slot_num;
+    EXPECT_EQ(rid.GetPageNum(page_num), NO_ERROR);
+    EXPECT_EQ(rid.GetSlotNum(slot_num), NO_ERROR);
+    // std::cout << page_num << ' ' << slot_num << std::endl;
+  }
+  RID rid(5, 10);  // 4 * 32 + 10 = 138
+  RM_Record record;
+  EXPECT_EQ(file_handle.GetRecord(rid, record), NO_ERROR);
+  char* data;
+  EXPECT_EQ(record.GetData(data), NO_ERROR);
+  EXPECT_EQ(*((int*)data), 138);
+
+  EXPECT_EQ(file_handle.GetNextNotEmptyPage(0), 1);
+  EXPECT_EQ(file_handle.GetNextNotEmptySlot(1, -1), 0);
+  for (int i = 0; i < 10; i++) {
+    RID rid(1, i);
+    file_handle.DeleteRecord(rid);
+  }
+  EXPECT_EQ(file_handle.GetNextNotEmptySlot(1, -1), 10);
+  for (int i = 10; i < 32; i++) {
+    RID rid(1, i);
+    file_handle.DeleteRecord(rid);
+  }
+  EXPECT_EQ(file_handle.GetNextNotEmptySlot(1, -1), 32);
+  EXPECT_EQ(file_handle.GetNextNotEmptyPage(0), 2);
+
+  EXPECT_EQ(file_handle.GetFileID(), file_id);
+}
+
 TEST(TestRMManager, SimpleTest) {
   FileManager* fm = new FileManager();
   BufPageManager* bpm = new BufPageManager(fm);
