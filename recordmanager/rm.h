@@ -116,9 +116,6 @@ class RM_FileScan {
   void* value_;
   std::function<bool(void*, void*, int)> check_;
   RID current_;
-
-  static std::function<bool(void*, void*, int)> GetCheckFunction(
-      AttrType attr_type, CompOp comp_op);
 };
 
 }  // namespace recordmanager
