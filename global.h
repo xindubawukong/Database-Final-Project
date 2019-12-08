@@ -3,7 +3,7 @@
 
 #include <functional>
 
-extern const int kPageSize;
+extern const int kPageSize;  // in bytes.
 
 enum AttrType {
   INT,

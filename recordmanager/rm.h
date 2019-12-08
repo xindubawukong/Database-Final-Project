@@ -30,6 +30,7 @@ class RM_FileHandle {
 
   ~RM_FileHandle();
 
+  // All size or position are in bytes.
   static const int kRecordSizePosition;
   static const int kPageBitMapStartPosition;
   static const int kMaxPageNum;

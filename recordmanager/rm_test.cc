@@ -152,8 +152,10 @@ TEST(TestRMFileScan, SimpleTest) {
   for (int i = 0; i < 1000; i++) {
     int a[25];
     for (int j = 0; j < 25; j++) {
-      if (i % 2 == 0) a[j] = i;
-      else a[j] = -i;
+      if (i % 2 == 0)
+        a[j] = i;
+      else
+        a[j] = -i;
     }
     RID rid;
     EXPECT_EQ(file_handle.InsertRecord((char*)a, rid), NO_ERROR);
@@ -164,7 +166,9 @@ TEST(TestRMFileScan, SimpleTest) {
   }
   RM_FileScan file_scan;
   int value = 0;
-  EXPECT_EQ(file_scan.OpenScan(&file_handle, AttrType::INT, 4, 24, CompOp::GT_OP, &value), NO_ERROR);
+  EXPECT_EQ(file_scan.OpenScan(&file_handle, AttrType::INT, 4, 24,
+                               CompOp::GT_OP, &value),
+            NO_ERROR);
   RM_Record record;
   int x = 2;
   while (file_scan.GetNextRecord(record) != EOF) {
@@ -174,14 +178,18 @@ TEST(TestRMFileScan, SimpleTest) {
     x += 2;
   }
   EXPECT_EQ(file_scan.CloseScan(), NO_ERROR);
-  EXPECT_EQ(file_scan.OpenScan(&file_handle, AttrType::INT, 4, 96, CompOp::LE_OP, &value), NO_ERROR);
+  EXPECT_EQ(file_scan.OpenScan(&file_handle, AttrType::INT, 4, 96,
+                               CompOp::LE_OP, &value),
+            NO_ERROR);
   x = 0;
   while (file_scan.GetNextRecord(record) != EOF) {
     char* data;
     EXPECT_EQ(record.GetData(data), NO_ERROR);
     EXPECT_EQ(*((int*)data), x);
-    if (x == 0) x = -1;
-    else x -= 2;
+    if (x == 0)
+      x = -1;
+    else
+      x -= 2;
   }
 }
 
