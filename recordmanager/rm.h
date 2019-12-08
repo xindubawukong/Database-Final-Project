@@ -97,7 +97,7 @@ class RM_Manager {
 //    RM_FileScan file_scan;
 //    file_scan.OpenScan(...);
 //    RM_Record record;
-//    while (file_scan.GetNextRecord(record) != EOF) {
+//    while (file_scan.GetNextRecord(record) != RM_EOF) {
 //      // Do something.
 //    }
 //

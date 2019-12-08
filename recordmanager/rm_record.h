@@ -15,7 +15,7 @@ class RM_Record {
   int GetData(char*& p) const;
   int GetRid(RID& rid) const;
 
-  void operator =(const RM_Record& record);
+  void operator =(const RM_Record& record);  // deep copy
 
  private:
   RID rid_;

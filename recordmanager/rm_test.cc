@@ -171,7 +171,7 @@ TEST(TestRMFileScan, SimpleTest) {
             NO_ERROR);
   RM_Record record;
   int x = 2;
-  while (file_scan.GetNextRecord(record) != EOF) {
+  while (file_scan.GetNextRecord(record) != RM_EOF) {
     char* data;
     EXPECT_EQ(record.GetData(data), NO_ERROR);
     EXPECT_EQ(*((int*)data), x);
@@ -182,7 +182,7 @@ TEST(TestRMFileScan, SimpleTest) {
                                CompOp::LE_OP, &value),
             NO_ERROR);
   x = 0;
-  while (file_scan.GetNextRecord(record) != EOF) {
+  while (file_scan.GetNextRecord(record) != RM_EOF) {
     char* data;
     EXPECT_EQ(record.GetData(data), NO_ERROR);
     EXPECT_EQ(*((int*)data), x);

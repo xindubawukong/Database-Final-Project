@@ -7,8 +7,13 @@ all_bazel_tests = [
   'utils:all',
 ]
 
+inst = 'bazel clean'
+print(inst)
+os.system(inst)
+print('')
+
 for test in all_bazel_tests:
-  inst = 'bazel test ' + test + ' --test_output=streamed'
+  inst = 'bazel test ' + test  # + ' --test_output=streamed'
   print(inst)
   os.system(inst)
   print('')

@@ -260,7 +260,7 @@ int RM_FileScan::GetNextRecord(RM_Record& record) {
       }
     }
   }
-  return EOF;
+  return RM_EOF;
 }
 
 int RM_FileScan::CloseScan() {
