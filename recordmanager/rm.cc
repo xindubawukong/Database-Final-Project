@@ -31,6 +31,7 @@ void RM_FileHandle::Init(const std::string& file_name, int record_size,
   fm_ = fm;
   bpm_ = bpm;
   file_id_ = file_id;
+  max_page_num_ = 0;
 }
 
 int RM_FileHandle::GetRecord(const RID& rid, RM_Record& rec) const {
@@ -64,6 +65,7 @@ int RM_FileHandle::InsertRecord(const char* data, RID& rid) {
   utils::BitMap page_bitmap(addr + kPageBitMapStartPosition / 4, kMaxPageNum);
   int page = page_bitmap.FindFirstZeroPosition() + 1;
   if (page > kMaxPageNum) return RM_FILEHANDLE_NO_EMPTY_POSITION_ERROR;
+  max_page_num_ = std::max(max_page_num_, page);
 
   addr = bpm_->getPage(file_id_, page, index);
   bpm_->access(index);
@@ -149,19 +151,9 @@ int RM_FileHandle::ForcePages() {
 
 int RM_FileHandle::GetFileID() { return file_id_; }
 
-int RM_FileHandle::GetNextNotEmptyPage(int from) {
-  int index;
-  auto addr = bpm_->getPage(file_id_, /*page_num=*/0, index);
-  bpm_->access(index);
-  utils::BitMap page_bitmap(addr + kPageBitMapStartPosition / 4,
-                            kMaxPageNum - 1);
-  for (int i = from + 1; i < kMaxPageNum; i++) {
-    int x;
-    page_bitmap.Get(i - 1, x);
-    if (x == 1) return i;
-  }
-  return kMaxPageNum;
-}
+int RM_FileHandle::GetRecordSize() { return record_size_; }
+
+int RM_FileHandle::GetMaxPageNum() { return max_page_num_; }
 
 int RM_FileHandle::GetNextNotEmptySlot(int page_num, int slot_num) {
   int index;
@@ -250,8 +242,7 @@ int RM_FileScan::GetNextRecord(RM_Record& record) {
   int page_num, slot_num;
   if ((rc = current_.GetPageNum(page_num))) return rc;
   if ((rc = current_.GetSlotNum(slot_num))) return rc;
-  for (int i = page_num; i < RM_FileHandle::kMaxPageNum;
-       i = file_handle_->GetNextNotEmptyPage(i)) {
+  for (int i = page_num; i <= file_handle_->GetMaxPageNum(); i++) {
     int j = -1;
     if (i == page_num) j = slot_num;
     for (j = file_handle_->GetNextNotEmptySlot(i, j);
@@ -263,7 +254,7 @@ int RM_FileScan::GetNextRecord(RM_Record& record) {
       char* data;
       if ((rc = tmp.GetData(data))) return rc;
       if (check_(data + attr_offset_, value_, attr_length_)) {
-        current_ = rid;
+        current_.Set(i, j);
         record = tmp;
         return NO_ERROR;
       }

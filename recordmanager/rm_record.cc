@@ -36,4 +36,12 @@ int RM_Record::GetRid(RID& rid) const {
   return NO_ERROR;
 }
 
+void RM_Record::operator =(const RM_Record& record) {
+  rid_ = record.rid_;
+  length_ = record.length_;
+  delete[] data_;
+  data_ = new char[length_]();
+  std::memcpy(data_, record.data_, length_);
+}
+
 }  // namespace recordmanager

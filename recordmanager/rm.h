@@ -55,7 +55,9 @@ class RM_FileHandle {
 
   int GetFileID();
 
-  int GetNextNotEmptyPage(int from);
+  int GetRecordSize();
+
+  int GetMaxPageNum();
 
   int GetNextNotEmptySlot(int page_num, int slot_num);
 
@@ -65,6 +67,7 @@ class RM_FileHandle {
   filesystem::FileManager* fm_;
   filesystem::BufPageManager* bpm_;
   int file_id_;
+  int max_page_num_;
 };
 
 class RM_Manager {

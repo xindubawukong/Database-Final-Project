@@ -104,6 +104,7 @@ TEST(TestRMFileHandle, TestMoreData) {
     EXPECT_EQ(rid.GetSlotNum(slot_num), NO_ERROR);
     // std::cout << page_num << ' ' << slot_num << std::endl;
   }
+  EXPECT_EQ(file_handle.GetMaxPageNum(), 32);
   RID rid(5, 10);  // 4 * 32 + 10 = 138
   RM_Record record;
   EXPECT_EQ(file_handle.GetRecord(rid, record), NO_ERROR);
@@ -111,7 +112,6 @@ TEST(TestRMFileHandle, TestMoreData) {
   EXPECT_EQ(record.GetData(data), NO_ERROR);
   EXPECT_EQ(*((int*)data), 138);
 
-  EXPECT_EQ(file_handle.GetNextNotEmptyPage(0), 1);
   EXPECT_EQ(file_handle.GetNextNotEmptySlot(1, -1), 0);
   for (int i = 0; i < 10; i++) {
     RID rid(1, i);
@@ -123,7 +123,6 @@ TEST(TestRMFileHandle, TestMoreData) {
     file_handle.DeleteRecord(rid);
   }
   EXPECT_EQ(file_handle.GetNextNotEmptySlot(1, -1), 32);
-  EXPECT_EQ(file_handle.GetNextNotEmptyPage(0), 2);
 
   EXPECT_EQ(file_handle.GetFileID(), file_id);
 }
@@ -142,6 +141,48 @@ TEST(TestRMManager, SimpleTest) {
   EXPECT_EQ(rm_manager.DestroyFile(file_name), NO_ERROR);
 }
 
-TEST(TestRMFileScan, SimpleTest) {}
+TEST(TestRMFileScan, SimpleTest) {
+  FileManager* fm = new FileManager();
+  BufPageManager* bpm = new BufPageManager(fm);
+  RM_Manager manager(fm, bpm);
+  RM_FileHandle file_handle;
+  std::string file_name = "test.txt";
+  EXPECT_EQ(manager.CreateFile(file_name, 100), NO_ERROR);
+  EXPECT_EQ(manager.OpenFile(file_name, file_handle), NO_ERROR);
+  for (int i = 0; i < 1000; i++) {
+    int a[25];
+    for (int j = 0; j < 25; j++) {
+      if (i % 2 == 0) a[j] = i;
+      else a[j] = -i;
+    }
+    RID rid;
+    EXPECT_EQ(file_handle.InsertRecord((char*)a, rid), NO_ERROR);
+    int page_num, slot_num;
+    EXPECT_EQ(rid.GetPageNum(page_num), NO_ERROR);
+    EXPECT_EQ(rid.GetSlotNum(slot_num), NO_ERROR);
+    // std::cout << page_num << ' ' << slot_num << std::endl;
+  }
+  RM_FileScan file_scan;
+  int value = 0;
+  EXPECT_EQ(file_scan.OpenScan(&file_handle, AttrType::INT, 4, 24, CompOp::GT_OP, &value), NO_ERROR);
+  RM_Record record;
+  int x = 2;
+  while (file_scan.GetNextRecord(record) != EOF) {
+    char* data;
+    EXPECT_EQ(record.GetData(data), NO_ERROR);
+    EXPECT_EQ(*((int*)data), x);
+    x += 2;
+  }
+  EXPECT_EQ(file_scan.CloseScan(), NO_ERROR);
+  EXPECT_EQ(file_scan.OpenScan(&file_handle, AttrType::INT, 4, 96, CompOp::LE_OP, &value), NO_ERROR);
+  x = 0;
+  while (file_scan.GetNextRecord(record) != EOF) {
+    char* data;
+    EXPECT_EQ(record.GetData(data), NO_ERROR);
+    EXPECT_EQ(*((int*)data), x);
+    if (x == 0) x = -1;
+    else x -= 2;
+  }
+}
 
 }  // namespace recordmanager
