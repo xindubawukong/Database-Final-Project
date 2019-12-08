@@ -31,3 +31,7 @@ bazel test bazel_example/main:hello-greet_test --test_output=streamed  # run goo
 ```shell
 python3 test_all.py
 ```
+
+## References
+
+https://web.stanford.edu/class/cs346/2015/

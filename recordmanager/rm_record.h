@@ -15,6 +15,8 @@ class RM_Record {
   int GetData(char*& p) const;
   int GetRid(RID& rid) const;
 
+  void operator =(const RM_Record& record);
+
  private:
   RID rid_;
   int length_;
