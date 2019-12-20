@@ -2,6 +2,7 @@
 
 #include <cstdio>
 #include <cstring>
+#include <sstream>
 
 #include "return_code.h"
 
@@ -214,7 +215,7 @@ int IX_IndexHandle::DeleteEnrty(void* pData, recordmanager::RID &r) {
       BTreeNode* others = DupScanLeftFind(node, pData, r);
       if(others != nullptr) {
         int removedPos = others->FindKey((const void* &)pData, r);
-        others->Remove(removedPos);
+        others->Remove(removedPos); // maybe underflow
         return NO_ERROR;
       }
     }
@@ -311,6 +312,33 @@ int IX_IndexHandle::DeleteEnrty(void* pData, recordmanager::RID &r) {
     SetHeight(header.height - 1);
     return NO_ERROR;
   }
+}
+
+BTreeNode* IX_IndexHandle::FindLeafForceRight(const void* pData) {
+  FindLeaf(pData);
+
+  if(path[header.height - 1]->GetRight() != -1) {
+    int pos = path[header.height - 1]->FindKey(pData);
+
+    if(pos != -1 && pos == path[header.height - 1]->GetNumKeys() - 1) {
+      BTreeNode* right = FetchNode(path[header.height - 1]->GetRight());
+
+      if(right != nullptr) {
+        void* key = nullptr;
+        right->GetKey(0, key);
+
+        if(right->CmpKey(pData, key) == 0) {
+          UnPin(path[header.height - 1]->GetPageNum());
+
+          delete path[header.height - 1];
+          path[header.height - 1] = FetchNode(right->GetPageRID());
+          pathP[header.height - 2]++;
+        }
+      }
+    }
+  }
+
+  return path[header.height - 1];
 }
 
 
@@ -512,6 +540,534 @@ int IX_IndexHandle::UnPin(int pageNum) {
   int index;
   bpm->getPage(fileID, pageNum, index);
   bpm->release(index);
+  return NO_ERROR;
+}
+
+
+IX_IndexScan::IX_IndexScan() {
+  bOpen = false;
+  desc = false;
+  eof = false;
+  lastNode = nullptr;
+  pixh = nullptr;
+  curNode = nullptr;
+  curPos = -1;
+  curKey = nullptr;
+  curRid = recordmanager::RID(-1, -1);
+  c = EQ_OP;
+  value = nullptr;
+}
+
+IX_IndexScan::~IX_IndexScan() {
+  if(pixh != nullptr && pixh->GetHeight() > 1) {
+    if(curNode != nullptr) {
+      delete curNode;
+    }
+    if(lastNode != nullptr) {
+      delete lastNode;
+    }
+  }
+}
+
+std::function<bool(void*, void*)> IX_IndexScan::GetCheckFunction(
+    AttrType attr_type, int attrLength, CompOp comp_op) {
+  if (attr_type == AttrType::INT) {
+    std::function<int(void*)> f = [](void* x) -> int { return *((int*)x); };
+    if (comp_op == CompOp::EQ_OP) {
+      return [&f](void* a, void* b) -> bool { return f(a) == f(b); };
+    } else if (comp_op == CompOp::LT_OP) {
+      return [&f](void* a, void* b) -> bool { return f(a) < f(b); };
+    } else if (comp_op == CompOp::GT_OP) {
+      return [&f](void* a, void* b) -> bool { return f(a) > f(b); };
+    } else if (comp_op == CompOp::LE_OP) {
+      return [&f](void* a, void* b) -> bool { return f(a) <= f(b); };
+    } else if (comp_op == CompOp::GE_OP) {
+      return [&f](void* a, void* b) -> bool { return f(a) >= f(b); };
+    } else if (comp_op == CompOp::NE_OP) {
+      return [&f](void* a, void* b) -> bool { return f(a) != f(b); };
+    } else {
+      return [](void*, void*) -> bool { return true; };
+    }
+  } else if (attr_type == AttrType::FLOAT) {
+    std::function<float(void*)> f = [](void* x) -> float {
+      return *((float*)x);
+    };
+    if (comp_op == CompOp::EQ_OP) {
+      return [&f](void* a, void* b) -> bool { return f(a) == f(b); };
+    } else if (comp_op == CompOp::LT_OP) {
+      return [&f](void* a, void* b) -> bool { return f(a) < f(b); };
+    } else if (comp_op == CompOp::GT_OP) {
+      return [&f](void* a, void* b) -> bool { return f(a) > f(b); };
+    } else if (comp_op == CompOp::LE_OP) {
+      return [&f](void* a, void* b) -> bool { return f(a) <= f(b); };
+    } else if (comp_op == CompOp::GE_OP) {
+      return [&f](void* a, void* b) -> bool { return f(a) >= f(b); };
+    } else if (comp_op == CompOp::NE_OP) {
+      return [&f](void* a, void* b) -> bool { return f(a) != f(b); };
+    } else {
+      return [](void*, void*) -> bool { return true; };
+    }
+  } else {  // attr_type == AttrType::STRING
+    if (comp_op == CompOp::EQ_OP) {
+      return [&attrLength](void* a, void* b) -> bool {
+        char* x = (char*)a;
+        char* y = (char*)b;
+        for (int i = 0; i < attrLength; i++) {
+          if ((*x) != (*y)) return false;
+          x++;
+          y++;
+        }
+        return true;
+      };
+    } else if (comp_op == CompOp::LT_OP) {
+      return [&attrLength](void* a, void* b) -> bool {
+        char* x = (char*)a;
+        char* y = (char*)b;
+        for (int i = 0; i < attrLength; i++) {
+          if ((*x) < (*y)) return true;
+          if ((*x) > (*y)) return false;
+          x++;
+          y++;
+        }
+        return false;
+      };
+    } else if (comp_op == CompOp::GT_OP) {
+      return [&attrLength](void* a, void* b) -> bool {
+        char* x = (char*)a;
+        char* y = (char*)b;
+        for (int i = 0; i < attrLength; i++) {
+          if ((*x) > (*y)) return true;
+          if ((*x) < (*y)) return false;
+          x++;
+          y++;
+        }
+        return false;
+      };
+    } else if (comp_op == CompOp::LE_OP) {
+      return [&attrLength](void* a, void* b) -> bool {
+        char* x = (char*)a;
+        char* y = (char*)b;
+        for (int i = 0; i < attrLength; i++) {
+          if ((*x) < (*y)) return true;
+          if ((*x) > (*y)) return false;
+          x++;
+          y++;
+        }
+        return true;
+      };
+    } else if (comp_op == CompOp::GE_OP) {
+      return [&attrLength](void* a, void* b) -> bool {
+        char* x = (char*)a;
+        char* y = (char*)b;
+        for (int i = 0; i < attrLength; i++) {
+          if ((*x) > (*y)) return true;
+          if ((*x) < (*y)) return false;
+          x++;
+          y++;
+        }
+        return true;
+      };
+    } else if (comp_op == CompOp::NE_OP) {
+      return [&attrLength](void* a, void* b) -> bool {
+        char* x = (char*)a;
+        char* y = (char*)b;
+        for (int i = 0; i < attrLength; i++) {
+          if ((*x) != (*y)) return true;
+          x++;
+          y++;
+        }
+        return false;
+      };
+    } else {
+      return [](void*, void*) -> bool { return true; };
+    }
+  }
+}
+
+int IX_IndexScan::OpenScan(const IX_IndexHandle &indexHandle, CompOp comOp, void* value, bool desc) {
+  if(bOpen) {
+    return -1;
+  }
+  if(comOp > NO_OP || comOp < EQ_OP) {
+    return -2;
+  }
+  pixh = const_cast<IX_IndexHandle*> (&indexHandle);
+  if(pixh == nullptr) {
+    return -3;
+  }
+
+  bOpen = true;
+  if(desc) {
+    this->desc = true;
+  }
+
+  foundOne = false;
+  c = comOp;
+  checkFunc = GetCheckFunction(pixh->GetAttrType(), pixh->GetAttrLength(), comOp);
+  if(value != nullptr) {
+    this->value = value;
+
+  }
+
+  return NO_ERROR;
+}
+
+int IX_IndexScan::GetNextEntry(recordmanager::RID &r) {
+  void* key = nullptr;
+  int i = -1;
+  return GetNextEntry(key, r, i);
+}
+
+int IX_IndexScan::GetNextEntry(void* &key, recordmanager::RID &r, int& numScanned) {
+  if(!bOpen) {
+    return -1;
+  }
+  if(eof) {
+    return -2;
+  }
+
+  if(curNode == nullptr && curPos == -1) {
+    if(!desc) {
+      curNode = pixh->FetchNode(pixh->FindSmallestLeaf()->GetPageRID());
+      curPos = -1;
+    } else {
+      curNode = pixh->FetchNode(pixh->FindLargestLeaf()->GetPageRID());
+      curPos = curNode->GetNumKeys();
+    }
+
+  } else {
+    if(curKey != nullptr && curNode != nullptr && curPos != -1) {
+      void* k = nullptr;
+      curNode->GetKey(curPos, k);
+    }
+  }
+
+  while(curNode != nullptr) {
+    int i = -1;
+    if(!desc) {
+
+      for(; i < curNode->GetNumKeys(); ++i) {
+        void* k = nullptr;
+        curNode->GetKey(i, k);
+        numScanned++;
+        curPos = i;
+        if(curKey == nullptr) {
+          curKey = (void*) new char[pixh->GetAttrLength()];
+        }
+        memcpy(curKey, k, pixh->GetAttrLength());
+
+        if(checkFunc(k, value)) {
+          key = k;
+          curNode->GetAddrByPosition(i, r);
+          foundOne = true;
+          return NO_ERROR;
+        } else {
+          if(foundOne) {
+            EarlyExitOptimize(k);
+            if(eof) {
+              return -2;
+            }
+          }
+        }
+      }
+    } else {
+
+      for(; i >= 0; --i) {
+        void* k = nullptr;
+        curNode->GetKey(i, k);
+        numScanned++;
+        curPos = i;
+        if(curKey == nullptr) {
+          curKey = (void*) new char[pixh->GetAttrLength()];
+        }
+        memcpy(curKey, k, pixh->GetAttrLength());
+
+        if(checkFunc(k, value)) {
+          key = k;
+          curNode->GetAddrByPosition(i, r);
+          foundOne = true;
+          return NO_ERROR;
+        } else {
+          if(foundOne) {
+            EarlyExitOptimize(k);
+            if(eof) {
+              return -2;
+            }
+          }
+        }
+      }
+    }
+
+    if(lastNode != nullptr && curNode->GetPageRID() == lastNode->GetPageRID()) {
+      break;
+    }
+
+    if(!desc) {
+      int right = curNode->GetRight();
+      pixh->UnPin(curNode->GetPageNum());
+      delete curNode;
+      curNode = pixh->FetchNode(right);
+      if(curNode != nullptr) {
+        pixh->Pin(curNode->GetPageNum());
+      }
+      curPos = -1;
+    } else {
+      int left = curNode->GetLeft();
+      pixh->UnPin(curNode->GetPageNum());
+      delete curNode;
+      curNode = pixh->FetchNode(left);
+      if(curNode != nullptr) {
+        pixh->Pin(curNode->GetPageNum());
+        curPos = curNode->GetNumKeys();
+      }
+    }
+    
+  }
+  return -2;
+}
+
+int IX_IndexScan::CloseScan() {
+  if(!bOpen) {
+    return -1;
+  }
+
+  bOpen = false;
+  curNode = nullptr;
+  curPos = -1;
+  if(curKey != nullptr) {
+    delete[] ((char*) curKey);
+    curKey = nullptr;
+  }
+  curRid = recordmanager::RID(-1, -1);
+  lastNode = nullptr;
+  eof = false;
+  return NO_ERROR;
+}
+
+int IX_IndexScan::ResetState() {
+  curNode = nullptr;
+  curPos = -1;
+  lastNode = nullptr;
+  eof = false;
+  foundOne = false;
+
+  return OpOptimize();
+}
+
+int IX_IndexScan::EarlyExitOptimize(void* nowKey) {
+  if(!bOpen) {
+    return -1;
+  }
+
+  if(value == nullptr) {
+    return NO_ERROR;
+  }
+
+  if(curNode != nullptr) {
+    int cmp = curNode->CmpKey(nowKey, value);
+
+    if(c == EQ_OP && cmp != 0) {
+      eof = true;
+      return NO_ERROR;
+    }
+
+    if((c == LT_OP || c == LE_OP) && cmp > 0 && !desc) {
+      eof = true;
+      return NO_ERROR;
+    }
+
+    if((c == GT_OP || c == GE_OP) && cmp < 0 && desc) {
+      eof = true;
+      return NO_ERROR;
+    }
+
+  }
+
+  return NO_ERROR;
+}
+
+int IX_IndexScan::OpOptimize() {
+  if(!bOpen) {
+    return -1;
+  }
+
+  if(value == nullptr) {
+    return NO_ERROR;
+  }
+
+  if(c == NE_OP) {
+    return NO_ERROR;
+  }
+
+  if(curNode != nullptr) {
+    delete curNode;
+  }
+
+  curNode = pixh->FetchNode(pixh->FindLeafForceRight(value)->GetPageRID());
+  curPos = curNode->FindKey((const void* &)value);
+
+  if(desc) {
+    if(c == LE_OP || c == LT_OP) {
+      lastNode = nullptr;
+      curPos = curPos + 1;
+    }
+
+    else if(c == EQ_OP) {
+      if(curPos == -1) {
+        delete curNode;
+        eof = true;
+        return NO_ERROR;
+      }
+
+      lastNode = nullptr;
+      curPos = curPos + 1;
+    }
+    else if(c == GE_OP) {
+      delete curNode;
+      lastNode = nullptr;
+      curNode = nullptr;
+      curPos = -1;
+    } else {
+      lastNode = pixh->FetchNode(curNode->GetPageRID());
+      delete curNode;
+      curNode = nullptr;
+      curPos = -1;
+    }
+  } else {
+    if(c == LE_OP || c == LT_OP) {
+      lastNode = pixh->FetchNode(curNode->GetPageRID());
+      delete curNode;
+      curNode = nullptr;
+      curPos = -1;
+    }
+    if(c == GT_OP) {
+      lastNode = nullptr;
+    }
+    if(c == GE_OP) {
+      delete curNode;
+      curNode = nullptr;
+      curPos = -1;
+      lastNode = nullptr;
+    }
+    if(c == EQ_OP) {
+      if(curPos == -1) { 
+        delete curNode;
+        eof = true;
+        return 0;
+      }
+      lastNode = pixh->FetchNode(curNode->GetPageRID());
+      delete curNode;
+      curNode = nullptr;
+      curPos = -1;
+    }
+  }
+  
+  int first = -1;
+  if(curNode != NULL) first = curNode->GetPageNum();
+  int last = -1;
+  if(lastNode != NULL) last = lastNode->GetPageNum();
+  return NO_ERROR;
+}
+
+IX_Manager:: IX_Manager(filesystem::FileManager* fm, filesystem::BufPageManager* bpm) {
+  this->bpm_ = bpm;
+  this->fm_ = fm;
+}
+
+IX_Manager::~IX_Manager() {
+
+}
+
+int IX_Manager::CreateIndex(const char* fileName, int indexNo, AttrType attrType, int attrLength) {
+  if(indexNo < 0 || attrType < INT || attrType > STRING || fileName == nullptr) {
+    return -1;
+  }
+
+  if(attrLength >= kPageSize - (int)sizeof(recordmanager::RID) || attrLength <= 0) {
+    return -2;
+  }
+
+  if((attrType == INT && (unsigned int)attrLength != sizeof(int)) ||
+     (attrType == FLOAT && (unsigned int)attrLength != sizeof(float))
+     ||
+     (attrType == STRING && 
+      ((unsigned int)attrLength <= 0 || 
+       (unsigned int)attrLength > 100)))
+      return -3;
+  
+  std::stringstream name;
+  name << fileName << "." << indexNo;
+
+  fm_->createFile(name.str().c_str());
+  int fileID;
+  fm_->openFile(name.str().c_str(), fileID);
+  int index;
+  char* data = (char*) bpm_->getPage(fileID, 0, index);
+  IX_FileHeader header;
+  header.numPages = 1;
+  header.capacity = -1;
+  header.height = 0;
+  header.rootPageNum = -1;
+  header.attrType = attrType;
+  header.attrLength = attrLength;
+
+  memcpy(data, &header, sizeof(header));
+
+  bpm_->markDirty(0);
+  bpm_->writeBack(0);
+  fm_->closeFile(fileID);
+  return NO_ERROR;
+}
+
+int IX_Manager::DestroyIndex(const char* fileName, int indexNo) {
+  if(indexNo < 0 || fileName == nullptr) {
+    return -1;
+  }
+
+  std::stringstream name;
+  name << fileName << "." << indexNo;
+  
+  // TO DO 
+
+}
+
+int IX_Manager::OpendIndex(const char* fileName, int indexNo, IX_IndexHandle& ixh) {
+  if(indexNo < 0 || fileName == nullptr) {
+    return -1;
+  }
+
+  std::stringstream name;
+  name << fileName << "." << indexNo;
+
+  int fileID;
+  fm_->openFile(name.str().c_str(), fileID);
+  int index;
+  char* data = (char*) bpm_->getPage(fileID, 0, index);
+  IX_FileHeader header;
+  memcpy(&header, data, sizeof(header));
+
+  ixh.Open(bpm_, fileID, header.pairSize, header.rootPageNum);
+  bpm_->release(0);
+  return NO_ERROR;
+}
+
+int IX_Manager::CloseIndex(IX_IndexHandle& ixh) {
+  if(!ixh.bFileOpen || ixh.bpm == nullptr) {
+    return -1;
+  }
+  if(ixh.bHdrChanged) {
+    int index;
+    ixh.bpm->getPage(ixh.fileID, 0, index);
+    ixh.SetFileHeader(0);
+    ixh.bpm->markDirty(index);
+    ixh.bpm->writeBack(index);
+    ixh.ForcePages();
+  }
+
+  fm_->closeFile(ixh.fileID);
+  ixh.~IX_IndexHandle;
+  ixh.bpm = nullptr;
+  ixh.bFileOpen = false;
   return NO_ERROR;
 }
 

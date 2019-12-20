@@ -1,6 +1,8 @@
 #ifndef INDEXING_IX_H
 #define INDEXING_IX_H
 
+#include <functional>
+
 #include "filesystem/bufmanager/BufPageManager.h"
 #include "filesystem/fileio/FileManager.h"
 #include "recordmanager/rm_rid.h"
@@ -23,6 +25,8 @@ namespace indexing {
 
   class IX_IndexHandle {
     public:
+      friend class IX_Manager;
+      
       IX_IndexHandle();
 
       ~IX_IndexHandle();
@@ -121,11 +125,38 @@ namespace indexing {
 
       ~IX_IndexScan();
 
-      int OpenScan(const IX_IndexHandle &indexHandle, CompOp comOp, void *value);
+      int OpenScan(const IX_IndexHandle &indexHandle, CompOp comOp, void *value, bool desc=false);
 
-      int GetNextEntry(recordmanager::RID rid);
+      int GetNextEntry(recordmanager::RID &rid);
+
+      int GetNextEntry(void* &key, recordmanager::RID &r, int& numScanned);
 
       int CloseScan();
+
+      std::function<bool(void*, void*)> GetCheckFunction(AttrType attrType, int attrLength, CompOp comOp);
+
+      // for iterator to reset state for another open/close
+      int ResetState();
+
+      bool IsOpen() const { return (bOpen && pixh != NULL); }
+      bool IsDesc() const { return desc; }
+      private:
+      int OpOptimize(); // Optimizes based on value of c, value and resets state
+      int EarlyExitOptimize(void* now);
+      private:
+      std::function<bool(void*, void*)> checkFunc;
+      IX_IndexHandle* pixh;
+      BTreeNode* curNode;
+      int curPos;
+      void* curKey; // saved to check for delete on scan
+      recordmanager::RID curRid; // saved to check for delete on scan
+      bool bOpen;
+      bool desc; // Is scan order ascending(def) or descending ?
+      bool eof; // early EOF set by btree analysis - set by OpOpt
+      bool foundOne; // flag that is set by getNext if it is ever successful
+      BTreeNode* lastNode; // last node setup by OpOpt
+      CompOp c; // save Op for OpOpt
+      void* value; // save Op for OpOpt
   };
 
 }
