@@ -72,10 +72,11 @@ class BTreeNode {
     // get/set pageRID
     recordmanager::RID GetPageRID() const;
     void SetPageRID(const recordmanager::RID&);
+    int GetPageNum() const;
 
     int CmpKey(const void * k1, const void * k2) const;
     // bool isSorted() const;
-    int LargestKey(void* &key) const;
+    void* LargestKey() const;
 
   private:
     char  *keys;

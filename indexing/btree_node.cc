@@ -239,7 +239,7 @@ int BTreeNode::GetAddrByPosition(const int pos, recordmanager::RID& r) const {
 int BTreeNode::FindPositionByKey(const void* &key) const {
   assert(IsValid() == 0);
   void* curKey = nullptr;
-  for(int i = numKeys; i >= 0; --i) {
+  for(int i = numKeys - 1; i >= 0; --i) {
     GetKey(i, curKey);
     if(CmpKey(key, curKey) == 0) {
       return i;
@@ -256,7 +256,11 @@ int BTreeNode::FindPositionByKey(const void* &key) const {
 int BTreeNode::FindAddrByKey(const void* &key, recordmanager::RID& r) const {
   assert(IsValid() == 0);
   int pos = FindPositionByKey(key);
-  r = rids[pos];
+
+  if(pos >= numKeys) {
+    r = recordmanager::RID(-1, -1);
+  }
+  else r = rids[pos];
   return NO_ERROR;
 }
 
@@ -317,7 +321,7 @@ int BTreeNode::Merge(BTreeNode* other) {
 
   assert(IsValid() == 0);
   assert(other->IsValid() == 0);
-  
+
   return NO_ERROR;
 }
 
@@ -327,6 +331,12 @@ recordmanager::RID BTreeNode::GetPageRID() const {
 
 void BTreeNode::SetPageRID(const recordmanager::RID& r) {
   pageRID = r;
+}
+
+int BTreeNode::GetPageNum() const {
+  int pageNum;
+  pageRID.GetPageNum(pageNum);
+  return pageNum;
 }
 
 int BTreeNode::CmpKey(const void* k1, const void* k2) const {
@@ -353,14 +363,12 @@ int BTreeNode::CmpKey(const void* k1, const void* k2) const {
   return 0;
 }
 
-int BTreeNode::LargestKey(void* &key) const {
+void* BTreeNode::LargestKey() const {
   assert(IsValid() == 0);
   if(numKeys > 0) {
-    key = keys + attrLength * (numKeys - 1);
-    return NO_ERROR;
+    return keys + attrLength * (numKeys - 1);
   } else {
-    key = nullptr;
-    return -1;
+    return nullptr;
   }
   
 }
