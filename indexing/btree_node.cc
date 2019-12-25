@@ -8,12 +8,12 @@
 
 namespace indexing {
 
-BTreeNode::BTreeNode(AttrType AttrType, int attrLength,
+BTreeNode::BTreeNode(AttrType attrType, int attrLength,
                     filesystem::BufPageManager *bpm, int fileID, 
-                    int pageID, bool newPage = true) 
+                    int pageID, bool newPage) 
 : keys(nullptr), rids(nullptr), attrLength(attrLength), attrType(attrType) {
 
-  int capacity = std::floor(
+  capacity = (int) std::floor(
     (kPageSize - sizeof(numKeys) - 2 * sizeof(int)) / 
     (attrLength + sizeof(recordmanager::RID))
   );
@@ -190,7 +190,7 @@ int BTreeNode::RangeRemove(const int startPos, const int endPos) {
   return NO_ERROR;
 }
 
-int BTreeNode::FindKey(const void* &key, const recordmanager::RID& r = recordmanager::RID(-1, -1)) const {
+int BTreeNode::FindKey(const void* &key, const recordmanager::RID& r) const {
   assert(IsValid() == 0);
   void* curKey = nullptr;
   int pageNum;
@@ -269,7 +269,8 @@ int BTreeNode::Split(BTreeNode* other) {
   assert(other->IsValid() == 0);
   int startMovedPos = (numKeys + 1) >> 1;
   int numMoved = numKeys - startMovedPos;
-  if(other->GetNumKeys() + numMoved < other->GetMaxKeys()) {
+  
+  if(other->GetNumKeys() + numMoved > other->GetMaxKeys()) {
     return -1;
   }
   for(int i = startMovedPos; i < numKeys; ++i) {
