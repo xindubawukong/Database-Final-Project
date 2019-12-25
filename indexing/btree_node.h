@@ -10,6 +10,8 @@ namespace indexing {
 
 class BTreeNode {
   public:
+    friend class IX_IndexHandle;
+
     BTreeNode(AttrType attrType, int attrLength, 
     filesystem::BufPageManager *bpm, int fileID, int pageID, 
     bool newPage = true);
@@ -17,7 +19,6 @@ class BTreeNode {
     ~BTreeNode();
     int Destroy();
 
-    friend class IX_IndexHandle;
     int IsValid() const;
     int GetMaxKeys() const;
     
@@ -38,17 +39,10 @@ class BTreeNode {
     int RangeRemove(const int startPos, const int endPos);
     
 
-    // return position if key already exists at position
-    // if there are dups - returns rightmost position unless an RID is
-    // specified.
-    // if optional RID is specified, will only return a position if both
-    // key and RID match.
-    // return -1 if there was an error or if key does not exist
     int FindKey(const void* &key, const recordmanager::RID& r = recordmanager::RID(-1,-1)) const;
     int GetAddrByKey(const void* &key, recordmanager::RID& r) const;
     int GetAddrByPosition(const int pos, recordmanager::RID& r) const;
 
-    // find a poistion instead of exact match
     int FindPositionByKey(const void* &key) const;
     int FindAddrByKey(const void* &key, recordmanager::RID& r) const;
 
@@ -63,7 +57,7 @@ class BTreeNode {
     void* LargestKey() const;
 
   private:
-    char  *keys;
+    char *keys;
     recordmanager::RID *rids;
     int numKeys;
     int attrLength;

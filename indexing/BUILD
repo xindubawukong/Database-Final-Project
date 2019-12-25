@@ -33,3 +33,12 @@ cc_test(
   ],
 )
 
+cc_test(
+  name = "ix_test",
+  srcs = ["ix_test.cc"],
+  deps = [
+    "@gtest//:gtest_main",
+    "//indexing:ix",
+  ]
+)
+

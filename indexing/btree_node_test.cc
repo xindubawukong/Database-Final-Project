@@ -20,17 +20,18 @@ TEST(TestBTreeNode, Construct) {
 
   BTreeNode intNode = BTreeNode(INT, sizeof(int), bpm, fileID, 0, true);
   EXPECT_EQ(intNode.GetMaxKeys(), 681);
-  intNode.Destroy();
 
   BTreeNode floatNode = BTreeNode(FLOAT, sizeof(float), bpm, fileID, 1, true);
   EXPECT_EQ(floatNode.GetMaxKeys(), 681);
-  floatNode.Destroy();
 
   BTreeNode stringNode = BTreeNode(STRING, sizeof(char[10]), bpm, fileID, 2, true);
   EXPECT_EQ(stringNode.GetMaxKeys(), 454);
-  stringNode.Destroy();
 
-  bpm->close();
+  fm->closeFile(fileID);
+  delete fm;
+  delete bpm;
+  fm = nullptr;
+  bpm = nullptr;
 }
 
 TEST(TestBTreeNode, KeyOperation) {
@@ -43,6 +44,7 @@ TEST(TestBTreeNode, KeyOperation) {
   fm->openFile(name.c_str(), fileID);
 
   BTreeNode testNode = BTreeNode(INT, sizeof(int), bpm, fileID, 0);
+
   for(int i = 0; i < 10; ++i) {
     testNode.Insert(&i, RID());
     void* key = nullptr;
@@ -69,6 +71,10 @@ TEST(TestBTreeNode, KeyOperation) {
   }
 
   bpm->close();
+  delete fm;
+  delete bpm;
+  fm = nullptr;
+  bpm = nullptr;
 }
 
 TEST(TestBTreeNode, InsertAndRemove) {
@@ -116,6 +122,10 @@ TEST(TestBTreeNode, InsertAndRemove) {
   EXPECT_EQ(testNode.GetNumKeys(), 670);
 
   bpm->close();
+  delete fm;
+  delete bpm;
+  fm = nullptr;
+  bpm = nullptr;
 }
 
 TEST(TestBTreeNode, Find) {
@@ -171,7 +181,12 @@ TEST(TestBTreeNode, Find) {
   testNode.FindAddrByKey((const void* &)queryKey, r);
   EXPECT_EQ(pos, 0);
   EXPECT_EQ(r, RID(0, 0));
+
   bpm->close();
+  delete fm;
+  delete bpm;
+  fm = nullptr;
+  bpm = nullptr;
 }
 
 TEST(TestBTreeNode, SetGet) {
@@ -199,6 +214,11 @@ TEST(TestBTreeNode, SetGet) {
   EXPECT_EQ(testNode.GetLeft(), 10);
   EXPECT_EQ(testNode.GetRight(), 11);
   EXPECT_EQ(testNode.GetNumKeys(), 100);
+
+  delete fm;
+  delete bpm;
+  fm = nullptr;
+  bpm = nullptr;
 }
 
 TEST(TestBTreeNode, SplitAndMerge) {
@@ -238,6 +258,11 @@ TEST(TestBTreeNode, SplitAndMerge) {
     testNode.GetKey(i, (void* &)key);
     EXPECT_EQ(*key, i);
   }
+
+  delete fm;
+  delete bpm;
+  fm = nullptr;
+  bpm = nullptr;
 }
 
 }

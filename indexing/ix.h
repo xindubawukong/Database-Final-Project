@@ -16,7 +16,6 @@ namespace indexing {
   struct IX_FileHeader {
     int numPages;
     int rootPageNum;
-    int pairSize;
     int capacity;
     int height;
     AttrType attrType;
@@ -39,11 +38,10 @@ namespace indexing {
 
       int Search(void* pData, recordmanager::RID &rid);
 
-      int Open(filesystem::BufPageManager *bpm, int fileID, int pairSize, int rootPage);
+      int Open(filesystem::BufPageManager *bpm, int fileID, int rootPage);
       int GetFileHeader(const int &pageNum);
       int SetFileHeader(const int &pageNum) const;
 
-      bool HdrChanged() const { return bHdrChanged; }
       int GetNumPages() const { return header.numPages; }
       AttrType GetAttrType() const { return header.attrType; }
       int GetAttrLength() const { return header.attrLength; }
@@ -53,25 +51,18 @@ namespace indexing {
 
       int IsValid() const;
 
-      // return NULL if the key is bad
-      // otherwise return a pointer to the leaf node where key might go
-      // also populates the path member variable with the path
+
       BTreeNode* FindLeaf(const void *pData);
       BTreeNode* FindSmallestLeaf();
       BTreeNode* FindLargestLeaf();
       BTreeNode* DupScanLeftFind(BTreeNode* right,
                                 void *pData,
                                 const recordmanager::RID& rid);
-      // hack for indexscan::OpOptimize
       BTreeNode* FindLeafForceRight(const void* pData);
 
       BTreeNode* FetchNode(recordmanager::RID r) const;
       BTreeNode* FetchNode(int p) const;
-      void ResetNode(BTreeNode*& old, int p) const;
-      // Reset to the BTreeNode at the recordmanager::RID specified within Btree
-      void ResetNode(BTreeNode*& old, recordmanager::RID r) const;
 
-      // get/set height
       int GetHeight() const;
       void SetHeight(const int&);
 
@@ -86,13 +77,14 @@ namespace indexing {
 
       IX_FileHeader header;
       bool bFileOpen;
+      bool bHeaderChanged;
       filesystem::BufPageManager * bpm;
       int fileID;
-      bool bHdrChanged;
+      
       BTreeNode * root; // root in turn points to the other nodes
       BTreeNode ** path; // list of nodes that is the path to leaf as a
                         // result of a search.
-      int* pathP; // the position in the parent in the path the points to
+      int* pathPos; // the position in the parent in the path the points to
                   // the child node.
 
       void * treeLargest; // largest key in the entire tree
@@ -143,7 +135,8 @@ namespace indexing {
       private:
       int OpOptimize(); // Optimizes based on value of c, value and resets state
       int EarlyExitOptimize(void* now);
-      private:
+
+    private:
       std::function<bool(void*, void*)> checkFunc;
       IX_IndexHandle* pixh;
       BTreeNode* curNode;

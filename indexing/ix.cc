@@ -13,26 +13,27 @@ void IX_PrintError(int rc) { fprintf(stderr, "IX error %d.\n", rc); }
 IX_IndexHandle::IX_IndexHandle() {
   bFileOpen = false;
   bpm = nullptr;
-  bHdrChanged = false;
+  bHeaderChanged = false;
   root = nullptr;
   path = nullptr;
-  pathP = nullptr;
+  pathPos = nullptr;
   treeLargest = nullptr;
   header.height = 0;
 }
 
 IX_IndexHandle::~IX_IndexHandle() {
   if(root != nullptr && bpm != nullptr) {
-    int index;
-    bpm->getPage(fileID, header.rootPageNum, index);
-    bpm->release(index);
+    // int index;
+    // bpm->getPage(fileID, header.rootPageNum, index);
+    // bpm->release(index);
+    UnPin(header.rootPageNum);
     delete root;
     root = nullptr;
   }
 
-  if(pathP != nullptr) {
-    delete[] pathP;
-    pathP = nullptr;
+  if(pathPos != nullptr) {
+    delete[] pathPos;
+    pathPos = nullptr;
   }
 
   if(path != nullptr) {
@@ -61,7 +62,7 @@ IX_IndexHandle::~IX_IndexHandle() {
 
 int IX_IndexHandle::InsertEntry(void* pData, recordmanager::RID &r) {
   if(pData == nullptr) {
-    return -1;
+    return IX_KEY_NULL_ERROR;
   }
 
   bool newLargest = false;
@@ -71,7 +72,7 @@ int IX_IndexHandle::InsertEntry(void* pData, recordmanager::RID &r) {
   BTreeNode* newNode = nullptr;
 
   if(node->FindKey((const void* &)pData) != -1) {
-    return -2;
+    return IX_KEY_EXISTING_ERROR;
   }
 
   if(node->GetNumKeys() == 0 || node->CmpKey(pData, treeLargest) > 0) {
@@ -85,7 +86,6 @@ int IX_IndexHandle::InsertEntry(void* pData, recordmanager::RID &r) {
     for(int i = 0; i < header.height - 1; ++i) {
       int pos = path[i]->FindKey((const void* &)prevKey);
       path[i]->SetKey(pos, pData);
-      
     }
 
     memcpy(treeLargest, pData, header.attrLength);
@@ -131,7 +131,7 @@ int IX_IndexHandle::InsertEntry(void* pData, recordmanager::RID &r) {
 
     level--;
     if(level < 0) break;
-    int posAtParent = pathP[level];
+    int posAtParent = pathPos[level];
     BTreeNode* parent = path[level];
     parent->Remove(posAtParent);
     ret = parent->Insert(node->LargestKey(), node->GetPageRID());
@@ -255,7 +255,7 @@ int IX_IndexHandle::DeleteEnrty(void* pData, recordmanager::RID &r) {
       break;
     }
 
-    int posAtParent = pathP[level];
+    int posAtParent = pathPos[level];
     BTreeNode* parent = path[level];
 
     if(level == 0 && parent->GetNumKeys() == 1 && ret == 0) {
@@ -332,7 +332,7 @@ BTreeNode* IX_IndexHandle::FindLeafForceRight(const void* pData) {
 
           delete path[header.height - 1];
           path[header.height - 1] = FetchNode(right->GetPageRID());
-          pathP[header.height - 2]++;
+          pathPos[header.height - 2]++;
         }
       }
     }
@@ -347,7 +347,7 @@ int IX_IndexHandle::GetNewPage(int &pageNum) {
   bpm->allocPage(fileID, pageNum, index);
   UnPin(pageNum);
   header.numPages++;
-  bHdrChanged = true;
+  bHeaderChanged = true;
   return NO_ERROR;
 }
 
@@ -358,13 +358,13 @@ int IX_IndexHandle::GetFileHeader(const int& pageNum) {
   return NO_ERROR;
 }
 
-int IX_IndexHandle::Open(filesystem::BufPageManager* bpm, int fileID, int pairSize, 
+int IX_IndexHandle::Open(filesystem::BufPageManager* bpm, int fileID, 
 int rootPage) {
   if(bFileOpen || this->bpm != nullptr) {
     return -1;
   }
 
-  if(bpm == nullptr || pairSize <= 0) {
+  if(bpm == nullptr) {
     return -2;
   }
   bFileOpen = true;
@@ -391,7 +391,7 @@ int rootPage) {
   root = new BTreeNode(header.attrType, header.attrLength, bpm, fileID, rootPage, newPage);
   path[0] = root;
   header.capacity = root->GetMaxKeys();
-  bHdrChanged = true;
+  bHeaderChanged = true;
   treeLargest = (void*) new char[header.attrLength];
   if(!newPage) {
     BTreeNode* node = FindLargestLeaf();
@@ -447,7 +447,7 @@ BTreeNode* IX_IndexHandle::FindLeaf(const void* pData) {
     path[i] = FetchNode(r);
     int index;
     bpm->getPage(fileID, path[i]->GetPageNum(), index);
-    pathP[i - 1] = pos;
+    pathPos[i - 1] = pos;
   }
 
   return path[header.height - 1];
@@ -477,7 +477,7 @@ BTreeNode* IX_IndexHandle::FindSmallestLeaf() {
     path[i] = FetchNode(r);
     int index;
     bpm->getPage(fileID, path[i]->GetPageNum(), index);
-    pathP[i - 1] = 0;
+    pathPos[i - 1] = 0;
   }
 
   return path[header.height - 1];
@@ -507,7 +507,7 @@ BTreeNode* IX_IndexHandle::FindLargestLeaf() {
     path[i] = FetchNode(r);
     int index;
     bpm->getPage(fileID, path[i]->GetPageNum(), index);
-    pathP[i - 1] = path[i - 1]->GetNumKeys() - 1;
+    pathPos[i - 1] = path[i - 1]->GetNumKeys() - 1;
   }
 
   return path[header.height - 1];
@@ -539,7 +539,8 @@ int IX_IndexHandle::UnPin(int pageNum) {
   }
   int index;
   bpm->getPage(fileID, pageNum, index);
-  bpm->release(index);
+  bpm->markDirty(index);
+  bpm->writeBack(index);
   return NO_ERROR;
 }
 
@@ -1027,8 +1028,12 @@ int IX_Manager::DestroyIndex(const char* fileName, int indexNo) {
   std::stringstream name;
   name << fileName << "." << indexNo;
   
-  // TO DO 
+  bool ret = fm_->deleteFile(name.str().c_str());
+  if(!ret) {
+    return -1;
+  }
 
+  return NO_ERROR;
 }
 
 int IX_Manager::OpendIndex(const char* fileName, int indexNo, IX_IndexHandle& ixh) {
@@ -1046,7 +1051,7 @@ int IX_Manager::OpendIndex(const char* fileName, int indexNo, IX_IndexHandle& ix
   IX_FileHeader header;
   memcpy(&header, data, sizeof(header));
 
-  ixh.Open(bpm_, fileID, header.pairSize, header.rootPageNum);
+  ixh.Open(bpm_, fileID, header.rootPageNum);
   bpm_->release(0);
   return NO_ERROR;
 }
@@ -1055,7 +1060,7 @@ int IX_Manager::CloseIndex(IX_IndexHandle& ixh) {
   if(!ixh.bFileOpen || ixh.bpm == nullptr) {
     return -1;
   }
-  if(ixh.bHdrChanged) {
+  if(ixh.bHeaderChanged) {
     int index;
     ixh.bpm->getPage(ixh.fileID, 0, index);
     ixh.SetFileHeader(0);
