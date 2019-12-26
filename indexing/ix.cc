@@ -19,14 +19,12 @@ IX_IndexHandle::IX_IndexHandle() {
   pathPos = nullptr;
   treeLargest = nullptr;
   header.height = 0;
+  header.maxPageNum = 0;
 }
 
 IX_IndexHandle::~IX_IndexHandle() {
   if(root != nullptr && bpm != nullptr) {
-    // int index;
-    // bpm->getPage(fileID, header.rootPageNum, index);
-    // bpm->release(index);
-    UnPin(header.rootPageNum);
+    WriteBack(header.rootPageNum);
     delete root;
     root = nullptr;
   }
@@ -40,13 +38,14 @@ IX_IndexHandle::~IX_IndexHandle() {
     for(int i = 0; i < header.height; ++i) {
       if(path[i] != nullptr) {
         if(bpm != nullptr) {
-          UnPin(path[i]->GetPageNum());
-          delete path[i];
+          WriteBack(path[i]->GetPageNum());
+          // delete path[i];
+          // path[i] = nullptr;
         }
       }
-      delete[] path;
-      path = nullptr;
     }
+    delete[] path;
+    path = nullptr;
   }
 
   if(bpm != nullptr) {
@@ -55,7 +54,7 @@ IX_IndexHandle::~IX_IndexHandle() {
   }
 
   if(treeLargest != nullptr) {
-    delete treeLargest;
+    delete (char*)treeLargest;
     treeLargest = nullptr;
   }
 }
@@ -71,9 +70,9 @@ int IX_IndexHandle::InsertEntry(void* pData, recordmanager::RID &r) {
   BTreeNode* node = FindLeaf(pData);
   BTreeNode* newNode = nullptr;
 
-  if(node->FindKey((const void* &)pData) != -1) {
-    return IX_KEY_EXISTING_ERROR;
-  }
+  // if(node->FindKey((const void* &)pData) != -1) {
+  //   return IX_KEY_EXISTING_ERROR;
+  // }
 
   if(node->GetNumKeys() == 0 || node->CmpKey(pData, treeLargest) > 0) {
     newLargest = true;
@@ -91,8 +90,8 @@ int IX_IndexHandle::InsertEntry(void* pData, recordmanager::RID &r) {
     memcpy(treeLargest, pData, header.attrLength);
   }
 
-  void* failedKey = pData;
-  recordmanager::RID failRid = r;
+  void* insertKey = pData;
+  recordmanager::RID insertRid = r;
   while(ret != 0) {
     char* charPtr = new char[header.attrLength];
     void* oldLargest = charPtr;
@@ -118,15 +117,12 @@ int IX_IndexHandle::InsertEntry(void* pData, recordmanager::RID &r) {
       delete curRight;
     }
 
-    BTreeNode* nodeInsertInto = nullptr;
     void* largestKey = nullptr;
     node->GetKey(node->GetNumKeys() - 1, largestKey);
     if(node->CmpKey(pData, largestKey) >= 0) {
-      newNode->Insert(failedKey, failRid);
-      nodeInsertInto = newNode;
+      newNode->Insert(insertKey, insertRid);
     } else {
-      node->Insert(failedKey, failRid);
-      nodeInsertInto = node;
+      node->Insert(insertKey, insertRid);
     }
 
     level--;
@@ -137,50 +133,50 @@ int IX_IndexHandle::InsertEntry(void* pData, recordmanager::RID &r) {
     ret = parent->Insert(node->LargestKey(), node->GetPageRID());
     ret = parent->Insert(newNode->LargestKey(), newNode->GetPageRID());
     node = parent;
-    failedKey = newNode->LargestKey();
-    failRid = newNode->GetPageRID();
+    insertKey = newNode->LargestKey();
+    insertRid = newNode->GetPageRID();
 
     delete newNode;
     newNode = nullptr;
   }
 
-  if(level >= 0) {
-    return NO_ERROR;
-  } else {
-    UnPin(header.rootPageNum);
+if(level < 0 ) {
+    // Release(header.rootPageNum);
+    WriteBack(header.rootPageNum);
 
     int pageNum;
     int index;
     GetNewPage(pageNum);
     bpm->getPage(fileID, pageNum, index);
-
+    // std::cout << pageNum << "," << header.rootPageNum << std::endl;
+  
     root = new BTreeNode(header.attrType, header.attrLength, bpm, fileID, pageNum);
-
+    
     root->Insert(node->LargestKey(), node->GetPageRID());
     root->Insert(newNode->LargestKey(), newNode->GetPageRID());
+    
 
     header.rootPageNum = root->GetPageNum();
-    int index;
-    bpm->getPage(fileID, header.rootPageNum, index);
+    // bpm->getPage(fileID, header.rootPageNum, index);
 
     if(newNode != nullptr) {
       delete newNode;
       newNode = nullptr;
     }
-
     SetHeight(header.height + 1);
-    return NO_ERROR;
+    
   }
+  return NO_ERROR;
 }
 
-BTreeNode* IX_IndexHandle::DupScanLeftFind(BTreeNode* right, void* pData, const recordmanager::RID &r) {
+BTreeNode* IX_IndexHandle::ScanLeftFind(BTreeNode* right, void* pData, const recordmanager::RID &r) {
   BTreeNode* curNode = FetchNode(right->GetLeft());
   while(curNode != nullptr) {
     int i = curNode->GetNumKeys() - 1;
     for(; i >= 0; --i) {
       void* key = nullptr;
-      int ret = curNode->GetKey(i, key);
-      // ???
+      curNode->GetKey(i, key);
+      
       if(curNode->CmpKey(pData, key) < 0) {
         continue;
       }
@@ -212,7 +208,7 @@ int IX_IndexHandle::DeleteEnrty(void* pData, recordmanager::RID &r) {
   if(pos == -1) {
     int p = node->FindKey((const void* &)pData);
     if(p != -1) {
-      BTreeNode* others = DupScanLeftFind(node, pData, r);
+      BTreeNode* others = ScanLeftFind(node, pData, r);
       if(others != nullptr) {
         int removedPos = others->FindKey((const void* &)pData, r);
         others->Remove(removedPos); // maybe underflow
@@ -227,29 +223,30 @@ int IX_IndexHandle::DeleteEnrty(void* pData, recordmanager::RID &r) {
 
   if(delLargest) {
     for(int i = header.height - 2; i >= 0; --i) {
-      int pos = path[i]->FindKey((const void* &)pData);
+      int temp_pos = path[i]->FindKey((const void* &)pData);
 
-      if(pos != -1) {
+      if(temp_pos != -1) {
         void* leftKey = nullptr;
         leftKey = path[i + 1]->LargestKey();
         if(node->CmpKey(pData, leftKey) == 0) {
-          int pos = path[i + 1]->GetNumKeys() - 2;
-          if(pos < 0) {
+          int m_pos = path[i + 1]->GetNumKeys() - 2;
+          if(m_pos < 0) {
             continue;
           }
-          path[i + 1]->GetKey(path[i + 1]->GetNumKeys() - 2, leftKey);
+          path[i + 1]->GetKey(m_pos, leftKey);
         }
 
-        if(i == header.height - 2 || pos == path[i]->GetNumKeys() - 1) {
-          path[i]->SetKey(pos, leftKey);
+        if(i == header.height - 2 || (temp_pos == path[i]->GetNumKeys() - 1)) {
+          path[i]->SetKey(temp_pos, leftKey);
         }
       }
     }
   }
 
-  int ret = node->Remove(pos);
+  node->Remove(pos);
   int level = header.height - 1;
-  while(ret != 0) {
+  // std::cout << pos << "," << ret << "," << node->GetNumKeys() << std::endl;
+  while(node->GetNumKeys() == 0) {
     level--;
     if(level < 0) {
       break;
@@ -257,10 +254,11 @@ int IX_IndexHandle::DeleteEnrty(void* pData, recordmanager::RID &r) {
 
     int posAtParent = pathPos[level];
     BTreeNode* parent = path[level];
+    parent->Remove(posAtParent);
 
-    if(level == 0 && parent->GetNumKeys() == 1 && ret == 0) {
-      ret = -1;
-    }
+    // if(level == 0 && parent->GetNumKeys() == 1 && ret == 0) {
+    //   ret = -1;
+    // }
 
     BTreeNode* left = FetchNode(node->GetLeft());
     BTreeNode* right = FetchNode(node->GetRight());
@@ -287,16 +285,15 @@ int IX_IndexHandle::DeleteEnrty(void* pData, recordmanager::RID &r) {
       delete left;
     }
 
-    node->Destroy();
+    // node->Destroy();
     DisposePage(node->GetPageNum());
+    // std::cout << 
     node = parent;
-
   }
 
-  if(level >= 0) {
-    return NO_ERROR;
-  } else {
-    if(header.height == 1) {
+  if(level < 0) {
+    if(header.numPages == 2) {
+      SetHeight(1);
       return NO_ERROR;
     }
     recordmanager::RID first;
@@ -306,12 +303,13 @@ int IX_IndexHandle::DeleteEnrty(void* pData, recordmanager::RID &r) {
     int index;
     bpm->getPage(fileID, header.rootPageNum, index);
 
-    node->Destroy();
+    // node->Destroy();
     DisposePage(node->GetPageNum());
 
     SetHeight(header.height - 1);
-    return NO_ERROR;
+    
   }
+  return NO_ERROR;
 }
 
 BTreeNode* IX_IndexHandle::FindLeafForceRight(const void* pData) {
@@ -328,7 +326,7 @@ BTreeNode* IX_IndexHandle::FindLeafForceRight(const void* pData) {
         right->GetKey(0, key);
 
         if(right->CmpKey(pData, key) == 0) {
-          UnPin(path[header.height - 1]->GetPageNum());
+          WriteBack(path[header.height - 1]->GetPageNum());
 
           delete path[header.height - 1];
           path[header.height - 1] = FetchNode(right->GetPageRID());
@@ -341,11 +339,49 @@ BTreeNode* IX_IndexHandle::FindLeafForceRight(const void* pData) {
   return path[header.height - 1];
 }
 
+BTreeNode* IX_IndexHandle::FindLeafForceLeft(const void* pData) {
+  FindLeaf(pData);
+
+  while(path[header.height - 1]->GetLeft() != -1) {
+    
+    void* firstKey = nullptr;
+    path[header.height - 1]->GetKey(0, firstKey);
+
+    if(path[header.height - 1]->CmpKey(firstKey, pData) == 0) {
+      BTreeNode* left = FetchNode(path[header.height - 1]->GetLeft());
+
+      if(left != nullptr) {
+        void* key = nullptr;
+        left->GetKey(0, key);
+
+        if(left->CmpKey(pData, key) == 0) {
+          WriteBack(path[header.height - 1]->GetPageNum());
+
+          delete path[header.height - 1];
+          path[header.height - 1] = FetchNode(left->GetPageRID());
+          pathPos[header.height - 2]--;
+        } else {
+          return left;
+        }
+      }
+    }
+  }
+
+  return path[header.height - 1];
+}
+
 
 int IX_IndexHandle::GetNewPage(int &pageNum) {
+  utils::BitMap bitmap(header.pageNumBitMap, 32768);
+  if(bitmap.IsFull()) {
+    return -1;
+  }
+  pageNum = bitmap.FindFirstZeroPosition();
+  bitmap.SetOne(pageNum);
+  header.maxPageNum = std::max(header.maxPageNum, pageNum);
+
   int index;
-  bpm->allocPage(fileID, pageNum, index);
-  UnPin(pageNum);
+  bpm->getPage(fileID, pageNum, index);
   header.numPages++;
   bHeaderChanged = true;
   return NO_ERROR;
@@ -360,6 +396,7 @@ int IX_IndexHandle::GetFileHeader(const int& pageNum) {
 
 int IX_IndexHandle::Open(filesystem::BufPageManager* bpm, int fileID, 
 int rootPage) {
+  
   if(bFileOpen || this->bpm != nullptr) {
     return -1;
   }
@@ -373,6 +410,8 @@ int rootPage) {
   int index;
   bpm->getPage(fileID, 0, index);
   this->GetFileHeader(0);
+  utils::BitMap bitmap(header.pageNumBitMap, 32768);
+  bitmap.SetOne(0);
 
   bool newPage = true;
   if(header.height > 0) {
@@ -380,15 +419,13 @@ int rootPage) {
     newPage = false;
     bpm->getPage(fileID, rootPage, index);
   } else {
-    int newPageNum;
-    // TO DO
-    this->GetNewPage(newPageNum);
-    header.rootPageNum = newPageNum;
+    this->GetNewPage(rootPage);
+    header.rootPageNum = rootPage;
     SetHeight(1);
   }
 
-  // TO DO
   root = new BTreeNode(header.attrType, header.attrLength, bpm, fileID, rootPage, newPage);
+
   path[0] = root;
   header.capacity = root->GetMaxKeys();
   bHeaderChanged = true;
@@ -413,10 +450,27 @@ int IX_IndexHandle::SetFileHeader(const int &pageNum) const {
 }
 
 int IX_IndexHandle::ForcePages() {
+  int index, used;
+  utils::BitMap bitmap(header.pageNumBitMap, 32768);
+  for(int i = 1; i <= header.maxPageNum; ++i) {
+    bitmap.Get(i, used);
+    if(used == 1) {
+      bpm->getPage(fileID, i, index);
+      bpm->markDirty(i);
+      bpm->writeBack(i);
+    }
+  }
   return NO_ERROR;
 }
 
 int IX_IndexHandle::DisposePage(const int& pageNum) {
+  utils::BitMap bitmap(header.pageNumBitMap, 32768);
+  bitmap.SetZero(pageNum);
+  int index;
+  bpm->getPage(fileID, pageNum, index);
+  bpm->release(index);
+  header.numPages--;
+  bHeaderChanged = true;
   return NO_ERROR;
 }
 
@@ -440,7 +494,7 @@ BTreeNode* IX_IndexHandle::FindLeaf(const void* pData) {
       path[i - 1]->GetAddrByPosition(pos, r);
     }
     if(path[i] != nullptr) {
-      UnPin(path[i]->GetPageNum());
+      WriteBack(path[i]->GetPageNum());
       delete path[i];
       path[i] = nullptr;
     }
@@ -470,7 +524,7 @@ BTreeNode* IX_IndexHandle::FindSmallestLeaf() {
       return nullptr;
     }
     if(path[i] != nullptr) {
-      UnPin(path[i]->GetPageNum());
+      WriteBack(path[i]->GetPageNum());
       delete path[i];
       path[i] = nullptr;
     }
@@ -500,7 +554,7 @@ BTreeNode* IX_IndexHandle::FindLargestLeaf() {
       return nullptr;
     }
     if(path[i] != nullptr) {
-      UnPin(path[i]->GetPageNum());
+      WriteBack(path[i]->GetPageNum());
       delete path[i];
       path[i] = nullptr;
     }
@@ -533,7 +587,7 @@ BTreeNode* IX_IndexHandle::FetchNode(int pageNum) const {
   return new BTreeNode(header.attrType, header.attrLength, bpm, fileID, pageNum, false);
 }
 
-int IX_IndexHandle::UnPin(int pageNum) {
+int IX_IndexHandle::WriteBack(int pageNum) {
   if(bpm == nullptr) {
     return -1;
   }
@@ -542,6 +596,46 @@ int IX_IndexHandle::UnPin(int pageNum) {
   bpm->markDirty(index);
   bpm->writeBack(index);
   return NO_ERROR;
+}
+
+int IX_IndexHandle::Release(int pageNum) {
+  if(bpm == nullptr) {
+    return -1;
+  }
+  int index;
+  bpm->getPage(fileID, pageNum, index);
+  bpm->release(index);
+  return NO_ERROR;
+
+}
+
+// int IX_IndexHandle::Pin(int pageNum) {
+//   return NO_ERROR;
+// }
+
+int IX_IndexHandle::GetHeight() const {
+  return header.height;
+}
+
+void IX_IndexHandle::SetHeight(const int& h)
+{
+  for(int i = 1;i < header.height; ++i)
+    if (path != nullptr && path[i] != nullptr) {
+      delete path[i];
+      path[i] = nullptr;
+    }
+  if(path != nullptr) delete [] path;
+  if(pathPos != nullptr) delete [] pathPos;
+
+  header.height = h;
+  path = new BTreeNode* [header.height];
+  for(int i = 1;i < header.height; ++i)
+    path[i] = nullptr;
+  path[0] = root;
+
+  pathPos = new int [header.height-1]; 
+  for(int i = 0;i < header.height-1; ++i)
+    pathPos[i] = -1;
 }
 
 
@@ -560,32 +654,37 @@ IX_IndexScan::IX_IndexScan() {
 }
 
 IX_IndexScan::~IX_IndexScan() {
-  if(pixh != nullptr && pixh->GetHeight() > 1) {
-    if(curNode != nullptr) {
-      delete curNode;
-    }
-    if(lastNode != nullptr) {
-      delete lastNode;
-    }
+  if(curNode != nullptr) {
+    delete curNode;
+    curNode = nullptr;
   }
+  if(lastNode != nullptr) {
+    delete lastNode;
+    lastNode = nullptr;
+  }
+  // if(pixh != nullptr) {
+  //   delete pixh;
+  //   pixh = nullptr;
+  // }
 }
 
 std::function<bool(void*, void*)> IX_IndexScan::GetCheckFunction(
     AttrType attr_type, int attrLength, CompOp comp_op) {
   if (attr_type == AttrType::INT) {
-    std::function<int(void*)> f = [](void* x) -> int { return *((int*)x); };
+    std::function<int(void*)> f = [](void* x) -> int { return *(int*)x; };
+
     if (comp_op == CompOp::EQ_OP) {
-      return [&f](void* a, void* b) -> bool { return f(a) == f(b); };
+      return [f](void* a, void* b) -> bool { return f(a) == f(b); };
     } else if (comp_op == CompOp::LT_OP) {
-      return [&f](void* a, void* b) -> bool { return f(a) < f(b); };
+      return [f](void* a, void* b) -> bool { return f(a) < f(b); };
     } else if (comp_op == CompOp::GT_OP) {
-      return [&f](void* a, void* b) -> bool { return f(a) > f(b); };
+      return [f](void* a, void* b) -> bool { return f(a) > f(b); };
     } else if (comp_op == CompOp::LE_OP) {
-      return [&f](void* a, void* b) -> bool { return f(a) <= f(b); };
+      return [f](void* a, void* b) -> bool { return f(a) <= f(b); };
     } else if (comp_op == CompOp::GE_OP) {
-      return [&f](void* a, void* b) -> bool { return f(a) >= f(b); };
+      return [f](void* a, void* b) -> bool { return f(a) >= f(b); };
     } else if (comp_op == CompOp::NE_OP) {
-      return [&f](void* a, void* b) -> bool { return f(a) != f(b); };
+      return [f](void* a, void* b) -> bool { return f(a) != f(b); };
     } else {
       return [](void*, void*) -> bool { return true; };
     }
@@ -594,23 +693,23 @@ std::function<bool(void*, void*)> IX_IndexScan::GetCheckFunction(
       return *((float*)x);
     };
     if (comp_op == CompOp::EQ_OP) {
-      return [&f](void* a, void* b) -> bool { return f(a) == f(b); };
+      return [f](void* a, void* b) -> bool { return f(a) == f(b); };
     } else if (comp_op == CompOp::LT_OP) {
-      return [&f](void* a, void* b) -> bool { return f(a) < f(b); };
+      return [f](void* a, void* b) -> bool { return f(a) < f(b); };
     } else if (comp_op == CompOp::GT_OP) {
-      return [&f](void* a, void* b) -> bool { return f(a) > f(b); };
+      return [f](void* a, void* b) -> bool { return f(a) > f(b); };
     } else if (comp_op == CompOp::LE_OP) {
-      return [&f](void* a, void* b) -> bool { return f(a) <= f(b); };
+      return [f](void* a, void* b) -> bool { return f(a) <= f(b); };
     } else if (comp_op == CompOp::GE_OP) {
-      return [&f](void* a, void* b) -> bool { return f(a) >= f(b); };
+      return [f](void* a, void* b) -> bool { return f(a) >= f(b); };
     } else if (comp_op == CompOp::NE_OP) {
-      return [&f](void* a, void* b) -> bool { return f(a) != f(b); };
+      return [f](void* a, void* b) -> bool { return f(a) != f(b); };
     } else {
       return [](void*, void*) -> bool { return true; };
     }
   } else {  // attr_type == AttrType::STRING
     if (comp_op == CompOp::EQ_OP) {
-      return [&attrLength](void* a, void* b) -> bool {
+      return [attrLength](void* a, void* b) -> bool {
         char* x = (char*)a;
         char* y = (char*)b;
         for (int i = 0; i < attrLength; i++) {
@@ -621,7 +720,7 @@ std::function<bool(void*, void*)> IX_IndexScan::GetCheckFunction(
         return true;
       };
     } else if (comp_op == CompOp::LT_OP) {
-      return [&attrLength](void* a, void* b) -> bool {
+      return [attrLength](void* a, void* b) -> bool {
         char* x = (char*)a;
         char* y = (char*)b;
         for (int i = 0; i < attrLength; i++) {
@@ -633,7 +732,7 @@ std::function<bool(void*, void*)> IX_IndexScan::GetCheckFunction(
         return false;
       };
     } else if (comp_op == CompOp::GT_OP) {
-      return [&attrLength](void* a, void* b) -> bool {
+      return [attrLength](void* a, void* b) -> bool {
         char* x = (char*)a;
         char* y = (char*)b;
         for (int i = 0; i < attrLength; i++) {
@@ -645,7 +744,7 @@ std::function<bool(void*, void*)> IX_IndexScan::GetCheckFunction(
         return false;
       };
     } else if (comp_op == CompOp::LE_OP) {
-      return [&attrLength](void* a, void* b) -> bool {
+      return [attrLength](void* a, void* b) -> bool {
         char* x = (char*)a;
         char* y = (char*)b;
         for (int i = 0; i < attrLength; i++) {
@@ -657,7 +756,7 @@ std::function<bool(void*, void*)> IX_IndexScan::GetCheckFunction(
         return true;
       };
     } else if (comp_op == CompOp::GE_OP) {
-      return [&attrLength](void* a, void* b) -> bool {
+      return [attrLength](void* a, void* b) -> bool {
         char* x = (char*)a;
         char* y = (char*)b;
         for (int i = 0; i < attrLength; i++) {
@@ -669,7 +768,7 @@ std::function<bool(void*, void*)> IX_IndexScan::GetCheckFunction(
         return true;
       };
     } else if (comp_op == CompOp::NE_OP) {
-      return [&attrLength](void* a, void* b) -> bool {
+      return [attrLength](void* a, void* b) -> bool {
         char* x = (char*)a;
         char* y = (char*)b;
         for (int i = 0; i < attrLength; i++) {
@@ -698,18 +797,12 @@ int IX_IndexScan::OpenScan(const IX_IndexHandle &indexHandle, CompOp comOp, void
   }
 
   bOpen = true;
-  if(desc) {
-    this->desc = true;
-  }
-
+  this->desc = desc;
   foundOne = false;
-  c = comOp;
+  this->c = comOp;
   checkFunc = GetCheckFunction(pixh->GetAttrType(), pixh->GetAttrLength(), comOp);
-  if(value != nullptr) {
-    this->value = value;
-
-  }
-
+  this->value = value;
+  OpOptimize();
   return NO_ERROR;
 }
 
@@ -727,6 +820,7 @@ int IX_IndexScan::GetNextEntry(void* &key, recordmanager::RID &r, int& numScanne
     return -2;
   }
 
+  bool curDeleted = false;
   if(curNode == nullptr && curPos == -1) {
     if(!desc) {
       curNode = pixh->FetchNode(pixh->FindSmallestLeaf()->GetPageRID());
@@ -735,32 +829,54 @@ int IX_IndexScan::GetNextEntry(void* &key, recordmanager::RID &r, int& numScanne
       curNode = pixh->FetchNode(pixh->FindLargestLeaf()->GetPageRID());
       curPos = curNode->GetNumKeys();
     }
-
   } else {
     if(curKey != nullptr && curNode != nullptr && curPos != -1) {
       void* k = nullptr;
       curNode->GetKey(curPos, k);
+      if(curNode->CmpKey(curKey, k) != 0) {
+        curDeleted = true;
+      } else {
+        recordmanager::RID rid;
+        curNode->GetAddrByPosition(curPos, rid);
+        if(!(rid == curRid)) {
+          curDeleted = true;
+        }
+      }
     }
   }
+  //std::cout << curPos << "," << curDeleted << std::endl;
 
   while(curNode != nullptr) {
     int i = -1;
     if(!desc) {
+      if(curDeleted) {
+        i = curPos;
+        curDeleted = false;
+      } else {
+        i = curPos + 1;
+      }
+      //std::cout << i << "," << curNode->GetNumKeys() << std::endl;
+      
 
       for(; i < curNode->GetNumKeys(); ++i) {
         void* k = nullptr;
         curNode->GetKey(i, k);
         numScanned++;
         curPos = i;
+        // std::cout << i << "," << curNode->GetNumKeys() << std::endl;
         if(curKey == nullptr) {
           curKey = (void*) new char[pixh->GetAttrLength()];
         }
         memcpy(curKey, k, pixh->GetAttrLength());
-
+        curNode->GetAddrByPosition(i, curRid);
+        //std::cout << *(int*)curKey << "," << *(int*)value << std::endl;
+        //std::cout << checkFunc(k, value) << std::endl;
         if(checkFunc(k, value)) {
           key = k;
+          //std::cout << "why"<< std::endl;
           curNode->GetAddrByPosition(i, r);
           foundOne = true;
+
           return NO_ERROR;
         } else {
           if(foundOne) {
@@ -771,7 +887,14 @@ int IX_IndexScan::GetNextEntry(void* &key, recordmanager::RID &r, int& numScanne
           }
         }
       }
+
     } else {
+      if(curDeleted) {
+        i = curPos;
+        curDeleted = false;
+      } else {
+        i = curPos - 1;
+      }
 
       for(; i >= 0; --i) {
         void* k = nullptr;
@@ -781,6 +904,7 @@ int IX_IndexScan::GetNextEntry(void* &key, recordmanager::RID &r, int& numScanne
         if(curKey == nullptr) {
           curKey = (void*) new char[pixh->GetAttrLength()];
         }
+        curNode->GetAddrByPosition(i, curRid);
         memcpy(curKey, k, pixh->GetAttrLength());
 
         if(checkFunc(k, value)) {
@@ -805,20 +929,20 @@ int IX_IndexScan::GetNextEntry(void* &key, recordmanager::RID &r, int& numScanne
 
     if(!desc) {
       int right = curNode->GetRight();
-      pixh->UnPin(curNode->GetPageNum());
+      pixh->WriteBack(curNode->GetPageNum());
       delete curNode;
       curNode = pixh->FetchNode(right);
-      if(curNode != nullptr) {
-        pixh->Pin(curNode->GetPageNum());
-      }
+      // if(curNode != nullptr) {
+      //   pixh->Pin(curNode->GetPageNum());
+      // }
       curPos = -1;
     } else {
       int left = curNode->GetLeft();
-      pixh->UnPin(curNode->GetPageNum());
+      pixh->WriteBack(curNode->GetPageNum());
       delete curNode;
       curNode = pixh->FetchNode(left);
       if(curNode != nullptr) {
-        pixh->Pin(curNode->GetPageNum());
+        // pixh->Pin(curNode->GetPageNum());
         curPos = curNode->GetNumKeys();
       }
     }
@@ -872,12 +996,22 @@ int IX_IndexScan::EarlyExitOptimize(void* nowKey) {
       return NO_ERROR;
     }
 
-    if((c == LT_OP || c == LE_OP) && cmp > 0 && !desc) {
+    if((c == LE_OP) && cmp > 0 && !desc) {
       eof = true;
       return NO_ERROR;
     }
 
-    if((c == GT_OP || c == GE_OP) && cmp < 0 && desc) {
+    if((c == LT_OP) && cmp >= 0 && !desc) {
+      eof = true;
+      return NO_ERROR;
+    }
+
+    if((c == GE_OP) && cmp < 0 && desc) {
+      eof = true;
+      return NO_ERROR;
+    }
+
+    if((c == GT_OP) && cmp <= 0 && desc) {
       eof = true;
       return NO_ERROR;
     }
@@ -906,7 +1040,7 @@ int IX_IndexScan::OpOptimize() {
 
   curNode = pixh->FetchNode(pixh->FindLeafForceRight(value)->GetPageRID());
   curPos = curNode->FindKey((const void* &)value);
-
+  //std::cout << curPos << std::endl;
   if(desc) {
     if(c == LE_OP || c == LT_OP) {
       lastNode = nullptr;
@@ -963,10 +1097,10 @@ int IX_IndexScan::OpOptimize() {
     }
   }
   
-  int first = -1;
-  if(curNode != NULL) first = curNode->GetPageNum();
-  int last = -1;
-  if(lastNode != NULL) last = lastNode->GetPageNum();
+  //int first = -1;
+  //if(curNode != NULL) first = curNode->GetPageNum();
+  //int last = -1;
+  //if(lastNode != NULL) last = lastNode->GetPageNum();
   return NO_ERROR;
 }
 
@@ -1070,7 +1204,7 @@ int IX_Manager::CloseIndex(IX_IndexHandle& ixh) {
   }
 
   fm_->closeFile(ixh.fileID);
-  ixh.~IX_IndexHandle;
+  ixh.~IX_IndexHandle();
   ixh.bpm = nullptr;
   ixh.bFileOpen = false;
   return NO_ERROR;

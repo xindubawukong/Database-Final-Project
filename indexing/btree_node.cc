@@ -25,7 +25,7 @@ BTreeNode::BTreeNode(AttrType attrType, int attrLength,
 
   keys = pData;
   rids = (recordmanager::RID*) (pData + capacity * attrLength);
-
+  
   SetPageRID(recordmanager::RID(pageID, -1));
 
   if(newPage) {
@@ -37,13 +37,13 @@ BTreeNode::BTreeNode(AttrType attrType, int attrLength,
     GetRight();
     GetNumKeys();
   }
-  
-  //assert(IsValid() == 0);
+  // std::cout << fileID << "," << pageID << "," << index << std::endl;
+  assert(IsValid() == 0);
 }
 
 BTreeNode::~BTreeNode() {
-  keys = nullptr;
-  rids = nullptr;
+  // keys = nullptr;
+  // rids = nullptr;
 }
 
 int BTreeNode::Destroy() {
@@ -51,7 +51,8 @@ int BTreeNode::Destroy() {
   if(numKeys != 0) {
     return -1;
   }
-
+  keys = nullptr;
+  rids = nullptr;
  
   return NO_ERROR;
 }
@@ -74,13 +75,13 @@ int BTreeNode::GetMaxKeys() const {
 }
 
 int BTreeNode::GetNumKeys() {
-  void* location = (void*)rids + sizeof(recordmanager::RID) * capacity;
+  void* location = (char*)rids + sizeof(recordmanager::RID) * capacity;
   numKeys = *((int*) location);
   return numKeys;
 }
 
 int BTreeNode::SetNumKeys(int newNumKeys) {
-  void* location = (void*)rids + sizeof(recordmanager::RID) * capacity;
+  void* location = (char*)rids + sizeof(recordmanager::RID) * capacity;
   memcpy(location, &newNumKeys, sizeof(int));
   numKeys = newNumKeys;
   assert(IsValid() == 0);
@@ -88,23 +89,23 @@ int BTreeNode::SetNumKeys(int newNumKeys) {
 }
 
 int BTreeNode::GetLeft() {
-  void* location = (void*)rids + sizeof(recordmanager::RID) * capacity + sizeof(int);
+  void* location = (char*)rids + sizeof(recordmanager::RID) * capacity + sizeof(int);
   return *((int*)location);
 }
 
 int BTreeNode::SetLeft(int pageNum) {
-  void* location = (void*)rids + sizeof(recordmanager::RID) * capacity + sizeof(int);
+  void* location = (char*)rids + sizeof(recordmanager::RID) * capacity + sizeof(int);
   memcpy(location, &pageNum, sizeof(int));
   return 0;
 }
 
 int BTreeNode::GetRight() {
-  void* location = (void*)rids + sizeof(recordmanager::RID) * capacity + 2 * sizeof(int);
+  void* location = (char*)rids + sizeof(recordmanager::RID) * capacity + 2 * sizeof(int);
   return *((int*)location);
 }
 
 int BTreeNode::SetRight(int pageNum) {
-  void* location = (void*)rids + sizeof(recordmanager::RID) * capacity + 2 * sizeof(int);
+  void* location = (char*)rids + sizeof(recordmanager::RID) * capacity + 2 * sizeof(int);
   memcpy(location, &pageNum, sizeof(int));
   return 0;
 }

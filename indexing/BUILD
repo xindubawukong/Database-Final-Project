@@ -20,6 +20,7 @@ cc_library(
     "//filesystem:filesystem",
     "//recordmanager:rm_rid",
     "//indexing:btree_node",
+    "//utils:bitmap",
   ],
   visibility = ["//visibility:public"],
 )

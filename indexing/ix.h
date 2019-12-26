@@ -6,6 +6,7 @@
 #include "filesystem/bufmanager/BufPageManager.h"
 #include "filesystem/fileio/FileManager.h"
 #include "recordmanager/rm_rid.h"
+#include "utils/bitmap.h"
 #include "global.h"
 #include "btree_node.h"
 
@@ -20,6 +21,8 @@ namespace indexing {
     int height;
     AttrType attrType;
     int attrLength;
+    int maxPageNum;
+    int pageNumBitMap[1024];
   };
 
   class IX_IndexHandle {
@@ -36,7 +39,7 @@ namespace indexing {
 
       int ForcePages();
 
-      int Search(void* pData, recordmanager::RID &rid);
+      // int Search(void* pData, recordmanager::RID &rid);
 
       int Open(filesystem::BufPageManager *bpm, int fileID, int rootPage);
       int GetFileHeader(const int &pageNum);
@@ -55,10 +58,11 @@ namespace indexing {
       BTreeNode* FindLeaf(const void *pData);
       BTreeNode* FindSmallestLeaf();
       BTreeNode* FindLargestLeaf();
-      BTreeNode* DupScanLeftFind(BTreeNode* right,
+      BTreeNode* ScanLeftFind(BTreeNode* right,
                                 void *pData,
                                 const recordmanager::RID& rid);
       BTreeNode* FindLeafForceRight(const void* pData);
+      BTreeNode* FindLeafForceLeft(const void* pData);
 
       BTreeNode* FetchNode(recordmanager::RID r) const;
       BTreeNode* FetchNode(int p) const;
@@ -66,14 +70,15 @@ namespace indexing {
       int GetHeight() const;
       void SetHeight(const int&);
 
-      BTreeNode* GetRoot() const;
+      //BTreeNode* GetRoot() const;
 
-      int Pin(int p);
-      int UnPin(int p);
+      // int Pin(int p);
+      int Release(int p);
+      int WriteBack(int p);
 
     private:
       //Unpinning version that will unpin after every call correctly
-      int GetThisPage(int p, filesystem::BufPageManager *bpm) const;
+      // int GetThisPage(int p, filesystem::BufPageManager *bpm) const;
 
       IX_FileHeader header;
       bool bFileOpen;
@@ -88,7 +93,6 @@ namespace indexing {
                   // the child node.
 
       void * treeLargest; // largest key in the entire tree
-
   };
 
   class IX_Manager {
@@ -130,8 +134,8 @@ namespace indexing {
       // for iterator to reset state for another open/close
       int ResetState();
 
-      bool IsOpen() const { return (bOpen && pixh != NULL); }
-      bool IsDesc() const { return desc; }
+      //bool IsOpen() const { return (bOpen && pixh != NULL); }
+      //bool IsDesc() const { return desc; }
       private:
       int OpOptimize(); // Optimizes based on value of c, value and resets state
       int EarlyExitOptimize(void* now);
