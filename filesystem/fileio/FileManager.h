@@ -30,6 +30,15 @@ class FileManager {
     return 0;
   }
 
+  int _deleteFile(const char* name) {
+    int ret = remove(name);
+    if(ret == -1) {
+      std::cout << "Fail to delete file " << name << "." << std::endl;
+      return -1;
+    }
+    return 0;
+  }
+
   int _openFile(const char* name, int fileID) {
     int f = open(name, O_RDWR);
     if (f == -1) {
@@ -115,6 +124,11 @@ class FileManager {
   bool createFile(const char* name) {
     _createFile(name);
     return true;
+  }
+
+  bool deleteFile(const char* name) {
+    int ret = _deleteFile(name);
+    return ret == 0;
   }
 
   /*
