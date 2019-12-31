@@ -23,5 +23,6 @@
 #define IX_KEY_INSERT_OVERLEAP_ERROR 204
 
 
+#define RM_EOF (-1)
 
 #endif  // RETURN_CODE_H

@@ -30,6 +30,7 @@ class RM_FileHandle {
 
   ~RM_FileHandle();
 
+  // All size or position are in bytes.
   static const int kRecordSizePosition;
   static const int kPageBitMapStartPosition;
   static const int kMaxPageNum;
@@ -55,7 +56,9 @@ class RM_FileHandle {
 
   int GetFileID();
 
-  int GetNextNotEmptyPage(int from);
+  int GetRecordSize();
+
+  int GetMaxPageNum();
 
   int GetNextNotEmptySlot(int page_num, int slot_num);
 
@@ -65,11 +68,13 @@ class RM_FileHandle {
   filesystem::FileManager* fm_;
   filesystem::BufPageManager* bpm_;
   int file_id_;
+  int max_page_num_;
 };
 
 class RM_Manager {
  public:
-  RM_Manager(filesystem::FileManager* fm, filesystem::BufPageManager* bpm);
+  explicit RM_Manager(filesystem::FileManager* fm,
+                      filesystem::BufPageManager* bpm);
 
   ~RM_Manager();
 
@@ -92,7 +97,7 @@ class RM_Manager {
 //    RM_FileScan file_scan;
 //    file_scan.OpenScan(...);
 //    RM_Record record;
-//    while (file_scan.GetNextRecord(record) != EOF) {
+//    while (file_scan.GetNextRecord(record) != RM_EOF) {
 //      // Do something.
 //    }
 //
@@ -116,9 +121,6 @@ class RM_FileScan {
   void* value_;
   std::function<bool(void*, void*, int)> check_;
   RID current_;
-
-  static std::function<bool(void*, void*, int)> GetCheckFunction(
-      AttrType attr_type, CompOp comp_op);
 };
 
 }  // namespace recordmanager

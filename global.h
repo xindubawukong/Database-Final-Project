@@ -1,7 +1,9 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
-extern const int kPageSize;
+#include <functional>
+
+extern const int kPageSize;  // in bytes.
 
 enum AttrType {
   INT,
@@ -18,5 +20,8 @@ enum CompOp {
   NE_OP,
   NO_OP,
 };
+
+std::function<bool(void*, void*, int)> GetCheckFunction(AttrType attr_type,
+                                                        CompOp comp_op);
 
 #endif  // GLOBAL_H
