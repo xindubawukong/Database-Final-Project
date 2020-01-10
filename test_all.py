@@ -4,6 +4,7 @@ all_bazel_tests = [
   'bazel_example/main:all',
   'recordmanager:all',
   'utils:all',
+  'indexing:all',
 ]
 
 for test in all_bazel_tests:

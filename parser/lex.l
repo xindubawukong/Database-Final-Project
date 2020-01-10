@@ -5,7 +5,6 @@
 #include <cstdio>
 #include <cstring>
 
-
 char *get_text(const char *text, bool strip = false) {
     int length = strlen(text);
     char *buffer;
@@ -77,7 +76,7 @@ varchar         { /*printf("varchar "); */ return VARCHAR; }
 {VALUE_INT}       { /*printf("INTEGER "); */ sscanf(yytext, "%d", &yylval.ivalue); return VALUE_INT; }
 {IDENTIFIER}    { yylval.string = get_text(yytext, false); /*printf("IDENTIFIER(%s) ", yylval.string);*/ return IDENTIFIER; }
 
-{VALUE_STRING}        { yylval.string = get_text(yytext, false); /*printf("STRING(%s) ", yylval.string);*/ return VALUE_STRING; }
+{VALUE_STRING}  { yylval.string = get_text(yytext, false); /*printf("STRING(%s) ", yylval.string);*/ return VALUE_STRING; }
 {WHITESPACE}    {}
 .               { yyerror((std::string("invalid char ") + yytext).c_str()); }
 

@@ -1,10 +1,12 @@
+%require "3.2"
+%language "c++"
+
+
 %{
 #include <cstdio>
-#include <stdlib.h>
-
 #include "global.h"
-#include "ast.h"
-#include "parser.yy.cpp"
+#include "parser/ast.h"
+#include "parser/parser.h"
 
 int yylex();
 void yyerror(const char *);
@@ -12,31 +14,33 @@ void yyerror(const char *);
 class Tree;
 %}
 
-%union {
-    int ivalue;
-    AttrType attrType;
-    float fvalue;
-    char *string;
-    Tree *tree;
-    Field *field;
-    
-
-}
+// %union {
+//     int ivalue;
+//     AttrType attrType;
+//     float fvalue;
+//     char *string;
+//     Tree *tree;
+//     Field *field;
+// }
 
 /* keyword */
 %token QUIT
-%token CREATE DROP USE SHOW TABLES DESC
-%token DATABASES DATABASE TABLE INDEX ON
+%token CREATE DROP USE SHOW TABLES DESC ADD CHANGE ALTER 
+%token DATABASES DATABASE TABLE INDEX ON CONSTRAINT
 
 /* COLUMN DESCPRITION */
 %token INT FLOAT VARCHAR PRIMARY FOREIGN REFERENCES NOTNULL DEFAULT
 
 
 /* number */
-%token <ivalue> VALUE_INT
-%token <fvalue> VALUE_FLOAT
-%token <string> VALUE_STRING IDENTIFIER VALUE_NULL
+%token <int> VALUE_INT
+%token <float> VALUE_FLOAT
+%token <char*> VALUE_STRING IDENTIFIER VALUE_NULL
+%token END_OF_FILE 0
 
+/* type */
+%type <Tree*> dbStmt
+%type <char*> tbName dbName idxName fkName columnName
 %%
 
 program: %empty 
@@ -69,6 +73,10 @@ stmt: sysStmt ';'
       {
 
       }
+      | QUIT
+      {
+          YYACCEPT;
+      }
       ;
 
 sysStmt: SHOW DATABASES 
@@ -79,15 +87,24 @@ sysStmt: SHOW DATABASES
 
 dbStmt: CREATE DATABASE dbName
         {
-
+            $$ = new CreateDatabase($3);
+            Tree::setInstance($$);
+            delete $3;
+            Tree::run();
         }
         | DROP DATABASE dbName
         {
-
+            $$ = new DropDatabase($3);
+            Tree::setInstance($$);
+            delete $3;
+            Tree::run();
         }
         | USE dbName
         {
-
+            $$ = new UseDatabase($2);
+            Tree::setInstance($$);
+            delete $2;
+            Tree::run();
         }
         | SHOW TABLES
         {
@@ -241,17 +258,28 @@ columnList: columnName
 
 dbName: IDENTIFIER
         {
-
+            $$ = $1;
         }
         ;
 tbName: IDENTIFIER
         {
-
+            $$ = $1;
         }
         ;
 columnName: IDENTIFIER
             {
-
+                $$ = $1;
             }
             ;
 
+fkName: IDENTIFIER
+        {
+            $$ = $1;
+        }
+        ;
+
+idxName: IDENTIFIER
+        {
+            $$ = $1;
+        }
+        ;

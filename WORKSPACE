@@ -6,3 +6,18 @@ http_archive(
     strip_prefix = "googletest-b4d4438df9479675a632b2f11125e57133822ece",
     sha256 = "5aaa5d566517cae711e2a3505ea9a6438be1b37fcaae0ebcb96ccba9aa56f23a",
 )
+
+local_repository(
+    name = "rules_bison",
+    path = "./bison"
+)
+
+load("@rules_bison//bison:bison.bzl", "bison_register_toolchains", "bison_repository")
+load("@rules_bison//bison/internal:versions.bzl", "VERSION_URLS")
+
+bison_register_toolchains()
+
+[bison_repository(
+    name = "bison_v" + version,
+    version = version,
+) for version in VERSION_URLS]

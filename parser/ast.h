@@ -8,13 +8,13 @@
 
 namespace parser {
 
-enum class AlterObject {
+enum AlterObject {
   PRIMARY,
   FOREIGN,
   COLUMN
 };
 
-enum class AlterType {
+enum AlterType {
   ADD,
   DROP,
   CHANGE
