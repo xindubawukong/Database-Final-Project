@@ -28,10 +28,26 @@ namespace systemmanager {
   }
 
   int SM_Manager::CreateDb(const char* dbName) {
-    int rc = mkdir(dbName, S_IRWXU);
+ 
+    int rc = _fm->createFile("DatabaseList");
+    int fileID, index;
+    rc = _fm->openFile("DatabaseList", fileID);
+    DatabaseList *dbList = (DatabaseList*) _bpm->getPage(fileID, 0, index);
+    if(dbList->databaseCount == MAX_DATABASES) {
+      return -1;
+    }
+    for(int i = 0; i < dbList->databaseCount; ++i) {
+      if(strcmp(dbList->databaseName[i], dbName)) {
+        return -1;
+      }
+    }
+    memcpy(dbList->databaseName[dbList->databaseCount++], dbName, MAX_LENGTH);
+
+    rc = mkdir(dbName, S_IRWXU);
     if(rc != 0) {
       return rc;
     }
+
     chdir(dbName);
     _fm->createFile("TableList");
     chdir("..");
@@ -63,6 +79,8 @@ namespace systemmanager {
         return -1;
     }
     closedir(dirp);
+
+    
     return 0;
   }
 
@@ -159,6 +177,19 @@ namespace systemmanager {
         }
 
         foreginTableNameSet.insert(std::string(constraints[i].foreignTableName));
+
+        for(int j = 0; j < constraints[i].thisNameList.attrCount; ++j) {
+          bool find = false;
+          for(int k = 0; k < attrCount; ++k) {
+            if(strcmp(attrInfos[k].attrName, constraints[i].thisNameList.names[j])) {
+              find = true;
+              break;
+            }
+          }
+          if(!find) {
+            return -1;
+          }
+        }
 
         for(int j = 0; j < constraints[i].referencesNameList.attrCount; ++i) {
           if(!AttrExist(constraints[i].foreignTableName, 
@@ -277,7 +308,7 @@ namespace systemmanager {
         break;
       }
     }
-    if(attrIndex = -1) {
+    if(attrIndex == -1) {
       return -1;
     }
     bool indexed = false;
@@ -296,13 +327,56 @@ namespace systemmanager {
     if(rc != 0) {
       return rc;
     }
+
+    _bpm->markDirty(index);
+    _bpm->writeBack(index);
+    _fm->closeFile(fileID);
     return 0;
 
   }
 
   int SM_Manager::DropIndex(const char* relName, const char* attrName) {
-    return 0;
+    if(!TableExist(relName)) {
+      return -1;
+    }
 
+    int fileID, index;
+    std::string metaFile = std::string(relName) + "_meta";
+    int rc = _fm->openFile(metaFile.c_str(), fileID);
+    if(rc == 0) {
+      return -1;
+    }
+    TableInfo *info = (TableInfo*) _bpm->getPage(fileID, 0, index);
+    int attrIndex = -1;
+    for(int i = 0; i < info->attrCount; ++i) {
+      if(strcmp(info->attrInfos[i].attrName, attrName)) {
+        attrIndex = i;
+        break;
+      }
+    }
+    if(attrIndex == -1) {
+      return -1;
+    }
+    bool indexed = false;
+    for(int i = 0; i < info->indexSize; ++i) {
+      if(info->indexedAttr[i] == attrIndex) {
+        indexed = true;
+        break;
+      }
+    }
+    if(!indexed) {
+      return -1;
+    }
+    info->indexedAttr[attrIndex] = info->indexedAttr[--info->indexSize];
+    rc = _ixm->DestroyIndex(relName, attrIndex);
+    if(rc != 0) {
+      return -1;
+    }
+
+    _bpm->markDirty(index);
+    _bpm->writeBack(index);
+    _fm->closeFile(fileID);
+    return 0;
   }
 
   bool SM_Manager::TableExist(const char *tableName) {

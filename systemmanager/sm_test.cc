@@ -53,7 +53,7 @@ TEST(TestTables, TableOperations) {
   memcpy(attr1.defaultValue, "NO_NAME", std::string("NO_NAME").size());
 
   sm->CreateTable("Test", 1, &attr1, 0, nullptr);
-
+  
   
 
 }
