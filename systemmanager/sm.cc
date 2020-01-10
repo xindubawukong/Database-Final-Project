@@ -277,7 +277,7 @@ namespace systemmanager {
         break;
       }
     }
-    if(attrIndex = -1) {
+    if(attrIndex == -1) {
       return -1;
     }
     bool indexed = false;
