@@ -1,6 +1,7 @@
 cc_library(
     name = "filesystem",
     hdrs = glob(["**/*.h"]),
+    srcs = glob(["**/*.cc"]),
     visibility = ["//visibility:public"],
 )
 

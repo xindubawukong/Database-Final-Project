@@ -17,7 +17,7 @@ namespace filesystem {
 #define MAX_INNER_NUM 67
 //#define MOD 61
 #define BIAS 5
-unsigned char h[61];
+extern unsigned char h[61];
 
 class MyBitMap {
  protected:
