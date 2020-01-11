@@ -42,12 +42,13 @@ struct BufPageManager {
   BufType fetchPage(int typeID, int pageID, int& index) {
     BufType b;
     index = replace->find();
+    //std::cout << index << std::endl;
     while(idx_pin[index]) {
       index = replace->find();
     }
 
     b = addr[index];
-    // std::cout << "b: " << b << std::endl;
+    //std::cout << "b: " << b << std::endl;
     if (b == NULL) {
       b = allocMem();
       addr[index] = b;
@@ -114,7 +115,7 @@ struct BufPageManager {
    */
   BufType getPage(int fileID, int pageID, int& index) {
     index = hash->findIndex(fileID, pageID);
-    // std::cout << "index: " << index << std::endl;
+    //std::cout << "index: " << index << std::endl;
     if (index != -1) {
       std::string oldName = idx_to_name[index];
       std::string newName = id_to_name[fileID];
@@ -129,6 +130,7 @@ struct BufPageManager {
     //   std::cout << oldName << ", " << newName << std::endl;
 
     BufType b = fetchPage(fileID, pageID, index);
+    //std::cout << (void*)b << std::endl;
     fileManager->readPage(fileID, pageID, b, 0);
 
     // std::cout << "old: " << idx_to_name[index] << std::endl;
@@ -177,7 +179,7 @@ struct BufPageManager {
     // int fd = idx_to_fd[index];
     // idx_to_fd[index] = -1;
     // fd_to_idx[fd].erase(index);
-    unpin(index);
+    // unpin(index);
 
     replace->free(index);
     hash->remove(index);
@@ -199,7 +201,7 @@ struct BufPageManager {
     // int fd = idx_to_fd[index];
     // idx_to_fd[index] = -1;
     // fd_to_idx[fd].erase(index);
-    unpin(index);
+    // unpin(index);
     // memset(addr[index], 0, PAGE_SIZE);
 
     replace->free(index);
