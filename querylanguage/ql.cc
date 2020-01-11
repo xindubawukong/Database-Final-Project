@@ -21,6 +21,8 @@ QL_Manager::~QL_Manager() {}
 int QL_Manager::Select(int nSelAttrs, const RelAttr selAttrs[], int nRelations,
                        const char *const relations[], int nConditions,
                        const Condition conditions[]) {
+  std::cout << "\nQL_Manager::Select" << std::endl;
+
   if (nSelAttrs <= 0) return -1;
   if (nRelations <= 0) return -1;
   int rc;
@@ -30,16 +32,20 @@ int QL_Manager::Select(int nSelAttrs, const RelAttr selAttrs[], int nRelations,
     string tbname = relations[i];
     string meta_file = tbname + "_meta";
     int meta_file_id, index;
-    fm_->openFile(meta_file.c_str(), meta_file_id);
+    if (!fm_->openFile(meta_file.c_str(), meta_file_id)) return -1;
     auto addr = bpm_->getPage(meta_file_id, 0, index);
+    bpm_->access(index);
     systemmanager::TableInfo table_info = *((systemmanager::TableInfo *)addr);
     tbinfos.push_back(table_info);
   }
 
   std::vector<recordmanager::RM_Record> now;
   std::vector<std::vector<recordmanager::RM_Record>> results;
+  std::cout << "Dfs start." << std::endl;
   rc = Dfs(nRelations, relations, &now, &results);
   if (rc) return rc;
+
+  std::cout << "Dfs end." << std::endl;
 
   for (const auto &records : results) {
     std::vector<char *> records_data;
@@ -287,7 +293,7 @@ int QL_Manager::Select(int nSelAttrs, const RelAttr selAttrs[], int nRelations,
 
 int QL_Manager::Insert(const char *relName, int nValues, const Value values[]) {
 
-  std::cout << "QL_Manager::Insert " << relName << std::endl;
+  std::cout << "\nQL_Manager::Insert " << relName << std::endl;
 
   if (relName == NULL) return -1;
   int rc;

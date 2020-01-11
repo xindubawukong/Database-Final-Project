@@ -244,7 +244,7 @@ int RM_FileScan::GetNextRecord(RM_Record& record) {
   int page_num, slot_num;
   if ((rc = current_.GetPageNum(page_num))) return rc;
   if ((rc = current_.GetSlotNum(slot_num))) return rc;
-  for (int i = page_num; i <= 1; i++) {
+  for (int i = page_num; i <= file_handle_->kMaxPageNum; i++) {
     int j = -1;
     if (i == page_num) j = slot_num;
     for (j = file_handle_->GetNextNotEmptySlot(i, j);

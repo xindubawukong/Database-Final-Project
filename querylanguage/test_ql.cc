@@ -78,5 +78,72 @@ int main() {
   rc = qlm->Delete(tb1.c_str(), 0, NULL);
   cout << "Delete(tb1): " << rc << endl;
 
+  rc = qlm->Insert(tb1.c_str(), 3, values);
+  cout << "Insert(tb1): " << rc << endl;
+
+  values[0].data = new char[11];
+  CopyStr((char*)values[0].data, "yyf", 10);
+  values[1].data = new int(21);
+  values[2].data = new float(90);
+  rc = qlm->Insert(tb1.c_str(), 3, values);
+  cout << "Insert(tb1): " << rc << endl;
+
+  querylanguage::Condition conditions[1];
+  conditions[0].bRhsIsAttr = false;
+  conditions[0].lhsAttr.relName = NULL;
+  conditions[0].lhsAttr.attrName = "age";
+  conditions[0].op = CompOp::GT_OP;
+  conditions[0].rhsValue.type = AttrType::INT;
+  conditions[0].rhsValue.data = new int(30);
+  rc = qlm->Delete(tb1.c_str(), 1, conditions);
+  cout << "Delete(tb1 >= 30): " << rc << endl;
+
+  conditions[0].bRhsIsAttr = false;
+  conditions[0].lhsAttr.relName = NULL;
+  conditions[0].lhsAttr.attrName = "age";
+  conditions[0].op = CompOp::GT_OP;
+  conditions[0].rhsValue.type = AttrType::INT;
+  conditions[0].rhsValue.data = new int(10);
+  rc = qlm->Delete(tb1.c_str(), 1, conditions);
+  cout << "Delete(tb1 >= 10): " << rc << endl;
+
+  values[0].data = new char[11];
+  CopyStr((char*)values[0].data, "yyf", 10);
+  values[1].data = new int(21);
+  values[2].data = new float(90);
+  rc = qlm->Insert(tb1.c_str(), 3, values);
+  cout << "Insert(tb1): " << rc << endl;
+
+  values[0].data = new char[11];
+  CopyStr((char*)values[0].data, "dxy", 10);
+  values[1].data = new int(21);
+  values[2].data = new float(100);
+  rc = qlm->Insert(tb1.c_str(), 3, values);
+  cout << "Insert(tb1): " << rc << endl;
+
+  values[0].data = new char[11];
+  CopyStr((char*)values[0].data, "zxh", 10);
+  values[1].data = new int(99);
+  values[2].data = new float(999);
+  rc = qlm->Insert(tb1.c_str(), 3, values);
+  cout << "Insert(tb1): " << rc << endl;
+
+  querylanguage::RelAttr selAttrs[1];
+  selAttrs[0].relName = NULL;
+  selAttrs[0].attrName = "name";
+  char* relations[1] = {"table_1"};
+
+  rc = qlm->Select(1, selAttrs, 1, relations, 0, conditions);
+  cout << "Select name from tb1: " << rc << endl;
+
+  conditions[0].bRhsIsAttr = false;
+  conditions[0].lhsAttr.relName = NULL;
+  conditions[0].lhsAttr.attrName = "score";
+  conditions[0].op = CompOp::GE_OP;
+  conditions[0].rhsValue.type = AttrType::FLOAT;
+  conditions[0].rhsValue.data = new float(95);
+  rc = qlm->Select(1, selAttrs, 1, relations, 1, conditions);
+  cout << "Select name from tb1 where score>=95: " << rc << endl;
+
   return 0;
 }
