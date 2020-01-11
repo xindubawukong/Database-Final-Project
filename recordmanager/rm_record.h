@@ -10,6 +10,8 @@ class RM_Record {
   RM_Record();
   ~RM_Record();
 
+  RM_Record(const RM_Record& record);
+
   int Set(int length, char* data, RID rid);
 
   int GetData(char*& p) const;
