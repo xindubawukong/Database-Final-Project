@@ -75,5 +75,8 @@ int main() {
   rc = qlm->Insert(tb1.c_str(), 3, values);
   cout << "Insert(tb1): " << rc << endl;
 
+  rc = qlm->Delete(tb1.c_str(), 0, NULL);
+  cout << "Delete(tb1): " << rc << endl;
+
   return 0;
 }
