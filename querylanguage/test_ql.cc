@@ -145,5 +145,30 @@ int main() {
   rc = qlm->Select(1, selAttrs, 1, relations, 1, conditions);
   cout << "Select name from tb1 where score>=95: " << rc << endl;
 
+  querylanguage::RelAttr updAttr;
+  updAttr.relName = NULL;
+  updAttr.attrName = "score";
+  querylanguage::RelAttr rhsRelAttr;
+  querylanguage::Value rhsValue;
+  rhsValue.type = AttrType::FLOAT;
+  rhsValue.data = new float(150);
+  conditions[0].bRhsIsAttr = false;
+  conditions[0].lhsAttr.relName = NULL;
+  conditions[0].lhsAttr.attrName = "name";
+  conditions[0].op = CompOp::EQ_OP;
+  conditions[0].rhsValue.type = AttrType::STRING;
+  char yyf[] = "yyf";
+  conditions[0].rhsValue.data = yyf;
+  rc = qlm->Update("table_1", updAttr, 1, rhsRelAttr, rhsValue, 1, conditions);
+  cout << "Update tb1: " << rc << endl;
+
+  conditions[0].bRhsIsAttr = false;
+  conditions[0].lhsAttr.relName = NULL;
+  conditions[0].lhsAttr.attrName = "score";
+  conditions[0].op = CompOp::GE_OP;
+  conditions[0].rhsValue.type = AttrType::FLOAT;
+  conditions[0].rhsValue.data = new float(95);
+  rc = qlm->Select(1, selAttrs, 1, relations, 1, conditions);
+  cout << "Select name from tb1 where score>=95: " << rc << endl;
   return 0;
 }

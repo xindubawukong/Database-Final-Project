@@ -360,6 +360,8 @@ int QL_Manager::Insert(const char *relName, int nValues, const Value values[]) {
 
 int QL_Manager::Delete(const char *relName, int nConditions,
                        const Condition conditions[]) {
+  std::cout << "\nQL_Manager::Delete" << std::endl;
+  
   if (relName == NULL) return -1;
   int rc;
 
@@ -507,6 +509,8 @@ int QL_Manager::Update(const char *relName, const RelAttr &updAttr,
                        const int bIsValue, const RelAttr &rhsRelAttr,
                        const Value &rhsValue, int nConditions,
                        const Condition conditions[]) {
+  std::cout << "\nQL_Manager::Update" << std::endl;
+  
   if (relName == NULL) return -1;
   int rc;
 
@@ -608,8 +612,7 @@ int QL_Manager::Update(const char *relName, const RelAttr &updAttr,
         } else {
           std::memcpy(r_data, condition.rhsValue.data, length);
         }
-        flag &=
-            check_f(record_data + l_offset, condition.rhsValue.data, length);
+        flag &= check_f(l_data, r_data, length);
         delete[] l_data;
         delete[] r_data;
       }
