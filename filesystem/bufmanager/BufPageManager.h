@@ -52,7 +52,6 @@ struct BufPageManager {
     if (b == NULL) {
       b = allocMem();
       addr[index] = b;
-      // std::cout << "hehe" << std::endl;
     } else {
       
       if (dirty[index]) {

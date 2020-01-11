@@ -5,6 +5,8 @@
 #include <string>
 #include <cassert>
 #include "global.h"
+#include "systemmanager/sm.h"
+
 
 namespace parser {
 
@@ -76,6 +78,7 @@ class Tree {
     }
 
     static Tree* tree;
+    static SM_Manager
 };
 
 class ShowDatabase: public Tree {

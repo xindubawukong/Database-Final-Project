@@ -260,7 +260,6 @@ namespace systemmanager {
     int primaryCnt = 0;
 
     for(int i = 0; i < constraintCount; ++i) {
-
       if(constraintNameSet.count(std::string(constraints[i].constraintName)) > 0) {
         return -1;
       }
@@ -270,6 +269,7 @@ namespace systemmanager {
         if(primaryCnt++ > 1) {
           return -1;
         }
+
         
         for(int j = 0; j < constraints[i].thisNameList.attrCount; ++j) {
           bool find = false;
@@ -286,6 +286,7 @@ namespace systemmanager {
             return -1;
           }
         }
+
       } else {
 
         if(!TableExist(constraints[i].foreignTableName)) {
@@ -349,6 +350,7 @@ namespace systemmanager {
       return -1;
     }
 
+
     TableInfo* info = new TableInfo();
     info->attrCount = attrCount;
     memcpy(info->attrInfos, attrInfos, sizeof(AttrInfo) * attrCount);
@@ -380,6 +382,7 @@ namespace systemmanager {
     if(rc != 0) {
       return -1;
     }
+
 
     _bpm->openFile("TableList", fileID);
     tableList = (TableList*) _bpm->getPage(fileID, 0, index);
