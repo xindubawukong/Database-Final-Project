@@ -62,6 +62,26 @@ int BitMap::FindFirstZeroPosition() {
   return length_;
 }
 
+int BitMap::FindLastOnePosition() {
+  unsigned int* p = addr_;
+  int last = 0;
+  int num = 0;
+  while (num < length_) {
+    int x = *p;
+    if (x != 0) {
+      int up = std::min(length_ - num, 32);
+      for (int i = 0; i < up; i++) {
+        if ((x & (1 << i)) != 0) {
+          last = num + i;
+        }
+      }
+    }
+    p++;
+    num += 32;
+  }
+  return last;
+}
+
 bool BitMap::IsFull() {
   unsigned int* p = addr_;
   int num = 0;
@@ -73,6 +93,24 @@ bool BitMap::IsFull() {
     }
     else {
       if ((*p) != all_one_) return false;
+    }
+    p++;
+    num += 32;
+  }
+  return true;
+}
+
+bool BitMap::IsEmpty() {
+  unsigned int* p = addr_;
+  int num = 0;
+  while (num < length_) {
+    if (num + 32 > length_) {
+      int n = length_ - num;
+      unsigned int tmp = (1 << n) - 1;
+      if (((*p) & tmp) != 0) return false;
+    }
+    else {
+      if ((*p) != 0) return false;
     }
     p++;
     num += 32;

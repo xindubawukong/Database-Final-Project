@@ -25,7 +25,11 @@ class BitMap {
 
   int FindFirstZeroPosition();
 
+  int FindLastOnePosition();
+
   bool IsFull();
+
+  bool IsEmpty();
 
  private:
   unsigned int* addr_;

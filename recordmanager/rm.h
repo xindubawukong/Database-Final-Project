@@ -33,6 +33,7 @@ class RM_FileHandle {
   // All size or position are in bytes.
   static const int kRecordSizePosition;
   static const int kPageBitMapStartPosition;
+  static const int kPageBitMap2StartPosition;
   static const int kMaxPageNum;
   static const int kBitMapStartPosition;
   static const int kBitMapLength;
@@ -68,7 +69,6 @@ class RM_FileHandle {
   filesystem::FileManager* fm_;
   filesystem::BufPageManager* bpm_;
   int file_id_;
-  int max_page_num_;
 };
 
 class RM_Manager {

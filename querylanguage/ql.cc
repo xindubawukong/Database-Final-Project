@@ -32,7 +32,7 @@ int QL_Manager::Select(int nSelAttrs, const RelAttr selAttrs[], int nRelations,
     string tbname = relations[i];
     string meta_file = tbname + "_meta";
     int meta_file_id, index;
-    if (!fm_->openFile(meta_file.c_str(), meta_file_id)) return -1;
+    if (!bpm_->openFile(meta_file.c_str(), meta_file_id)) return -1;
     auto addr = bpm_->getPage(meta_file_id, 0, index);
     bpm_->access(index);
     systemmanager::TableInfo table_info = *((systemmanager::TableInfo *)addr);
@@ -305,8 +305,9 @@ int QL_Manager::Insert(const char *relName, int nValues, const Value values[]) {
   std::cout << "meta_file: " << meta_file << std::endl;
 
   int meta_file_id, index;
-  fm_->openFile(meta_file.c_str(), meta_file_id);
+  bpm_->openFile(meta_file.c_str(), meta_file_id);
   auto addr = bpm_->getPage(meta_file_id, 0, index);
+  bpm_->access(index);
   systemmanager::TableInfo table_info = *((systemmanager::TableInfo *)addr);
 
   // 检测属性个数及类型是否一致
@@ -369,8 +370,9 @@ int QL_Manager::Delete(const char *relName, int nConditions,
   string meta_file = (string)relName + "_meta";
 
   int meta_file_id, index;
-  fm_->openFile(meta_file.c_str(), meta_file_id);
+  bpm_->openFile(meta_file.c_str(), meta_file_id);
   auto addr = bpm_->getPage(meta_file_id, 0, index);
+  bpm_->access(index);
   systemmanager::TableInfo table_info = *((systemmanager::TableInfo *)addr);
 
   recordmanager::RM_FileHandle rm_filehandle;
@@ -518,8 +520,9 @@ int QL_Manager::Update(const char *relName, const RelAttr &updAttr,
   string meta_file = (string)relName + "_meta";
 
   int meta_file_id, index;
-  fm_->openFile(meta_file.c_str(), meta_file_id);
+  bpm_->openFile(meta_file.c_str(), meta_file_id);
   auto addr = bpm_->getPage(meta_file_id, 0, index);
+  bpm_->access(index);
   systemmanager::TableInfo table_info = *((systemmanager::TableInfo *)addr);
 
   recordmanager::RM_FileHandle rm_filehandle;

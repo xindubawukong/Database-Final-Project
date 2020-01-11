@@ -12,7 +12,8 @@ void RM_PrintError(int rc) { fprintf(stderr, "RM error %d.\n", rc); }
 
 const int RM_FileHandle::kRecordSizePosition = 0;
 const int RM_FileHandle::kPageBitMapStartPosition = 4096;
-const int RM_FileHandle::kMaxPageNum = 32769;
+const int RM_FileHandle::kPageBitMap2StartPosition = 6144;
+const int RM_FileHandle::kMaxPageNum = 16385;
 const int RM_FileHandle::kBitMapStartPosition = 0;
 const int RM_FileHandle::kBitMapLength = 4;
 const int RM_FileHandle::kRecordStartPosition = 192;
@@ -31,7 +32,6 @@ void RM_FileHandle::Init(const std::string& file_name, int record_size,
   fm_ = fm;
   bpm_ = bpm;
   file_id_ = file_id;
-  max_page_num_ = 0;
 }
 
 int RM_FileHandle::GetRecord(const RID& rid, RM_Record& rec) const {
@@ -62,28 +62,39 @@ int RM_FileHandle::InsertRecord(const char* data, RID& rid) {
   int index;
   auto addr = bpm_->getPage(file_id_, /*page_num=*/0, index);
   bpm_->access(index);
-  utils::BitMap page_bitmap(addr + kPageBitMapStartPosition / 4, kMaxPageNum);
+  utils::BitMap page_bitmap(addr + kPageBitMapStartPosition / 4, kMaxPageNum - 1);
   int page = page_bitmap.FindFirstZeroPosition() + 1;
   if (page > kMaxPageNum) return RM_FILEHANDLE_NO_EMPTY_POSITION_ERROR;
-  max_page_num_ = std::max(max_page_num_, page);
 
   addr = bpm_->getPage(file_id_, page, index);
   bpm_->access(index);
   utils::BitMap bitmap(addr + kBitMapStartPosition / 4, kBitMapLength * 8);
+  bool is_empty_before_insert = bitmap.IsEmpty();
   int slot = bitmap.FindFirstZeroPosition();
   if ((rc = rid.Set(page, slot))) return rc;
+  if ((rc = bitmap.SetOne(slot))) return rc;
   int record_offset = kRecordStartPosition / 4 + slot * kRecordMaxLength / 4;
   std::memset(addr + record_offset, 0, record_size_);
   std::memcpy(addr + record_offset, data, record_size_);
   bpm_->markDirty(index);
-  if ((rc = bitmap.SetOne(slot))) return rc;
+  bpm_->writeBack(index);
+
 
   if (bitmap.IsFull()) {
     addr = bpm_->getPage(file_id_, /*page_num=*/0, index);
     bpm_->access(index);
-    utils::BitMap page_bitmap(addr + kPageBitMapStartPosition / 4, kMaxPageNum);
+    utils::BitMap page_bitmap(addr + kPageBitMapStartPosition / 4, kMaxPageNum - 1);
     if ((rc = page_bitmap.SetOne(page - 1))) return rc;
     bpm_->markDirty(index);
+    bpm_->writeBack(index);
+  }
+  if (is_empty_before_insert) {
+    addr = bpm_->getPage(file_id_, /*page_num=*/0, index);
+    bpm_->access(index);
+    utils::BitMap page_bitmap(addr + kPageBitMap2StartPosition / 4, kMaxPageNum - 1);
+    if ((rc = page_bitmap.SetOne(page - 1))) return rc;
+    bpm_->markDirty(index);
+    bpm_->writeBack(index);
   }
   return NO_ERROR;
 }
@@ -106,14 +117,28 @@ int RM_FileHandle::DeleteRecord(const RID& rid) {
   if ((rc = bitmap.Get(slot_num, exist))) return rc;
   if (exist == 0) return RM_FILEHANDLE_RECORD_NOT_FOUND_ERROR;
   if ((rc = bitmap.SetZero(slot_num))) return rc;
+  int record_offset =
+      kRecordStartPosition / 4 + slot_num * kRecordMaxLength / 4;
+  std::memset(addr + record_offset, 0, record_size_);
   bpm_->markDirty(index);
+  bpm_->writeBack(index);
+
+  if (bitmap.IsEmpty()) {
+    addr = bpm_->getPage(file_id_, /*page_num=*/0, index);
+    bpm_->access(index);
+    utils::BitMap page_bitmap(addr + kPageBitMap2StartPosition / 4, kMaxPageNum - 1);
+    if ((rc = page_bitmap.SetZero(page_num - 1))) return rc;
+    bpm_->markDirty(index);
+    bpm_->writeBack(index);
+  }
 
   if (is_full_before_destroy) {
     addr = bpm_->getPage(file_id_, /*page_num=*/0, index);
     bpm_->access(index);
-    utils::BitMap page_bitmap(addr + kPageBitMapStartPosition / 4, kMaxPageNum);
+    utils::BitMap page_bitmap(addr + kPageBitMapStartPosition / 4, kMaxPageNum - 1);
     if ((rc = page_bitmap.SetZero(page_num - 1))) return rc;
     bpm_->markDirty(index);
+    bpm_->writeBack(index);
   }
   return NO_ERROR;
 }
@@ -143,6 +168,7 @@ int RM_FileHandle::UpdateRecord(const RM_Record& rec) {
   std::memset(addr + record_offset, 0, record_size_);
   std::memcpy(addr + record_offset, data, record_size_);
   bpm_->markDirty(index);
+  bpm_->writeBack(index);
   return NO_ERROR;
 }
 
@@ -155,7 +181,13 @@ int RM_FileHandle::GetFileID() { return file_id_; }
 
 int RM_FileHandle::GetRecordSize() { return record_size_; }
 
-int RM_FileHandle::GetMaxPageNum() { return max_page_num_; }
+int RM_FileHandle::GetMaxPageNum() {
+  int index;
+  auto addr = bpm_->getPage(file_id_, /*page_num=*/0, index);
+  bpm_->access(index);
+  utils::BitMap page_bitmap(addr + kPageBitMap2StartPosition / 4, kMaxPageNum - 1);
+  return page_bitmap.FindLastOnePosition() + 1;
+}
 
 int RM_FileHandle::GetNextNotEmptySlot(int page_num, int slot_num) {
   int index;
@@ -180,7 +212,7 @@ int RM_Manager::CreateFile(const std::string& file_name, int record_size) {
   if (fn_to_rs_.find(file_name) != fn_to_rs_.end()) {
     return RM_MANAGER_DUPLICATE_FILE_NAME_ERROR;
   }
-  fm_->createFile(file_name.c_str());
+  bpm_->createFile(file_name.c_str());
   fn_to_rs_[file_name] = record_size;
   return NO_ERROR;
 }
@@ -201,7 +233,7 @@ int RM_Manager::OpenFile(const std::string& file_name,
     return RM_MANAGER_FILE_NOT_FOUND_ERROR;
   }
   int file_id;
-  if (!fm_->openFile(file_name.c_str(), file_id)) {
+  if (!bpm_->openFile(file_name.c_str(), file_id)) {
     return RM_MANAGER_FILE_CANNOT_OPEN_ERROR;
   }
   file_handle.Init(file_name, it->second, fm_, bpm_, file_id);
@@ -209,8 +241,7 @@ int RM_Manager::OpenFile(const std::string& file_name,
 }
 
 int RM_Manager::CloseFile(RM_FileHandle& file_handle) {
-  int rc;
-  if ((rc = fm_->closeFile(file_handle.GetFileID()))) return rc;
+  bpm_->closeFile(file_handle.GetFileID());
   return NO_ERROR;
 }
 
@@ -244,7 +275,7 @@ int RM_FileScan::GetNextRecord(RM_Record& record) {
   int page_num, slot_num;
   if ((rc = current_.GetPageNum(page_num))) return rc;
   if ((rc = current_.GetSlotNum(slot_num))) return rc;
-  for (int i = page_num; i <= file_handle_->kMaxPageNum; i++) {
+  for (int i = page_num; i <= file_handle_->GetMaxPageNum(); i++) {
     int j = -1;
     if (i == page_num) j = slot_num;
     for (j = file_handle_->GetNextNotEmptySlot(i, j);
