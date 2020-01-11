@@ -3,7 +3,6 @@
 
 #include <iostream>
 #include <string>
-#include <unordered_map>
 
 #include "global.h"
 #include "indexing/ix.h"
@@ -73,8 +72,6 @@ class QL_Manager {
   systemmanager::SM_Manager *smm_;
 
   int Dfs(int nRelations, const char *const relations[],
-          std::unordered_map<std::string, systemmanager::TableInfo>
-              tbname_to_tbinfo,
           std::vector<recordmanager::RM_Record> *now,
           std::vector<std::vector<recordmanager::RM_Record>> *results);
 };

@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <vector>
 
 #include "ql.h"
@@ -24,7 +25,7 @@ int QL_Manager::Select(int nSelAttrs, const RelAttr selAttrs[], int nRelations,
   if (nRelations <= 0) return -1;
   int rc;
 
-  std::unordered_map<string, systemmanager::TableInfo> tbname_to_tbinfo;
+  std::vector<systemmanager::TableInfo> tbinfos;
   for (int i = 0; i < nRelations; i++) {
     string tbname = relations[i];
     string meta_file = tbname + "_meta";
@@ -32,16 +33,175 @@ int QL_Manager::Select(int nSelAttrs, const RelAttr selAttrs[], int nRelations,
     fm_->openFile(meta_file.c_str(), meta_file_id);
     auto addr = bpm_->getPage(meta_file_id, 0, index);
     systemmanager::TableInfo table_info = *((systemmanager::TableInfo *)addr);
-    tbname_to_tbinfo[tbname] = table_info;
+    tbinfos.push_back(table_info);
   }
 
   std::vector<recordmanager::RM_Record> now;
   std::vector<std::vector<recordmanager::RM_Record>> results;
-  rc = Dfs(nRelations, relations, tbname_to_tbinfo, &now, &results);
+  rc = Dfs(nRelations, relations, &now, &results);
   if (rc) return rc;
 
-  for (const auto& records : results) {
+  for (const auto &records : results) {
+    std::vector<char *> records_data;
+    for (const auto &record : records) {
+      char *data;
+      record.GetData(data);
+      records_data.push_back(data);
+    }
 
+    bool flag = true;
+    for (int condition_id = 0; condition_id < nConditions; condition_id++) {
+      auto &condition = conditions[condition_id];
+      if (condition.bRhsIsAttr) {
+        int l_rel_id = -1, l_attr_id = -1, l_attr_offset = 0;
+        if (condition.lhsAttr.relName == NULL) {
+          for (int i = 0; i < nRelations; i++) {
+            auto &tbinfo = tbinfos[i];
+            for (int j = 0, offset = 0; j < tbinfo.attrCount; j++) {
+              if (strcmp(tbinfo.attrInfos[j].attrName,
+                         condition.lhsAttr.attrName) == 0) {
+                l_rel_id = i;
+                l_attr_id = j;
+                l_attr_offset = offset;
+                break;
+              }
+              offset += tbinfo.attrInfos[j].attrLength;
+            }
+            if (l_rel_id != -1) break;
+          }
+        } else {
+          for (int i = 0; i < nRelations; i++) {
+            if (strcmp(relations[i], condition.lhsAttr.relName) == 0) {
+              l_rel_id = i;
+              break;
+            }
+          }
+          auto &tbinfo = tbinfos[l_rel_id];
+          for (int j = 0, offset = 0; j < tbinfo.attrCount; j++) {
+            if (strcmp(tbinfo.attrInfos[j].attrName,
+                       condition.lhsAttr.attrName) == 0) {
+              l_attr_id = j;
+              l_attr_offset = offset;
+            }
+            offset += tbinfo.attrInfos[j].attrLength;
+          }
+        }
+
+        int r_rel_id = -1, r_attr_id = -1, r_attr_offset = 0;
+        if (condition.lhsAttr.relName == NULL) {
+          for (int i = 0; i < nRelations; i++) {
+            auto &tbinfo = tbinfos[i];
+            for (int j = 0, offset = 0; j < tbinfo.attrCount; j++) {
+              if (strcmp(tbinfo.attrInfos[j].attrName,
+                         condition.rhsAttr.attrName) == 0) {
+                r_rel_id = i;
+                r_attr_id = j;
+                r_attr_offset = offset;
+                break;
+              }
+              offset += tbinfo.attrInfos[j].attrLength;
+            }
+            if (r_rel_id != -1) break;
+          }
+        } else {
+          for (int i = 0; i < nRelations; i++) {
+            if (strcmp(relations[i], condition.rhsAttr.relName) == 0) {
+              r_rel_id = i;
+              break;
+            }
+          }
+          auto &tbinfo = tbinfos[r_rel_id];
+          for (int j = 0, offset = 0; j < tbinfo.attrCount; j++) {
+            if (strcmp(tbinfo.attrInfos[j].attrName,
+                       condition.rhsAttr.attrName) == 0) {
+              r_attr_id = j;
+              r_attr_offset = offset;
+            }
+            offset += tbinfo.attrInfos[j].attrLength;
+          }
+        }
+
+        // 左右类型必须相同
+        if (tbinfos[l_rel_id].attrInfos[l_attr_id].attrType !=
+            tbinfos[r_rel_id].attrInfos[r_attr_id].attrType)
+          return -1;
+        AttrType attr_type = tbinfos[l_rel_id].attrInfos[l_attr_id].attrType;
+        auto check_f = GetCheckFunction(attr_type, condition.op);
+        int length =
+            std::max(tbinfos[l_rel_id].attrInfos[l_attr_id].attrLength,
+                     tbinfos[r_rel_id].attrInfos[r_attr_id].attrLength);
+        char *l_data = new char[length];
+        char *r_data = new char[length];
+        std::memset(l_data, 0, length);
+        std::memset(r_data, 0, length);
+        std::memcpy(l_data, records_data[l_rel_id] + l_attr_offset,
+                    tbinfos[l_rel_id].attrInfos[l_attr_id].attrLength);
+        std::memcpy(r_data, records_data[r_rel_id] + r_attr_offset,
+                    tbinfos[r_rel_id].attrInfos[r_attr_id].attrLength);
+        flag &= check_f(l_data, r_data, length);
+        delete[] l_data;
+        delete[] r_data;
+      } else {
+        int l_rel_id = -1, l_attr_id = -1, l_attr_offset = 0;
+        if (condition.lhsAttr.relName == NULL) {
+          for (int i = 0; i < nRelations; i++) {
+            auto &tbinfo = tbinfos[i];
+            for (int j = 0, offset = 0; j < tbinfo.attrCount; j++) {
+              if (strcmp(tbinfo.attrInfos[j].attrName,
+                         condition.lhsAttr.attrName) == 0) {
+                l_rel_id = i;
+                l_attr_id = j;
+                l_attr_offset = offset;
+                break;
+              }
+              offset += tbinfo.attrInfos[j].attrLength;
+            }
+            if (l_rel_id != -1) break;
+          }
+        } else {
+          for (int i = 0; i < nRelations; i++) {
+            if (strcmp(relations[i], condition.lhsAttr.relName) == 0) {
+              l_rel_id = i;
+              break;
+            }
+          }
+          auto &tbinfo = tbinfos[l_rel_id];
+          for (int j = 0, offset = 0; j < tbinfo.attrCount; j++) {
+            if (strcmp(tbinfo.attrInfos[j].attrName,
+                       condition.lhsAttr.attrName) == 0) {
+              l_attr_id = j;
+              l_attr_offset = offset;
+            }
+            offset += tbinfo.attrInfos[j].attrLength;
+          }
+        }
+
+        // 左右类型必须相同
+        if (tbinfos[l_rel_id].attrInfos[l_attr_id].attrType != condition.rhsValue.type) return -1;
+        AttrType attr_type = tbinfos[l_rel_id].attrInfos[l_attr_id].attrType;
+        auto check_f = GetCheckFunction(attr_type, condition.op);
+        int length = tbinfos[l_rel_id].attrInfos[l_attr_id].attrLength;
+        char* l_data = new char[length];
+        char* r_data = new char[length];
+        std::memset(l_data, 0, length);
+        std::memset(r_data, 0, length);
+        std::memcpy(l_data, records_data[l_rel_id] + l_attr_offset, length);
+        if (attr_type == AttrType::STRING) {
+          int tmp = std::min(length, (int)std::strlen((char*)condition.rhsValue.data));
+          std::memcpy(r_data, condition.rhsValue.data, tmp);
+        }
+        else {
+          std::memcpy(r_data, condition.rhsValue.data, length);
+        }
+        flag &= check_f(l_data, r_data, length);
+        delete[] l_data;
+        delete[] r_data;
+      }
+      if (!flag) break;
+    }
+    if (flag) {
+      // output
+    }
   }
 
   return NO_ERROR;
@@ -70,7 +230,8 @@ int QL_Manager::Insert(const char *relName, int nValues, const Value values[]) {
   for (int i = 0; i < nValues; i++) {
     record_size += table_info.attrInfos[i].attrLength;
   }
-  char *data = new char[record_size];
+  char* data = new char[record_size];
+  std::memset(data, 0, record_size);
   int offset = 0;
   for (int i = 0; i < nValues; i++) {
     memcpy(data + offset, values[i].data, table_info.attrInfos[i].attrLength);
@@ -149,9 +310,16 @@ int QL_Manager::Delete(const char *relName, int nConditions,
           return -1;
         AttrType attr_type = table_info.attrInfos[l_id].attrType;
         auto check_f = GetCheckFunction(attr_type, condition.op);
-        int attr_length = table_info.attrInfos[l_id].attrLength;
-        flag &= check_f(record_data + l_offset, record_data + r_offset,
-                        attr_length);
+        int length = std::max(table_info.attrInfos[l_id].attrLength, table_info.attrInfos[r_id].attrLength);
+        char* l_data = new char[length];
+        char* r_data = new char[length];
+        std::memset(l_data, 0, length);
+        std::memset(r_data, 0, length);
+        std::memcpy(l_data, record_data + l_offset, table_info.attrInfos[l_id].attrLength);
+        std::memcpy(r_data, record_data + r_offset, table_info.attrInfos[r_id].attrLength);
+        flag &= check_f(l_data, r_data, length);
+        delete[] l_data;
+        delete[] r_data;
       } else {
         int l_id = -1, l_offset = 0;
         for (int i = 0, offset = 0; i < table_info.attrCount; i++) {
@@ -169,9 +337,22 @@ int QL_Manager::Delete(const char *relName, int nConditions,
         AttrType attr_type = table_info.attrInfos[l_id].attrType;
         if (attr_type != condition.rhsValue.type) return -1;
         auto check_f = GetCheckFunction(attr_type, condition.op);
-        int attr_length = table_info.attrInfos[l_id].attrLength;
-        flag &= check_f(record_data + l_offset, condition.rhsValue.data,
-                        attr_length);
+        int length = table_info.attrInfos[l_id].attrLength;
+        char* l_data = new char[length];
+        char* r_data = new char[length];
+        std::memset(l_data, 0, length);
+        std::memset(r_data, 0, length);
+        std::memcpy(l_data, record_data + l_offset, length);
+        if (attr_type == AttrType::STRING) {
+          int tmp = std::min(length, (int)std::strlen((char*)condition.rhsValue.data));
+          std::memcpy(r_data, condition.rhsValue.data, tmp);
+        }
+        else {
+          std::memcpy(r_data, condition.rhsValue.data, length);
+        }
+        flag &= check_f(record_data + l_offset, condition.rhsValue.data, length);
+        delete[] l_data;
+        delete[] r_data;
       }
       if (!flag) break;
     }
@@ -252,9 +433,16 @@ int QL_Manager::Update(const char *relName, const RelAttr &updAttr,
           return -1;
         AttrType attr_type = table_info.attrInfos[l_id].attrType;
         auto check_f = GetCheckFunction(attr_type, condition.op);
-        int attr_length = table_info.attrInfos[l_id].attrLength;
-        flag &= check_f(record_data + l_offset, record_data + r_offset,
-                        attr_length);
+        int length = std::max(table_info.attrInfos[l_id].attrLength, table_info.attrInfos[r_id].attrLength);
+        char* l_data = new char[length];
+        char* r_data = new char[length];
+        std::memset(l_data, 0, length);
+        std::memset(r_data, 0, length);
+        std::memcpy(l_data, record_data + l_offset, table_info.attrInfos[l_id].attrLength);
+        std::memcpy(r_data, record_data + r_offset, table_info.attrInfos[r_id].attrLength);
+        flag &= check_f(l_data, r_data, length);
+        delete[] l_data;
+        delete[] r_data;
       } else {
         int l_id = -1, l_offset = 0;
         for (int i = 0, offset = 0; i < table_info.attrCount; i++) {
@@ -272,9 +460,22 @@ int QL_Manager::Update(const char *relName, const RelAttr &updAttr,
         AttrType attr_type = table_info.attrInfos[l_id].attrType;
         if (attr_type != condition.rhsValue.type) return -1;
         auto check_f = GetCheckFunction(attr_type, condition.op);
-        int attr_length = table_info.attrInfos[l_id].attrLength;
-        flag &= check_f(record_data + l_offset, condition.rhsValue.data,
-                        attr_length);
+        int length = table_info.attrInfos[l_id].attrLength;
+        char* l_data = new char[length];
+        char* r_data = new char[length];
+        std::memset(l_data, 0, length);
+        std::memset(r_data, 0, length);
+        std::memcpy(l_data, record_data + l_offset, length);
+        if (attr_type == AttrType::STRING) {
+          int tmp = std::min(length, (int)std::strlen((char*)condition.rhsValue.data));
+          std::memcpy(r_data, condition.rhsValue.data, tmp);
+        }
+        else {
+          std::memcpy(r_data, condition.rhsValue.data, length);
+        }
+        flag &= check_f(record_data + l_offset, condition.rhsValue.data, length);
+        delete[] l_data;
+        delete[] r_data;
       }
       if (!flag) break;
     }
@@ -301,7 +502,8 @@ int QL_Manager::Update(const char *relName, const RelAttr &updAttr,
     if (bIsValue) {
       if (table_info.attrInfos[id].attrType != rhsValue.type) return -1;
       int attr_length = table_info.attrInfos[id].attrLength;
-      memcpy(record_data + pos, rhsValue.data, attr_length);
+      std::memset(record_data + pos, 0, attr_length);
+      std::memcpy(record_data + pos, rhsValue.data, attr_length);
     } else {  // 暂时只支持要update的右值为value
       return -1;
     }
@@ -314,18 +516,15 @@ int QL_Manager::Update(const char *relName, const RelAttr &updAttr,
 
 int QL_Manager::Dfs(
     int nRelations, const char *const relations[],
-    std::unordered_map<string, systemmanager::TableInfo> tbname_to_tbinfo,
     std::vector<recordmanager::RM_Record> *now,
     std::vector<std::vector<recordmanager::RM_Record>> *results) {
-
   if (now->size() == nRelations) {
     results->push_back(*now);
     return NO_ERROR;
   }
-  
+
   int t = now->size();
   string tbname = relations[t];
-  auto tbinfo = tbname_to_tbinfo[tbname];
   string data_file = tbname + "_data";
   recordmanager::RM_FileHandle rm_filehandle;
   int rc = rmm_->OpenFile(data_file, rm_filehandle);
@@ -339,7 +538,7 @@ int QL_Manager::Dfs(
   recordmanager::RM_Record record;
   while (rm_filescan.GetNextRecord(record) != RM_EOF) {
     now->push_back(record);
-    rc = Dfs(nRelations, relations, tbname_to_tbinfo, now, results);
+    rc = Dfs(nRelations, relations, now, results);
     if (rc) return rc;
     now->pop_back();
   }

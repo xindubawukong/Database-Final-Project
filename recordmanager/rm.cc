@@ -73,6 +73,7 @@ int RM_FileHandle::InsertRecord(const char* data, RID& rid) {
   int slot = bitmap.FindFirstZeroPosition();
   if ((rc = rid.Set(page, slot))) return rc;
   int record_offset = kRecordStartPosition / 4 + slot * kRecordMaxLength / 4;
+  std::memset(addr + record_offset, 0, record_size_);
   std::memcpy(addr + record_offset, data, record_size_);
   bpm_->markDirty(index);
   if ((rc = bitmap.SetOne(slot))) return rc;
@@ -139,6 +140,7 @@ int RM_FileHandle::UpdateRecord(const RM_Record& rec) {
   if (exist == 0) return RM_FILEHANDLE_RECORD_NOT_FOUND_ERROR;
   int record_offset =
       kRecordStartPosition / 4 + slot_num * kRecordMaxLength / 4;
+  std::memset(addr + record_offset, 0, record_size_);
   std::memcpy(addr + record_offset, data, record_size_);
   bpm_->markDirty(index);
   return NO_ERROR;
