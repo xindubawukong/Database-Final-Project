@@ -77,23 +77,33 @@ int main() {
   CopyStr(attrs[6].names[1], "age", MAX_LENGTH);
   CopyStr(attrs[6].names[2], "salary", MAX_LENGTH);
 
+  Constraint *cons = new Constraint[10];
+  CopyStr(cons[0].constraintName, "PrimaryKey", MAX_LENGTH);
+  cons[0].isPrimary = true;
+  cons[0].thisNameList = attrs[0];
+
+  CopyStr(cons[1].constraintName, "fk1", MAX_LENGTH);
+  cons[1].isPrimary = false;
+  cons[1].thisNameList = attrs[0];
+  CopyStr(cons[1].foreignTableName, "ATest", MAX_LENGTH);
+  cons[1].referencesNameList = attrs[0];
 
 
-  rc = sm->CreateTable("ATest", 1, infos, 0, nullptr);
-  //sm->ShowTable("ATest");
+  rc = sm->CreateTable("ATest", 1, infos, 1, cons);
   assert(rc == 0);
   rc = sm->AlterPrimaryKey("ATest", true, &attrs[1]);
-  // sm->ShowAllTable();
   assert(rc == -1);
   rc = sm->AlterPrimaryKey("ATest", true, &attrs[0]);
-  assert(rc == 0);
-  //rc = sm->ShowTable("ATest");
-  rc = sm->AlterPrimaryKey("ATest");
+  assert(rc == -1);
   rc = sm->ShowTable("ATest");
 
   
-  rc = sm->CreateTable("BTest", 2, infos, 0, nullptr);
-  rc = sm->CreateTable("CTest", 3, infos, 0, nullptr);
+  rc = sm->CreateTable("BTest", 2, infos, 1, &cons[1]);
+  assert(rc == 0);
+  rc = sm->AlterPrimaryKey("ATest");
+  assert(rc == 0);
+  rc = sm->CreateTable("CTest", 3, infos, 1, &cons[1]);
+  assert(rc == -1);
   rc = sm->CreateTable("ATest", 1, infos, 0, nullptr);
 
 
