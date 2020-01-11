@@ -1,5 +1,6 @@
 #include <cstring>
 #include <fstream>
+#include <assert.h>
 #include "sm.h"
 
 using filesystem::BufPageManager;
@@ -24,17 +25,15 @@ int main() {
 
   string dbName("NewTest");
   int rc = sm->CreateDb(dbName.c_str());
-  // std::cout << "CreateDb: " << rc << std::endl;
   sm->OpenDb(dbName.c_str());
-  // std::cout << "OpenDb: " << rc << std::endl;
 
-  AttrInfo* infos = new AttrInfo[10];
+  AttrInfo infos[10]; //= new AttrInfo[10];
   AttrInfo attr1;
   CopyStr(attr1.attrName, "name", MAX_LENGTH);
   attr1.attrType = STRING;
   attr1.attrLength = 10;
-  attr1.notNullFlag = true;
-  CopyStr(attr1.defaultValue, "NO_NAME", MAX_LENGTH);
+  //attr1.notNullFlag = true;
+  //CopyStr(attr1.defaultValue, "NO_NAME", MAX_LENGTH);
   infos[0] = attr1;
 
   CopyStr(infos[1].attrName, "age", MAX_LENGTH);
@@ -47,9 +46,8 @@ int main() {
   CopyStr(infos[2].attrName, "salary", MAX_LENGTH);
   infos[2].attrType = AttrType::FLOAT;
   infos[2].attrLength = 4;
-  infos[2].notNullFlag = true;
+  infos[2].notNullFlag = false;
   float fvalue = 20000.123;
-  std::cout << fvalue << std::endl;
   memcpy(infos[2].defaultValue, &fvalue, sizeof(float));
 
   AttrList *attrs = new AttrList[10];
@@ -80,28 +78,29 @@ int main() {
   CopyStr(attrs[6].names[2], "salary", MAX_LENGTH);
 
 
-  
-
-   
 
   rc = sm->CreateTable("ATest", 1, infos, 0, nullptr);
+  rc = sm->AlterPrimaryKey("ATest", true, &attrs[1]);
+  assert(rc == -1);
   rc = sm->AlterPrimaryKey("ATest", true, &attrs[0]);
+  // assert(rc == -1);
   rc = sm->ShowTable("ATest");
   rc = sm->AlterPrimaryKey("ATest");
-  
+  rc = sm->ShowTable("ATest");
 
+  
   rc = sm->CreateTable("BTest", 2, infos, 0, nullptr);
   rc = sm->CreateTable("CTest", 3, infos, 0, nullptr);
   rc = sm->CreateTable("ATest", 1, infos, 0, nullptr);
 
 
-  sm->CloseDb();
-  sm->ShowDb("NewTest");
-  sm->ShowAllDb();
-  sm->OpenDb("NewTest");
+  // sm->CloseDb();
+  // sm->ShowDb("NewTest");
+  // sm->ShowAllDb();
+  // sm->OpenDb("NewTest");
   sm->ShowAllTable();
   rc = sm->DropTable("ATest");
-  std::cout << "Drop Table: " << rc << std::endl;
+  // std::cout << "Drop Table: " << rc << std::endl;
   sm->CloseDb();
   sm->ShowAllDb();
   

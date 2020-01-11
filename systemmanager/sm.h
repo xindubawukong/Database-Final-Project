@@ -20,7 +20,7 @@ namespace systemmanager {
   void SM_PrintError(int rc);
 
   struct AttrInfo {
-    char attrName[MAX_LENGTH + 1];
+    char attrName[MAX_LENGTH];
     AttrType attrType;
     int attrLength;
     bool notNullFlag;
@@ -103,6 +103,7 @@ namespace systemmanager {
 
       bool TableExist(const char *tableName);
       bool AttrExist(const char* tableName, const char *attrName);
+      bool AttrListEqual(AttrList a, AttrList b);
     
     private:
       filesystem::FileManager* _fm;
