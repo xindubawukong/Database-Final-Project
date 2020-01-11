@@ -199,8 +199,11 @@ int QL_Manager::Select(int nSelAttrs, const RelAttr selAttrs[], int nRelations,
       }
       if (!flag) break;
     }
-    if (flag) {
-      // output
+    if (flag) {  // 输出符合条件的records
+      string output_string;
+      // select *
+      if (nSelAttrs == 1 && std::strcmp(selAttrs[0].attrName, "*") == 0) {
+      }
     }
   }
 
