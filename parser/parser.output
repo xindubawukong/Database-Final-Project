@@ -73,85 +73,104 @@ Grammar
 
 Terminals, with rules where they appear
 
-$end (0) 0
-'(' (40) 14 19 20 21 23 25 36 37
-')' (41) 14 19 20 21 23 25 36 37
-',' (44) 18 31 44
-';' (59) 3 4 5 6 7
-error (256)
-QUIT (258) 8
-CREATE (259) 10 14 21
-DROP (260) 11 15 22 24 26 28
-USE (261) 12
-SHOW (262) 9 13
-TABLES (263) 13
-DESC (264) 16
-ADD (265) 23 25 27
-CHANGE (266) 29
-ALTER (267) 23 24 25 26 27 28 29
-DATABASES (268) 9
-DATABASE (269) 10 11
-TABLE (270) 14 15 23 24 25 26 27 28 29
-INDEX (271) 21 22
-ON (272) 21
-CONSTRAINT (273) 25
-T_INT (274) 36
-T_FLOAT (275) 38
-VARCHAR (276) 37
-PRIMARY (277) 19 23 24
-FOREIGN (278) 20 25 26
-REFERENCES (279) 20 25
-NOTNULL (280) 33 35
-DEFAULT (281) 34 35
-VALUE_INT (282) 36 37 39
-VALUE_FLOAT (283) 41
-VALUE_STRING (284) 40
-IDENTIFIER (285) 45 46 47 48 49
-VALUE_NULL (286) 42
+    $end (0) 0
+    '(' (40) 14 19 20 21 23 25 36 37
+    ')' (41) 14 19 20 21 23 25 36 37
+    ',' (44) 18 31 44
+    ';' (59) 3 4 5 6 7
+    error (256)
+    QUIT (258) 8
+    CREATE (259) 10 14 21
+    DROP (260) 11 15 22 24 26 28
+    USE (261) 12
+    SHOW (262) 9 13
+    TABLES (263) 13
+    DESC (264) 16
+    ADD (265) 23 25 27
+    CHANGE (266) 29
+    ALTER (267) 23 24 25 26 27 28 29
+    DATABASES (268) 9
+    DATABASE (269) 10 11
+    TABLE (270) 14 15 23 24 25 26 27 28 29
+    INDEX (271) 21 22
+    ON (272) 21
+    CONSTRAINT (273) 25
+    T_INT (274) 36
+    T_FLOAT (275) 38
+    VARCHAR (276) 37
+    PRIMARY (277) 19 23 24
+    FOREIGN (278) 20 25 26
+    REFERENCES (279) 20 25
+    NOTNULL (280) 33 35
+    DEFAULT (281) 34 35
+    VALUE_INT <ivalue> (282) 36 37 39
+    VALUE_FLOAT <fvalue> (283) 41
+    VALUE_STRING <string> (284) 40
+    IDENTIFIER <string> (285) 45 46 47 48 49
+    VALUE_NULL <string> (286) 42
 
 
 Nonterminals, with rules where they appear
 
-$accept (36)
-    on left: 0
-program (37)
-    on left: 1 2, on right: 0 2
-stmt (38)
-    on left: 3 4 5 6 7 8, on right: 2
-sysStmt (39)
-    on left: 9, on right: 3
-dbStmt (40)
-    on left: 10 11 12 13, on right: 4
-tbStmt (41)
-    on left: 14 15 16, on right: 5
-keyConstraints (42)
-    on left: 17 18, on right: 14 18
-keyConstrint (43)
-    on left: 19 20, on right: 18
-idxStmt (44)
-    on left: 21 22, on right: 6
-alterStmt (45)
-    on left: 23 24 25 26 27 28 29, on right: 7
-fieldList (46)
-    on left: 30 31, on right: 14 31
-field (47)
-    on left: 32 33 34 35, on right: 27 29 30 31
-type (48)
-    on left: 36 37 38, on right: 32 33 34 35
-value (49)
-    on left: 39 40 41 42, on right: 34 35
-columnList (50)
-    on left: 43 44, on right: 19 20 21 23 25 44
-dbName (51)
-    on left: 45, on right: 10 11 12
-tbName (52)
-    on left: 46, on right: 14 15 16 20 21 23 24 25 26 27 28 29
-columnName (53)
-    on left: 47, on right: 27 28 29 32 33 34 35 43 44
-fkName (54)
-    on left: 48, on right: 25 26
-idxName (55)
-    on left: 49, on right: 21 22
+    $accept (36)
+        on left: 0
+    program (37)
+        on left: 1 2
+        on right: 0 2
+    stmt (38)
+        on left: 3 4 5 6 7 8
+        on right: 2
+    sysStmt (39)
+        on left: 9
+        on right: 3
+    dbStmt <tree> (40)
+        on left: 10 11 12 13
+        on right: 4
+    tbStmt (41)
+        on left: 14 15 16
+        on right: 5
+    keyConstraints (42)
+        on left: 17 18
+        on right: 14 18
+    keyConstrint (43)
+        on left: 19 20
+        on right: 18
+    idxStmt (44)
+        on left: 21 22
+        on right: 6
+    alterStmt (45)
+        on left: 23 24 25 26 27 28 29
+        on right: 7
+    fieldList (46)
+        on left: 30 31
+        on right: 14 31
+    field (47)
+        on left: 32 33 34 35
+        on right: 27 29 30 31
+    type (48)
+        on left: 36 37 38
+        on right: 32 33 34 35
+    value (49)
+        on left: 39 40 41 42
+        on right: 34 35
+    columnList (50)
+        on left: 43 44
+        on right: 19 20 21 23 25 44
+    dbName <string> (51)
+        on left: 45
+        on right: 10 11 12
+    tbName <string> (52)
+        on left: 46
+        on right: 14 15 16 20 21 23 24 25 26 27 28 29
+    columnName <string> (53)
+        on left: 47
+        on right: 27 28 29 32 33 34 35 43 44
+    fkName <string> (54)
+        on left: 48
+        on right: 25 26
+    idxName <string> (55)
+        on left: 49
+        on right: 21 22
 
 
 State 0

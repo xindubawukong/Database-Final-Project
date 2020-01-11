@@ -1,2 +1,2 @@
-/usr/bin/ar qc libSqlParser.a  CMakeFiles/SqlParser.dir/parser.tab.o CMakeFiles/SqlParser.dir/parser.yy.o
-/usr/bin/ranlib libSqlParser.a
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ar qc libSqlParser.a  CMakeFiles/SqlParser.dir/parser.tab.o CMakeFiles/SqlParser.dir/parser.yy.o
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib libSqlParser.a

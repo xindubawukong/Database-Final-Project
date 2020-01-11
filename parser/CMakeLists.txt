@@ -1,6 +1,8 @@
 find_package(BISON REQUIRED)
 find_package(FLEX REQUIRED)
 
+set(CMAKE_CXX_STANDARD 11)
+
 BISON_TARGET(Parser ${CMAKE_CURRENT_SOURCE_DIR}/parser.y ${CMAKE_CURRENT_BINARY_DIR}/parser.tab.cpp
         VERBOSE ${CMAKE_CURRENT_BINARY_DIR}/parser.output)
 FLEX_TARGET(Lexer ${CMAKE_CURRENT_SOURCE_DIR}/lex.l ${CMAKE_CURRENT_BINARY_DIR}/parser.yy.cpp)

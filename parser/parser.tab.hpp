@@ -1,8 +1,9 @@
-/* A Bison parser, made by GNU Bison 3.0.4.  */
+/* A Bison parser, made by GNU Bison 3.5.  */
 
 /* Bison interface for Yacc-like parsers in C
 
-   Copyright (C) 1984, 1989-1990, 2000-2015 Free Software Foundation, Inc.
+   Copyright (C) 1984, 1989-1990, 2000-2015, 2018-2019 Free Software Foundation,
+   Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -30,8 +31,11 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
-#ifndef YY_YY_MNT_D_LEARN_SENIOR_DATABASE_DATABASE_FINAL_PROJECT_PARSER_PARSER_TAB_HPP_INCLUDED
-# define YY_YY_MNT_D_LEARN_SENIOR_DATABASE_DATABASE_FINAL_PROJECT_PARSER_PARSER_TAB_HPP_INCLUDED
+/* Undocumented macros, especially those whose name start with YY_,
+   are private implementation details.  Do not rely on them.  */
+
+#ifndef YY_YY_USERS_XDBWK_DESKTOP_THU41_DATABASE_DATABASE_FINAL_PROJECT_PARSER_PARSER_TAB_HPP_INCLUDED
+# define YY_YY_USERS_XDBWK_DESKTOP_THU41_DATABASE_DATABASE_FINAL_PROJECT_PARSER_PARSER_TAB_HPP_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -79,10 +83,9 @@ extern int yydebug;
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-
 union YYSTYPE
 {
-#line 21 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1909  */
+#line 21 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
 
     int ivalue;
     AttrType attrType;
@@ -90,9 +93,9 @@ union YYSTYPE
     char *string;
     parser::Tree* tree;
 
-#line 94 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.hpp" /* yacc.c:1909  */
-};
+#line 97 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.hpp"
 
+};
 typedef union YYSTYPE YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
@@ -103,4 +106,4 @@ extern YYSTYPE yylval;
 
 int yyparse (void);
 
-#endif /* !YY_YY_MNT_D_LEARN_SENIOR_DATABASE_DATABASE_FINAL_PROJECT_PARSER_PARSER_TAB_HPP_INCLUDED  */
+#endif /* !YY_YY_USERS_XDBWK_DESKTOP_THU41_DATABASE_DATABASE_FINAL_PROJECT_PARSER_PARSER_TAB_HPP_INCLUDED  */

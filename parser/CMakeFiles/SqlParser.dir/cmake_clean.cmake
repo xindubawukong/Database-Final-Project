@@ -1,13 +1,12 @@
 file(REMOVE_RECURSE
-  "parser.tab.cpp"
-  "parser.tab.hpp"
-  "parser.output"
-  "parser.output"
-  "parser.yy.cpp"
   "CMakeFiles/SqlParser.dir/parser.tab.o"
   "CMakeFiles/SqlParser.dir/parser.yy.o"
-  "libSqlParser.pdb"
   "libSqlParser.a"
+  "libSqlParser.pdb"
+  "parser.output"
+  "parser.tab.cpp"
+  "parser.tab.hpp"
+  "parser.yy.cpp"
 )
 
 # Per-language clean rules from dependency scanning.
