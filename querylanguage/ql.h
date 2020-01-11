@@ -4,10 +4,10 @@
 #include <iostream>
 #include <string>
 
-#include "global.h"
-#include "indexing/ix.h"
-#include "recordmanager/rm.h"
-#include "systemmanager/sm.h"
+#include "../global.h"
+#include "../indexing/ix.h"
+#include "../recordmanager/rm.h"
+#include "../systemmanager/sm.h"
 
 namespace querylanguage {
 

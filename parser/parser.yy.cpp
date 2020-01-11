@@ -572,7 +572,7 @@ int yy_flex_debug = 0;
 char *yytext;
 #line 1 "/mnt/d/learn/senior/database/Database-Final-Project/parser/lex.l"
 #line 4 "/mnt/d/learn/senior/database/Database-Final-Project/parser/lex.l"
-#include "ast.h"
+#include "ast.hh"
 #include "parser.tab.hpp"
 #include <cstdio>
 #include <cstring>

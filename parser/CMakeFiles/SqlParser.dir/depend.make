@@ -11,10 +11,11 @@ CMakeFiles/SqlParser.dir/parser.tab.o: /mnt/d/learn/senior/database/Database-Fin
 CMakeFiles/SqlParser.dir/parser.tab.o: /mnt/d/learn/senior/database/Database-Final-Project/global.h
 CMakeFiles/SqlParser.dir/parser.tab.o: /mnt/d/learn/senior/database/Database-Final-Project/indexing/btree_node.h
 CMakeFiles/SqlParser.dir/parser.tab.o: /mnt/d/learn/senior/database/Database-Final-Project/indexing/ix.h
-CMakeFiles/SqlParser.dir/parser.tab.o: ast.h
+CMakeFiles/SqlParser.dir/parser.tab.o: ast.hh
 CMakeFiles/SqlParser.dir/parser.tab.o: parser.tab.cpp
 CMakeFiles/SqlParser.dir/parser.tab.o: parser.tab.hpp
 CMakeFiles/SqlParser.dir/parser.tab.o: parser.yy.cpp
+CMakeFiles/SqlParser.dir/parser.tab.o: /mnt/d/learn/senior/database/Database-Final-Project/querylanguage/ql.h
 CMakeFiles/SqlParser.dir/parser.tab.o: /mnt/d/learn/senior/database/Database-Final-Project/recordmanager/rm.h
 CMakeFiles/SqlParser.dir/parser.tab.o: /mnt/d/learn/senior/database/Database-Final-Project/recordmanager/rm_record.h
 CMakeFiles/SqlParser.dir/parser.tab.o: /mnt/d/learn/senior/database/Database-Final-Project/recordmanager/rm_rid.h
@@ -31,9 +32,10 @@ CMakeFiles/SqlParser.dir/parser.yy.o: /mnt/d/learn/senior/database/Database-Fina
 CMakeFiles/SqlParser.dir/parser.yy.o: /mnt/d/learn/senior/database/Database-Final-Project/global.h
 CMakeFiles/SqlParser.dir/parser.yy.o: /mnt/d/learn/senior/database/Database-Final-Project/indexing/btree_node.h
 CMakeFiles/SqlParser.dir/parser.yy.o: /mnt/d/learn/senior/database/Database-Final-Project/indexing/ix.h
-CMakeFiles/SqlParser.dir/parser.yy.o: ast.h
+CMakeFiles/SqlParser.dir/parser.yy.o: ast.hh
 CMakeFiles/SqlParser.dir/parser.yy.o: parser.tab.hpp
 CMakeFiles/SqlParser.dir/parser.yy.o: parser.yy.cpp
+CMakeFiles/SqlParser.dir/parser.yy.o: /mnt/d/learn/senior/database/Database-Final-Project/querylanguage/ql.h
 CMakeFiles/SqlParser.dir/parser.yy.o: /mnt/d/learn/senior/database/Database-Final-Project/recordmanager/rm.h
 CMakeFiles/SqlParser.dir/parser.yy.o: /mnt/d/learn/senior/database/Database-Final-Project/recordmanager/rm_record.h
 CMakeFiles/SqlParser.dir/parser.yy.o: /mnt/d/learn/senior/database/Database-Final-Project/recordmanager/rm_rid.h

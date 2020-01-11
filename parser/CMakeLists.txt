@@ -24,5 +24,5 @@ set(SOURCE
 
 set(HEADERS
         ${HEADERS}
-        ${CMAKE_CURRENT_SOURCE_DIR}/ast.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/ast.hh
         )

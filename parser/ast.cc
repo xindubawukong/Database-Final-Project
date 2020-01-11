@@ -1,19 +1,24 @@
-#include "ast.h"
+#include "ast.hh"
 #include "systemmanager/sm.h"
 
 namespace parser {
   using std::string;
   using std::move;
-  using systemmanager::SM_Manager;
 
   Tree *Tree::tree = nullptr;
+
+  filesystem::FileManager* fm = new filesystem::FileManager();
+  filesystem::BufPageManager* bpm = new filesystem::BufPageManager(fm);
+  recordmanager::RM_Manager* rmm = new recordmanager::RM_Manager(fm, bpm);
+  indexing::IX_Manager* ixm = new indexing::IX_Manager(fm, bpm);
+  systemmanager::SM_Manager* sm = new systemmanager::SM_Manager(fm, bpm, ixm, rmm);
 
   ShowDatabase::ShowDatabase(string dbName) {
     this->dbName = move(dbName);
   }
 
   void ShowDatabase::visit() {
-    systemmanager::sm->ShowDb(dbName.c_str());
+    sm->ShowDb(dbName.c_str());
   }
 
   CreateDatabase::CreateDatabase(string dbName) {
@@ -21,7 +26,7 @@ namespace parser {
   }
 
   void CreateDatabase::visit() {
-    systemmanager::sm->CreateDb(dbName.c_str());
+    sm->CreateDb(dbName.c_str());
   }
 
   DropDatabase::DropDatabase(string dbName) {
@@ -29,7 +34,7 @@ namespace parser {
   }
 
   void DropDatabase::visit() {
-    systemmanager::sm->DropDb(dbName.c_str());
+    sm->DropDb(dbName.c_str());
   }
 
   UseDatabase::UseDatabase(string dbName) {
@@ -37,7 +42,7 @@ namespace parser {
   }
 
   void UseDatabase::visit() {
-    systemmanager::sm->OpenDb(dbName.c_str());
+    sm->OpenDb(dbName.c_str());
   }
 
 

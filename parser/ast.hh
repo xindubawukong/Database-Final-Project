@@ -6,7 +6,9 @@
 #include <assert.h>
 #include "../global.h"
 #include "../systemmanager/sm.h"
-
+#include "../recordmanager/rm.h"
+#include "../indexing/ix.h"
+#include "../querylanguage/ql.h"
 
 namespace parser {
 

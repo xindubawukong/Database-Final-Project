@@ -11,12 +11,6 @@ namespace systemmanager {
   using indexing::IX_Manager;
   using recordmanager::RM_Manager;
 
-  filesystem::FileManager* fm = new filesystem::FileManager();
-  filesystem::BufPageManager* bpm = new filesystem::BufPageManager(fm);
-  recordmanager::RM_Manager* rmm = new recordmanager::RM_Manager(fm, bpm);
-  indexing::IX_Manager* ixm = new indexing::IX_Manager(fm, bpm);
-  SM_Manager* sm = new SM_Manager(fm, bpm, ixm, rmm);
-
   void SM_PrintError(int rc) {
     printf("SM error %d.\n", rc);
   }

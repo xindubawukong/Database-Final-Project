@@ -9,7 +9,7 @@
 
 #include <stdlib.h>
 #include "../global.h"
-#include "ast.h"
+#include "ast.hh"
 #include "parser.yy.cpp"
 
 int yylex();

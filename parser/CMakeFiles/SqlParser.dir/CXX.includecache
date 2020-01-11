@@ -110,7 +110,7 @@ functional
 btree_node.h
 /mnt/d/learn/senior/database/Database-Final-Project/indexing/btree_node.h
 
-/mnt/d/learn/senior/database/Database-Final-Project/parser/ast.h
+/mnt/d/learn/senior/database/Database-Final-Project/parser/ast.hh
 vector
 -
 string
@@ -121,6 +121,12 @@ assert.h
 /mnt/d/learn/senior/database/Database-Final-Project/global.h
 ../systemmanager/sm.h
 /mnt/d/learn/senior/database/Database-Final-Project/systemmanager/sm.h
+../recordmanager/rm.h
+/mnt/d/learn/senior/database/Database-Final-Project/recordmanager/rm.h
+../indexing/ix.h
+/mnt/d/learn/senior/database/Database-Final-Project/indexing/ix.h
+../querylanguage/ql.h
+/mnt/d/learn/senior/database/Database-Final-Project/querylanguage/ql.h
 
 /mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp
 cstdio
@@ -131,8 +137,8 @@ stdlib.h
 -
 ../global.h
 /mnt/d/learn/senior/database/Database-Final-Project/global.h
-ast.h
-/mnt/d/learn/senior/database/Database-Final-Project/parser/ast.h
+ast.hh
+/mnt/d/learn/senior/database/Database-Final-Project/parser/ast.hh
 parser.yy.cpp
 /mnt/d/learn/senior/database/Database-Final-Project/parser/parser.yy.cpp
 stddef.h
@@ -163,8 +169,8 @@ stdlib.h
 -
 inttypes.h
 -
-ast.h
-/mnt/d/learn/senior/database/Database-Final-Project/parser/ast.h
+ast.hh
+/mnt/d/learn/senior/database/Database-Final-Project/parser/ast.hh
 parser.tab.hpp
 /mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.hpp
 cstdio
@@ -173,6 +179,20 @@ cstring
 -
 unistd.h
 -
+
+/mnt/d/learn/senior/database/Database-Final-Project/querylanguage/ql.h
+iostream
+-
+string
+-
+../global.h
+/mnt/d/learn/senior/database/Database-Final-Project/global.h
+../indexing/ix.h
+/mnt/d/learn/senior/database/Database-Final-Project/indexing/ix.h
+../recordmanager/rm.h
+/mnt/d/learn/senior/database/Database-Final-Project/recordmanager/rm.h
+../systemmanager/sm.h
+/mnt/d/learn/senior/database/Database-Final-Project/systemmanager/sm.h
 
 /mnt/d/learn/senior/database/Database-Final-Project/recordmanager/rm.h
 functional

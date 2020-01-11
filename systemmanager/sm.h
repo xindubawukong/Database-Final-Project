@@ -111,12 +111,5 @@ namespace systemmanager {
       recordmanager::RM_Manager* _rmm;
       indexing::IX_Manager* _ixm;
   };
-
-  extern filesystem::FileManager* fm;
-  extern filesystem::BufPageManager* bpm;
-  extern recordmanager::RM_Manager* rmm;
-  extern indexing::IX_Manager* ixm;
-  extern SM_Manager* sm;
-  
 }
 #endif

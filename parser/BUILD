@@ -1,10 +1,13 @@
 cc_library(
   name = "ast",
   srcs = ["ast.cc"],
-  hdrs = ["ast.h"],
+  hdrs = ["ast.hh"],
   deps = [
     "//:global",
     "//systemmanager:sm",
+    "//recordmanager:rm",
+    "//indexing:ix",
+    "//querylanguage:ql",
   ],
 
   visibility = ["//visibility:public"],

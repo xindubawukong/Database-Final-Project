@@ -1,7 +1,7 @@
 %option caseless
 
 %{
-#include "ast.h"
+#include "ast.hh"
 #include "parser.tab.hpp"
 #include <cstdio>
 #include <cstring>

@@ -12,10 +12,11 @@ CMakeFiles/SqlParser.dir/parser.tab.o
  /mnt/d/learn/senior/database/Database-Final-Project/global.h
  /mnt/d/learn/senior/database/Database-Final-Project/indexing/btree_node.h
  /mnt/d/learn/senior/database/Database-Final-Project/indexing/ix.h
- /mnt/d/learn/senior/database/Database-Final-Project/parser/ast.h
+ /mnt/d/learn/senior/database/Database-Final-Project/parser/ast.hh
  /mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp
  /mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.hpp
  /mnt/d/learn/senior/database/Database-Final-Project/parser/parser.yy.cpp
+ /mnt/d/learn/senior/database/Database-Final-Project/querylanguage/ql.h
  /mnt/d/learn/senior/database/Database-Final-Project/recordmanager/rm.h
  /mnt/d/learn/senior/database/Database-Final-Project/recordmanager/rm_record.h
  /mnt/d/learn/senior/database/Database-Final-Project/recordmanager/rm_rid.h
@@ -32,9 +33,10 @@ CMakeFiles/SqlParser.dir/parser.yy.o
  /mnt/d/learn/senior/database/Database-Final-Project/global.h
  /mnt/d/learn/senior/database/Database-Final-Project/indexing/btree_node.h
  /mnt/d/learn/senior/database/Database-Final-Project/indexing/ix.h
- /mnt/d/learn/senior/database/Database-Final-Project/parser/ast.h
+ /mnt/d/learn/senior/database/Database-Final-Project/parser/ast.hh
  /mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.hpp
  /mnt/d/learn/senior/database/Database-Final-Project/parser/parser.yy.cpp
+ /mnt/d/learn/senior/database/Database-Final-Project/querylanguage/ql.h
  /mnt/d/learn/senior/database/Database-Final-Project/recordmanager/rm.h
  /mnt/d/learn/senior/database/Database-Final-Project/recordmanager/rm_record.h
  /mnt/d/learn/senior/database/Database-Final-Project/recordmanager/rm_rid.h
