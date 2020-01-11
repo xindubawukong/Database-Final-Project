@@ -199,11 +199,86 @@ int QL_Manager::Select(int nSelAttrs, const RelAttr selAttrs[], int nRelations,
       }
       if (!flag) break;
     }
-    if (flag) {  // 输出符合条件的records
+    if (flag) {  // 符合条件，输出records
       string output_string;
-      // select *
-      if (nSelAttrs == 1 && std::strcmp(selAttrs[0].attrName, "*") == 0) {
+      if (nSelAttrs == 1 && std::strcmp(selAttrs[0].attrName, "*") == 0) {  // select *
+        output_string = "[";
+        for (int i = 0; i < nRelations; i++) {
+          if (i > 0) output_string += ", ";
+          output_string += "(";
+          for (int j = 0, offset = 0; j < tbinfos[i].attrCount; j++) {
+            if (j > 0) output_string += ", ";
+            if (tbinfos[i].attrInfos[j].attrType == AttrType::INT) {
+              int x = *((int*)(records_data[i] + offset));
+              output_string += std::to_string(x);
+            }
+            else if (tbinfos[i].attrInfos[j].attrType == AttrType::FLOAT) {
+              float x = *((float*)(records_data[i] + offset));
+              output_string += std::to_string(x);
+            }
+            else {
+              char* s = records_data[i] + offset;
+              output_string += (string)s;
+            }
+            offset += tbinfos[i].attrInfos[j].attrLength;
+          }
+          output_string += ")";
+        }
+        output_string += "]";
       }
+      else {
+        output_string = "[";
+        for (int kk = 0; kk < nSelAttrs; kk++) {
+          if (kk > 0) output_string += ", ";
+
+          int rel_id = -1, attr_id = -1, attr_offset = 0;
+          if (selAttrs[kk].relName == NULL) {
+            for (int i = 0; i < nRelations; i++) {
+              for (int j = 0, offset = 0; j < tbinfos[i].attrCount; j++) {
+                if (strcmp(selAttrs[kk].attrName, tbinfos[i].attrInfos[j].attrName) == 0) {
+                  rel_id = i;
+                  attr_id = j;
+                  attr_offset = offset;
+                  break;
+                }
+                offset += tbinfos[i].attrInfos[j].attrLength;
+              }
+              if (rel_id != -1) break;
+            }
+          }
+          else {
+            for (int i = 0; i < nRelations; i++) {
+              if (strcmp(selAttrs[kk].relName, relations[i]) == 0) {
+                rel_id = i;
+                break;
+              }
+            }
+            for (int j = 0, offset = 0; j < tbinfos[rel_id].attrCount; j++) {
+              if (strcmp(selAttrs[kk].attrName, tbinfos[rel_id].attrInfos[j].attrName) == 0) {
+                attr_id = j;
+                attr_offset = offset;
+                break;
+              }
+              offset += tbinfos[rel_id].attrInfos[j].attrLength;
+            }
+          }
+
+          if (tbinfos[rel_id].attrInfos[attr_id].attrType == AttrType::INT) {
+            int x = *((int*)(records_data[rel_id] + attr_offset));
+            output_string += std::to_string(x);
+          }
+          else if (tbinfos[rel_id].attrInfos[attr_id].attrType == AttrType::FLOAT) {
+            float x = *((float*)(records_data[rel_id] + attr_offset));
+            output_string += std::to_string(x);
+          }
+          else {
+            char* s = records_data[rel_id] + attr_offset;
+            output_string += (string)s;
+          }
+        }
+        output_string += "]";
+      }
+      std::cout << output_string << std::endl;
     }
   }
 
