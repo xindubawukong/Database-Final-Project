@@ -80,7 +80,6 @@ namespace systemmanager {
   void CopyStr(char *dst, const char *src, int maxLength) {
     memset(dst, 0, maxLength);
     memcpy(dst, src, strlen(src));
-
   }
  
   SM_Manager::SM_Manager(FileManager* fm, BufPageManager* bpm, IX_Manager *ixm, RM_Manager *rmm) {
@@ -99,14 +98,12 @@ namespace systemmanager {
 
   int SM_Manager::CreateDb(const char* dbName) {
  
-    int rc = _fm->createFile("DatabaseList");
+    int rc = _bpm->createFile("DatabaseList");
     
     int fileID, index;
-    rc = _fm->openFile("DatabaseList", fileID);
+    rc = _bpm->openFile("DatabaseList", fileID);
     DatabaseList *dbList = (DatabaseList*) _bpm->getPage(fileID, 0, index);
-    // std::cout << dbList << std::endl;
-    // std::cout << "DatabaseList FileID:" << fileID << std::endl;
-    // std::cout << "DatabaseList index: " << index << std::endl;
+
     if(dbList->databaseCount == MAX_DATABASES) {
       return -1;
     }
@@ -116,7 +113,6 @@ namespace systemmanager {
       }
     }
     CopyStr(dbList->databaseName[dbList->databaseCount++], dbName, MAX_LENGTH);
-    // _bpm->access(index);
     _bpm->markDirty(index);
     _bpm->writeBack(index);
     _bpm->closeFile(fileID);
@@ -127,7 +123,7 @@ namespace systemmanager {
     }
 
     chdir(dbName);
-    _fm->createFile("TableList");
+    _bpm->createFile("TableList");
     chdir("..");
     return 0;
   } 
@@ -140,7 +136,7 @@ namespace systemmanager {
   int SM_Manager::DropDb(const char* dbName) {
 
     int fileID, index;
-    int rc = _fm->openFile("DatabaseList", fileID);
+    int rc = _bpm->openFile("DatabaseList", fileID);
     if(rc == 0) {
       return -1;
     }
@@ -199,17 +195,15 @@ namespace systemmanager {
     }
 
     int fileID;
-    rc = _fm->openFile("TableList", fileID);
+    rc = _bpm->openFile("TableList", fileID);
     if(rc == 0) {
       return -1;
     }
 
     int index;
     TableList* tableList = (TableList*) _bpm->getPage(fileID, 0, index);
-    // std::cout << "index: " << index << std::endl;
-    // std::cout << "fileID: " << fileID << std::endl;
+
     std::cout << "Database " << name << " has tables below:" << std::endl; 
-    // std::cout << tableList->tableCount << std::endl;
     for(int i = 0; i < tableList->tableCount; ++i) {
       std::cout << tableList->tableName[i] << std::endl;
     }
@@ -223,7 +217,7 @@ namespace systemmanager {
 
   int SM_Manager::ShowAllDb() {
     int fileID, index;
-    int rc = _fm->openFile("DatabaseList", fileID);
+    int rc = _bpm->openFile("DatabaseList", fileID);
     if(rc == 0) {
       return -1;
     }
@@ -242,7 +236,7 @@ namespace systemmanager {
 
   int SM_Manager::CreateTable(const char *relName, int attrCount, AttrInfo* attrInfos, int constraintCount, Constraint* constraints) {
     int fileID;
-    int rc = _fm->openFile("TableList", fileID);
+    int rc = _bpm->openFile("TableList", fileID);
     if(rc == 0) {
       return -1;
     }
@@ -259,7 +253,6 @@ namespace systemmanager {
     if(tableList->tableCount == MAX_TABLES) {
       return -1;
     }
-    // _bpm->release(index);
     _bpm->closeFile(fileID);
 
     std::set<std::string> constraintNameSet;
@@ -327,7 +320,7 @@ namespace systemmanager {
 
         int fileID, index;
         std::string fkMetaFile = std::string(constraints[i].foreignTableName) + "_meta";
-        _fm->openFile(fkMetaFile.c_str(), fileID);
+        _bpm->openFile(fkMetaFile.c_str(), fileID);
         TableInfo *info = (TableInfo*) _bpm->getPage(fileID, 0, index);
         _bpm->pin(index);
         int find = false;
@@ -351,7 +344,7 @@ namespace systemmanager {
     }
 
     std::string metaFile = std::string(relName) + "_meta";
-    rc = _fm->createFile(metaFile.c_str());
+    rc = _bpm->createFile(metaFile.c_str());
     if(rc == 0) {
       return -1;
     }
@@ -361,7 +354,7 @@ namespace systemmanager {
     memcpy(info->attrInfos, attrInfos, sizeof(AttrInfo) * attrCount);
     info->constraintCount = constraintCount;
 
-    _fm->openFile(metaFile.c_str(), fileID);
+    _bpm->openFile(metaFile.c_str(), fileID);
     char* buffer = (char*) _bpm->getPage(fileID, 0, index);
     memcpy(buffer, info, sizeof(TableInfo));
     _bpm->markDirty(index);
@@ -388,16 +381,16 @@ namespace systemmanager {
       return -1;
     }
 
-    _fm->openFile("TableList", fileID);
+    _bpm->openFile("TableList", fileID);
     tableList = (TableList*) _bpm->getPage(fileID, 0, index);
-    // std::cout << fileID << ", " << index << std::endl;
+
     CopyStr(tableList->tableName[tableList->tableCount++], relName, MAX_LENGTH);
+    // std::cout << "counts after create: " << tableList->tableCount << std::endl;
+    // std::cout << "create name: " << tableList->tableName[tableList->tableCount - 1] << std::endl;
     _bpm->markDirty(index);
     _bpm->writeBack(index);
     _bpm->closeFile(fileID);
-
     return 0;
-
   }
 
   int SM_Manager::ShowTable(const char* relName) {
@@ -406,9 +399,11 @@ namespace systemmanager {
     }
     std::cout << "Table " << relName << ":" << std::endl;
 
-    std::string metaFile = std::string(relName) + "_meta";
+    std::string metaFile = (std::string)relName + "_meta";
+    
     int fileID, index;
-    int rc = _fm->openFile(metaFile.c_str(), fileID);
+    int rc = _bpm->openFile(metaFile.c_str(), fileID);
+
     TableInfo *info = (TableInfo*) _bpm->getPage(fileID, 0, index);
 
     int *offset = new int[info->attrCount];
@@ -416,7 +411,6 @@ namespace systemmanager {
     for(int i = 1; i < info->attrCount; ++i) {
       offset[i] += info->attrInfos[i].attrLength;
     }
-
     Print(*info);
     _bpm->pin(index);
     for(int i = 0; i < info->constraintCount; ++i) {
@@ -426,10 +420,13 @@ namespace systemmanager {
     }
     // _bpm->unpin(index);
     // _bpm->closeFile(fileID);
-
-    std::string dataFile = std::string(relName) + "_data";
+    std::string dataFile = (std::string)relName + "_data";
+    
     recordmanager::RM_FileHandle fileHandle;
-    _rmm->OpenFile(dataFile, fileHandle);
+    rc = _rmm->OpenFile(dataFile, fileHandle); 
+    if(rc != 0) {
+      return rc;
+    }
     recordmanager::RM_FileScan fileScan;
     fileScan.OpenScan(&fileHandle, info->attrInfos[0].attrType, info->attrInfos[0].attrLength, 0, NO_OP, nullptr);
 
@@ -437,9 +434,11 @@ namespace systemmanager {
     while(fileScan.GetNextRecord(record) != RM_EOF) {
       char *data;
       rc = record.GetData(data);
+
       if(rc != 0) {
         return -1;
       }
+
 
       for(int i = 0; i < info->attrCount; ++i) {
         
@@ -475,18 +474,21 @@ namespace systemmanager {
 
   int SM_Manager::ShowAllTable() {
     int fileID, index;
-    int rc = _fm->openFile("TableList", fileID);
+    int rc = _bpm->openFile("TableList", fileID);
     if(rc == 0) {
       return -1;
     }
 
     TableList *tbList = (TableList*) _bpm->getPage(fileID, 0, index);
+    _bpm->pin(index);
     for(int i = 0; i < tbList->tableCount; ++i) {
+ 
       rc = ShowTable(tbList->tableName[i]);
       if(rc != 0) {
         return -1;
       }
     }
+    _bpm->unpin(index);
     std::cout << std::endl;
     return 0;
   }
@@ -497,7 +499,7 @@ namespace systemmanager {
     }
     std::string metaFile = std::string(relName) + "_meta";
     int fileID, index;
-    _fm->openFile(metaFile.c_str(), fileID); 
+    _bpm->openFile(metaFile.c_str(), fileID); 
     
     TableInfo *info = (TableInfo*) _bpm->getPage(fileID, 0, index);
     _bpm->pin(index);
@@ -510,7 +512,6 @@ namespace systemmanager {
         break;
       }
     }
-
     if(add) {
       if(pri != nullptr) {
         return -1;
@@ -568,13 +569,11 @@ namespace systemmanager {
   int SM_Manager::DropTable(const char* relName) {
     int fileID;
     int index;
-    int rc = _fm->openFile("TableList", fileID);
-    // std::cout << " why " << std::endl;
+    int rc = _bpm->openFile("TableList", fileID);
 
     if(rc == 0) {
       return -1;
     }
-    // std::cout << " why " << std::endl;
 
     bool find = false;
     TableList* tableList = (TableList*) _bpm->getPage(fileID, 0, index);
@@ -586,7 +585,6 @@ namespace systemmanager {
         break;
       }
     }
-    // std::cout << " why " << std::endl;
 
     if(!find) {
       return -1;
@@ -596,7 +594,7 @@ namespace systemmanager {
     _bpm->closeFile(fileID);
     
     std::string metaFile = std::string(relName) + "_meta";
-    rc = _fm->openFile(metaFile.c_str(), fileID);
+    rc = _bpm->openFile(metaFile.c_str(), fileID);
     if(rc == 0) {
       return -1;
     }
@@ -604,12 +602,12 @@ namespace systemmanager {
     TableInfo *info = (TableInfo*) _bpm->getPage(fileID, 0, index);
     for(int i = 0; i < info->indexSize; ++i) {
       std::string indexName = std::string(relName) + "." + std::to_string(info->indexedAttr[i]);
-      _fm->deleteFile(indexName.c_str());
+      _bpm->deleteFile(indexName.c_str());
     }
 
-    _fm->deleteFile(metaFile.c_str());
+    _bpm->deleteFile(metaFile.c_str());
     std::string dataFile = std::string(relName) + "_data";
-    _fm->deleteFile(dataFile.c_str());
+    _bpm->deleteFile(dataFile.c_str());
 
     return 0;
   }
@@ -620,7 +618,7 @@ namespace systemmanager {
     }
     int fileID, index;
     std::string metaFile = std::string(relName) + "_meta";
-    int rc = _fm->openFile(metaFile.c_str(), fileID);
+    int rc = _bpm->openFile(metaFile.c_str(), fileID);
     if(rc == 0) {
       return -1;
     }
@@ -667,7 +665,7 @@ namespace systemmanager {
 
     int fileID, index;
     std::string metaFile = std::string(relName) + "_meta";
-    int rc = _fm->openFile(metaFile.c_str(), fileID);
+    int rc = _bpm->openFile(metaFile.c_str(), fileID);
     if(rc == 0) {
       return -1;
     }
@@ -707,7 +705,7 @@ namespace systemmanager {
   bool SM_Manager::TableExist(const char *tableName) {
     bool res = false;
     int fileID;
-    int rc = _fm->openFile("TableList", fileID);
+    int rc = _bpm->openFile("TableList", fileID);
     if(rc == 0) {
       return -1;
     }
@@ -729,7 +727,7 @@ namespace systemmanager {
     int fileID;
     int index;
     std::string infoName = std::string(tableName) + "_meta";
-    _fm->openFile(infoName.c_str(), fileID);
+    _bpm->openFile(infoName.c_str(), fileID);
 
     TableInfo* tableInfo = (TableInfo*) _bpm->getPage(fileID, 0, index);
     for(int i = 0; i < tableInfo->attrCount; ++i) {

@@ -15,7 +15,7 @@ using namespace filesystem;
 
 
 int main() {
-  // chdir("/mnt/d/learn/senior/database/Test");
+ // chdir("/mnt/d/learn/senior/database/Test");
   MyBitMap::initConst();  //新加的初始化
   FileManager* fm = new FileManager();
   BufPageManager* bpm = new BufPageManager(fm);
@@ -30,10 +30,10 @@ int main() {
   AttrInfo infos[10]; //= new AttrInfo[10];
   AttrInfo attr1;
   CopyStr(attr1.attrName, "name", MAX_LENGTH);
-  attr1.attrType = STRING;
+  attr1.attrType = AttrType::STRING;
   attr1.attrLength = 10;
-  //attr1.notNullFlag = true;
-  //CopyStr(attr1.defaultValue, "NO_NAME", MAX_LENGTH);
+  attr1.notNullFlag = true;
+  CopyStr(attr1.defaultValue, "NO_NAME", MAX_LENGTH);
   infos[0] = attr1;
 
   CopyStr(infos[1].attrName, "age", MAX_LENGTH);
@@ -80,11 +80,14 @@ int main() {
 
 
   rc = sm->CreateTable("ATest", 1, infos, 0, nullptr);
+  //sm->ShowTable("ATest");
+  assert(rc == 0);
   rc = sm->AlterPrimaryKey("ATest", true, &attrs[1]);
+  // sm->ShowAllTable();
   assert(rc == -1);
   rc = sm->AlterPrimaryKey("ATest", true, &attrs[0]);
-  // assert(rc == -1);
-  rc = sm->ShowTable("ATest");
+  assert(rc == 0);
+  //rc = sm->ShowTable("ATest");
   rc = sm->AlterPrimaryKey("ATest");
   rc = sm->ShowTable("ATest");
 
@@ -98,8 +101,9 @@ int main() {
   // sm->ShowDb("NewTest");
   // sm->ShowAllDb();
   // sm->OpenDb("NewTest");
+  // bpm->close();
   sm->ShowAllTable();
-  rc = sm->DropTable("ATest");
+  // rc = sm->DropTable("ATest");
   // std::cout << "Drop Table: " << rc << std::endl;
   sm->CloseDb();
   sm->ShowAllDb();
