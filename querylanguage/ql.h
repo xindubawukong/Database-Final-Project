@@ -2,6 +2,8 @@
 #define QUERYPROCESSING_QL_H
 
 #include <iostream>
+#include <string>
+#include <unordered_map>
 
 #include "global.h"
 #include "indexing/ix.h"
@@ -13,13 +15,13 @@ namespace querylanguage {
 struct RelAttr {
   char *relName;   // relation name (may be NULL)
   char *attrName;  // attribute name
-  friend std::ostream& operator <<(std::ostream &s, const RelAttr &ra);
+  friend std::ostream &operator<<(std::ostream &s, const RelAttr &ra);
 };
 
 struct Value {
   AttrType type;  // type of value
   void *data;     // value
-  friend std::ostream& operator <<(std::ostream &s, const Value &v);
+  friend std::ostream &operator<<(std::ostream &s, const Value &v);
 };
 
 struct Condition {
@@ -29,14 +31,14 @@ struct Condition {
                     // and not a value
   RelAttr rhsAttr;  // right-hand side attribute if bRhsIsAttr = TRUE
   Value rhsValue;   // right-hand side value if bRhsIsAttr = FALSE
-  friend std::ostream& operator <<(std::ostream &s, const Condition &c);
+  friend std::ostream &operator<<(std::ostream &s, const Condition &c);
 };
 
 class QL_Manager {
  public:
   QL_Manager(recordmanager::RM_Manager *rmm, indexing::IX_Manager *ixm,
-             systemmanager::SM_Manager *smm, filesystem::FileManager* fm,
-             filesystem::BufPageManager* bpm);
+             systemmanager::SM_Manager *smm, filesystem::FileManager *fm,
+             filesystem::BufPageManager *bpm);
 
   ~QL_Manager();
 
@@ -64,11 +66,17 @@ class QL_Manager {
              const Condition conditions[]);  // conditions in Where clause
 
  private:
-  filesystem::FileManager* fm_;
-  filesystem::BufPageManager* bpm_;
+  filesystem::FileManager *fm_;
+  filesystem::BufPageManager *bpm_;
   recordmanager::RM_Manager *rmm_;
   indexing::IX_Manager *ixm_;
   systemmanager::SM_Manager *smm_;
+
+  int Dfs(int nRelations, const char *const relations[],
+          std::unordered_map<std::string, systemmanager::TableInfo>
+              tbname_to_tbinfo,
+          std::vector<recordmanager::RM_Record> *now,
+          std::vector<std::vector<recordmanager::RM_Record>> *results);
 };
 
 }  // namespace querylanguage
