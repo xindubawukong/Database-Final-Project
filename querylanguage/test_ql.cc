@@ -36,9 +36,9 @@ int main() {
 
   string tb1 = "table_1";
 
-  // systemmanager::AttrInfo attr_infos[3];
+  systemmanager::AttrInfo attr_infos[3];
 
-  systemmanager::AttrInfo* attr_infos = new systemmanager::AttrInfo[3];
+  // systemmanager::AttrInfo* attr_infos = new systemmanager::AttrInfo[3];
 
   CopyStr(attr_infos[0].attrName, "name", MAX_LENGTH);
   attr_infos[0].attrType = AttrType::STRING;
@@ -63,7 +63,17 @@ int main() {
   rc = smm->CreateTable(tb1.c_str(), 3, attr_infos, 0, NULL);
   cout << "CreateTable(tb1): " << rc << endl;
 
-  delete[] attr_infos;
+  querylanguage::Value values[3];
+  values[0].type = AttrType::STRING;
+  values[0].data = new char[11];
+  CopyStr((char*)values[0].data, "dxy", 10);
+  values[1].type = AttrType::INT;
+  values[1].data = new int(21);
+  values[2].type = AttrType::FLOAT;
+  values[2].data = new float(100);
+
+  rc = qlm->Insert(tb1.c_str(), 3, values);
+  cout << "Insert(tb1): " << rc << endl;
 
   return 0;
 }

@@ -198,8 +198,11 @@ struct BufPageManager {
   }
 
   void closeFile(int fileID) {
-    for(auto it = fd_to_idx[fileID].begin(); it != fd_to_idx[fileID].end(); it++) {
-      writeBack(*it);
+    // for(auto it = fd_to_idx[fileID].begin(); it != fd_to_idx[fileID].end(); it++) {
+    //   writeBack(*it);
+    // }
+    while (!fd_to_idx[fileID].empty()) {
+      writeBack(*(fd_to_idx[fileID].begin()));
     }
     fileManager->closeFile(fileID);
   }

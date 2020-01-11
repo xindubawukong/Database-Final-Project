@@ -14,7 +14,7 @@ QL_Manager::QL_Manager(recordmanager::RM_Manager *rmm,
                        systemmanager::SM_Manager *smm,
                        filesystem::FileManager *fm,
                        filesystem::BufPageManager *bpm)
-    : rmm_(rmm), ixm_(ixm), smm_(smm) {}
+    : rmm_(rmm), ixm_(ixm), smm_(smm), fm_(fm), bpm_(bpm) {}
 
 QL_Manager::~QL_Manager() {}
 
@@ -286,11 +286,17 @@ int QL_Manager::Select(int nSelAttrs, const RelAttr selAttrs[], int nRelations,
 }
 
 int QL_Manager::Insert(const char *relName, int nValues, const Value values[]) {
+
+  std::cout << "QL_Manager::Insert " << relName << std::endl;
+
   if (relName == NULL) return -1;
   int rc;
 
   string data_file = (string)relName + "_data";
   string meta_file = (string)relName + "_meta";
+
+  std::cout << "data_file: " << data_file << std::endl;
+  std::cout << "meta_file: " << meta_file << std::endl;
 
   int meta_file_id, index;
   fm_->openFile(meta_file.c_str(), meta_file_id);
@@ -310,9 +316,9 @@ int QL_Manager::Insert(const char *relName, int nValues, const Value values[]) {
   }
   char *data = new char[record_size];
   std::memset(data, 0, record_size);
-  int offset = 0;
-  for (int i = 0; i < nValues; i++) {
-    memcpy(data + offset, values[i].data, table_info.attrInfos[i].attrLength);
+  for (int i = 0, offset = 0; i < nValues; i++) {
+    std::memcpy(data + offset, values[i].data, table_info.attrInfos[i].attrLength);
+    offset += table_info.attrInfos[i].attrLength;
   }
 
   // 将data插入文件中
