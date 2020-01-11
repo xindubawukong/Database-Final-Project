@@ -6,12 +6,14 @@ namespace parser {
   using std::move;
   using systemmanager::SM_Manager;
 
+  Tree *Tree::tree = nullptr;
+
   ShowDatabase::ShowDatabase(string dbName) {
     this->dbName = move(dbName);
   }
 
   void ShowDatabase::visit() {
-    // TODO
+    systemmanager::sm->ShowDb(dbName.c_str());
   }
 
   CreateDatabase::CreateDatabase(string dbName) {
@@ -19,7 +21,6 @@ namespace parser {
   }
 
   void CreateDatabase::visit() {
-    SM_Manager::getInstance()->CreateDb(dbName.c_str());
   }
 
   DropDatabase::DropDatabase(string dbName) {
@@ -27,7 +28,7 @@ namespace parser {
   }
 
   void DropDatabase::visit() {
-    SM_Manager::getInstance()->DropDb(dbName.c_str());
+    systemmanager::sm->DropDb(dbName.c_str());
   }
 
   UseDatabase::UseDatabase(string dbName) {
@@ -35,7 +36,7 @@ namespace parser {
   }
 
   void UseDatabase::visit() {
-    SM_Manager::getInstance()->OpenDb(dbName.c_str());
+    systemmanager::sm->OpenDb(dbName.c_str());
   }
 
 

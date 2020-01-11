@@ -1,0 +1,3 @@
+/mnt/d/learn/senior/database/Database-Final-Project/parser/CMakeFiles/rebuild_cache.dir
+/mnt/d/learn/senior/database/Database-Final-Project/parser/CMakeFiles/SqlParser.dir
+/mnt/d/learn/senior/database/Database-Final-Project/parser/CMakeFiles/edit_cache.dir

@@ -3,12 +3,13 @@
 
 #include <vector>
 #include <string>
-#include <cassert>
-#include "global.h"
-#include "systemmanager/sm.h"
+#include <assert.h>
+#include "../global.h"
+#include "../systemmanager/sm.h"
 
 
 namespace parser {
+
 
 enum AlterObject {
   PRIMARY,
@@ -78,7 +79,6 @@ class Tree {
     }
 
     static Tree* tree;
-    static SM_Manager
 };
 
 class ShowDatabase: public Tree {

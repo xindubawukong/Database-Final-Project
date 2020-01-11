@@ -19,3 +19,15 @@ cc_test(
     ":global",
   ]
 )
+
+
+
+cc_binary(
+  name = "sql",
+  srcs = ["main.cpp"],
+  deps = [
+    "//parser:parser_1",
+    "//filesystem:filesystem",
+  ],
+  linkstatic = 1,
+)

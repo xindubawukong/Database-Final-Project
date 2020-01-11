@@ -1,27 +1,30 @@
-%require "3.2"
-%language "c++"
-
-
 %{
+#ifdef __STRICT_ANSI__
+#undef __STRICT_ANSI__
 #include <cstdio>
-#include "global.h"
-#include "parser/ast.h"
-#include "parser/parser.h"
+#define __STRICT_ANSI__
+#else
+#include <cstdio>
+#endif
+
+#include <stdlib.h>
+#include "../global.h"
+#include "ast.h"
+#include "parser.yy.cpp"
 
 int yylex();
 void yyerror(const char *);
 
-class Tree;
+// class Tree;
 %}
 
-// %union {
-//     int ivalue;
-//     AttrType attrType;
-//     float fvalue;
-//     char *string;
-//     Tree *tree;
-//     Field *field;
-// }
+%union {
+    int ivalue;
+    AttrType attrType;
+    float fvalue;
+    char *string;
+    parser::Tree* tree;
+}
 
 /* keyword */
 %token QUIT
@@ -29,18 +32,17 @@ class Tree;
 %token DATABASES DATABASE TABLE INDEX ON CONSTRAINT
 
 /* COLUMN DESCPRITION */
-%token INT FLOAT VARCHAR PRIMARY FOREIGN REFERENCES NOTNULL DEFAULT
+%token T_INT T_FLOAT VARCHAR PRIMARY FOREIGN REFERENCES NOTNULL DEFAULT
 
 
 /* number */
-%token <int> VALUE_INT
-%token <float> VALUE_FLOAT
-%token <char*> VALUE_STRING IDENTIFIER VALUE_NULL
-%token END_OF_FILE 0
+%token <ivalue> VALUE_INT
+%token <fvalue> VALUE_FLOAT
+%token <string> VALUE_STRING IDENTIFIER VALUE_NULL
 
 /* type */
-%type <Tree*> dbStmt
-%type <char*> tbName dbName idxName fkName columnName
+%type <tree> dbStmt
+%type <string> tbName dbName idxName fkName columnName
 %%
 
 program: %empty 
@@ -87,24 +89,24 @@ sysStmt: SHOW DATABASES
 
 dbStmt: CREATE DATABASE dbName
         {
-            $$ = new CreateDatabase($3);
-            Tree::setInstance($$);
+            $$ = new parser::CreateDatabase($3);
+            parser::Tree::setInstance($$);
             delete $3;
-            Tree::run();
+            parser::Tree::run();
         }
         | DROP DATABASE dbName
         {
-            $$ = new DropDatabase($3);
-            Tree::setInstance($$);
+            $$ = new parser::DropDatabase($3);
+            parser::Tree::setInstance($$);
             delete $3;
-            Tree::run();
+            parser::Tree::run();
         }
         | USE dbName
         {
-            $$ = new UseDatabase($2);
-            Tree::setInstance($$);
+            $$ = new parser::UseDatabase($2);
+            parser::Tree::setInstance($$);
             delete $2;
-            Tree::run();
+            parser::Tree::run();
         }
         | SHOW TABLES
         {
@@ -214,7 +216,7 @@ field: columnName type
       }
       ;
 
-type: INT '(' VALUE_INT ')'
+type: T_INT '(' VALUE_INT ')'
       {
 
       }
@@ -222,7 +224,7 @@ type: INT '(' VALUE_INT ')'
       {
 
       }
-      | FLOAT
+      | T_FLOAT
       {
 
       }

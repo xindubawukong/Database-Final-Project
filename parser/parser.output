@@ -1,0 +1,1182 @@
+Grammar
+
+    0 $accept: program $end
+
+    1 program: %empty
+    2        | program stmt
+
+    3 stmt: sysStmt ';'
+    4     | dbStmt ';'
+    5     | tbStmt ';'
+    6     | idxStmt ';'
+    7     | alterStmt ';'
+    8     | QUIT
+
+    9 sysStmt: SHOW DATABASES
+
+   10 dbStmt: CREATE DATABASE dbName
+   11       | DROP DATABASE dbName
+   12       | USE dbName
+   13       | SHOW TABLES
+
+   14 tbStmt: CREATE TABLE tbName '(' fieldList keyConstraints ')'
+   15       | DROP TABLE tbName
+   16       | DESC tbName
+
+   17 keyConstraints: %empty
+   18               | ',' keyConstrint keyConstraints
+
+   19 keyConstrint: PRIMARY '(' columnList ')'
+   20             | FOREIGN '(' columnList ')' REFERENCES tbName '(' columnList ')'
+
+   21 idxStmt: CREATE INDEX idxName ON tbName '(' columnList ')'
+   22        | DROP INDEX idxName
+
+   23 alterStmt: ALTER TABLE tbName ADD PRIMARY '(' columnList ')'
+   24          | ALTER TABLE tbName DROP PRIMARY
+   25          | ALTER TABLE tbName ADD CONSTRAINT fkName FOREIGN '(' columnList ')' REFERENCES tbName '(' columnList ')'
+   26          | ALTER TABLE tbName DROP FOREIGN fkName
+   27          | ALTER TABLE tbName ADD columnName field
+   28          | ALTER TABLE tbName DROP columnName
+   29          | ALTER TABLE tbName CHANGE columnName field
+
+   30 fieldList: field
+   31          | fieldList ',' field
+
+   32 field: columnName type
+   33      | columnName type NOTNULL
+   34      | columnName type DEFAULT value
+   35      | columnName type NOTNULL DEFAULT value
+
+   36 type: T_INT '(' VALUE_INT ')'
+   37     | VARCHAR '(' VALUE_INT ')'
+   38     | T_FLOAT
+
+   39 value: VALUE_INT
+   40      | VALUE_STRING
+   41      | VALUE_FLOAT
+   42      | VALUE_NULL
+
+   43 columnList: columnName
+   44           | columnList ',' columnName
+
+   45 dbName: IDENTIFIER
+
+   46 tbName: IDENTIFIER
+
+   47 columnName: IDENTIFIER
+
+   48 fkName: IDENTIFIER
+
+   49 idxName: IDENTIFIER
+
+
+Terminals, with rules where they appear
+
+$end (0) 0
+'(' (40) 14 19 20 21 23 25 36 37
+')' (41) 14 19 20 21 23 25 36 37
+',' (44) 18 31 44
+';' (59) 3 4 5 6 7
+error (256)
+QUIT (258) 8
+CREATE (259) 10 14 21
+DROP (260) 11 15 22 24 26 28
+USE (261) 12
+SHOW (262) 9 13
+TABLES (263) 13
+DESC (264) 16
+ADD (265) 23 25 27
+CHANGE (266) 29
+ALTER (267) 23 24 25 26 27 28 29
+DATABASES (268) 9
+DATABASE (269) 10 11
+TABLE (270) 14 15 23 24 25 26 27 28 29
+INDEX (271) 21 22
+ON (272) 21
+CONSTRAINT (273) 25
+T_INT (274) 36
+T_FLOAT (275) 38
+VARCHAR (276) 37
+PRIMARY (277) 19 23 24
+FOREIGN (278) 20 25 26
+REFERENCES (279) 20 25
+NOTNULL (280) 33 35
+DEFAULT (281) 34 35
+VALUE_INT (282) 36 37 39
+VALUE_FLOAT (283) 41
+VALUE_STRING (284) 40
+IDENTIFIER (285) 45 46 47 48 49
+VALUE_NULL (286) 42
+
+
+Nonterminals, with rules where they appear
+
+$accept (36)
+    on left: 0
+program (37)
+    on left: 1 2, on right: 0 2
+stmt (38)
+    on left: 3 4 5 6 7 8, on right: 2
+sysStmt (39)
+    on left: 9, on right: 3
+dbStmt (40)
+    on left: 10 11 12 13, on right: 4
+tbStmt (41)
+    on left: 14 15 16, on right: 5
+keyConstraints (42)
+    on left: 17 18, on right: 14 18
+keyConstrint (43)
+    on left: 19 20, on right: 18
+idxStmt (44)
+    on left: 21 22, on right: 6
+alterStmt (45)
+    on left: 23 24 25 26 27 28 29, on right: 7
+fieldList (46)
+    on left: 30 31, on right: 14 31
+field (47)
+    on left: 32 33 34 35, on right: 27 29 30 31
+type (48)
+    on left: 36 37 38, on right: 32 33 34 35
+value (49)
+    on left: 39 40 41 42, on right: 34 35
+columnList (50)
+    on left: 43 44, on right: 19 20 21 23 25 44
+dbName (51)
+    on left: 45, on right: 10 11 12
+tbName (52)
+    on left: 46, on right: 14 15 16 20 21 23 24 25 26 27 28 29
+columnName (53)
+    on left: 47, on right: 27 28 29 32 33 34 35 43 44
+fkName (54)
+    on left: 48, on right: 25 26
+idxName (55)
+    on left: 49, on right: 21 22
+
+
+State 0
+
+    0 $accept: . program $end
+
+    $default  reduce using rule 1 (program)
+
+    program  go to state 1
+
+
+State 1
+
+    0 $accept: program . $end
+    2 program: program . stmt
+
+    $end    shift, and go to state 2
+    QUIT    shift, and go to state 3
+    CREATE  shift, and go to state 4
+    DROP    shift, and go to state 5
+    USE     shift, and go to state 6
+    SHOW    shift, and go to state 7
+    DESC    shift, and go to state 8
+    ALTER   shift, and go to state 9
+
+    stmt       go to state 10
+    sysStmt    go to state 11
+    dbStmt     go to state 12
+    tbStmt     go to state 13
+    idxStmt    go to state 14
+    alterStmt  go to state 15
+
+
+State 2
+
+    0 $accept: program $end .
+
+    $default  accept
+
+
+State 3
+
+    8 stmt: QUIT .
+
+    $default  reduce using rule 8 (stmt)
+
+
+State 4
+
+   10 dbStmt: CREATE . DATABASE dbName
+   14 tbStmt: CREATE . TABLE tbName '(' fieldList keyConstraints ')'
+   21 idxStmt: CREATE . INDEX idxName ON tbName '(' columnList ')'
+
+    DATABASE  shift, and go to state 16
+    TABLE     shift, and go to state 17
+    INDEX     shift, and go to state 18
+
+
+State 5
+
+   11 dbStmt: DROP . DATABASE dbName
+   15 tbStmt: DROP . TABLE tbName
+   22 idxStmt: DROP . INDEX idxName
+
+    DATABASE  shift, and go to state 19
+    TABLE     shift, and go to state 20
+    INDEX     shift, and go to state 21
+
+
+State 6
+
+   12 dbStmt: USE . dbName
+
+    IDENTIFIER  shift, and go to state 22
+
+    dbName  go to state 23
+
+
+State 7
+
+    9 sysStmt: SHOW . DATABASES
+   13 dbStmt: SHOW . TABLES
+
+    TABLES     shift, and go to state 24
+    DATABASES  shift, and go to state 25
+
+
+State 8
+
+   16 tbStmt: DESC . tbName
+
+    IDENTIFIER  shift, and go to state 26
+
+    tbName  go to state 27
+
+
+State 9
+
+   23 alterStmt: ALTER . TABLE tbName ADD PRIMARY '(' columnList ')'
+   24          | ALTER . TABLE tbName DROP PRIMARY
+   25          | ALTER . TABLE tbName ADD CONSTRAINT fkName FOREIGN '(' columnList ')' REFERENCES tbName '(' columnList ')'
+   26          | ALTER . TABLE tbName DROP FOREIGN fkName
+   27          | ALTER . TABLE tbName ADD columnName field
+   28          | ALTER . TABLE tbName DROP columnName
+   29          | ALTER . TABLE tbName CHANGE columnName field
+
+    TABLE  shift, and go to state 28
+
+
+State 10
+
+    2 program: program stmt .
+
+    $default  reduce using rule 2 (program)
+
+
+State 11
+
+    3 stmt: sysStmt . ';'
+
+    ';'  shift, and go to state 29
+
+
+State 12
+
+    4 stmt: dbStmt . ';'
+
+    ';'  shift, and go to state 30
+
+
+State 13
+
+    5 stmt: tbStmt . ';'
+
+    ';'  shift, and go to state 31
+
+
+State 14
+
+    6 stmt: idxStmt . ';'
+
+    ';'  shift, and go to state 32
+
+
+State 15
+
+    7 stmt: alterStmt . ';'
+
+    ';'  shift, and go to state 33
+
+
+State 16
+
+   10 dbStmt: CREATE DATABASE . dbName
+
+    IDENTIFIER  shift, and go to state 22
+
+    dbName  go to state 34
+
+
+State 17
+
+   14 tbStmt: CREATE TABLE . tbName '(' fieldList keyConstraints ')'
+
+    IDENTIFIER  shift, and go to state 26
+
+    tbName  go to state 35
+
+
+State 18
+
+   21 idxStmt: CREATE INDEX . idxName ON tbName '(' columnList ')'
+
+    IDENTIFIER  shift, and go to state 36
+
+    idxName  go to state 37
+
+
+State 19
+
+   11 dbStmt: DROP DATABASE . dbName
+
+    IDENTIFIER  shift, and go to state 22
+
+    dbName  go to state 38
+
+
+State 20
+
+   15 tbStmt: DROP TABLE . tbName
+
+    IDENTIFIER  shift, and go to state 26
+
+    tbName  go to state 39
+
+
+State 21
+
+   22 idxStmt: DROP INDEX . idxName
+
+    IDENTIFIER  shift, and go to state 36
+
+    idxName  go to state 40
+
+
+State 22
+
+   45 dbName: IDENTIFIER .
+
+    $default  reduce using rule 45 (dbName)
+
+
+State 23
+
+   12 dbStmt: USE dbName .
+
+    $default  reduce using rule 12 (dbStmt)
+
+
+State 24
+
+   13 dbStmt: SHOW TABLES .
+
+    $default  reduce using rule 13 (dbStmt)
+
+
+State 25
+
+    9 sysStmt: SHOW DATABASES .
+
+    $default  reduce using rule 9 (sysStmt)
+
+
+State 26
+
+   46 tbName: IDENTIFIER .
+
+    $default  reduce using rule 46 (tbName)
+
+
+State 27
+
+   16 tbStmt: DESC tbName .
+
+    $default  reduce using rule 16 (tbStmt)
+
+
+State 28
+
+   23 alterStmt: ALTER TABLE . tbName ADD PRIMARY '(' columnList ')'
+   24          | ALTER TABLE . tbName DROP PRIMARY
+   25          | ALTER TABLE . tbName ADD CONSTRAINT fkName FOREIGN '(' columnList ')' REFERENCES tbName '(' columnList ')'
+   26          | ALTER TABLE . tbName DROP FOREIGN fkName
+   27          | ALTER TABLE . tbName ADD columnName field
+   28          | ALTER TABLE . tbName DROP columnName
+   29          | ALTER TABLE . tbName CHANGE columnName field
+
+    IDENTIFIER  shift, and go to state 26
+
+    tbName  go to state 41
+
+
+State 29
+
+    3 stmt: sysStmt ';' .
+
+    $default  reduce using rule 3 (stmt)
+
+
+State 30
+
+    4 stmt: dbStmt ';' .
+
+    $default  reduce using rule 4 (stmt)
+
+
+State 31
+
+    5 stmt: tbStmt ';' .
+
+    $default  reduce using rule 5 (stmt)
+
+
+State 32
+
+    6 stmt: idxStmt ';' .
+
+    $default  reduce using rule 6 (stmt)
+
+
+State 33
+
+    7 stmt: alterStmt ';' .
+
+    $default  reduce using rule 7 (stmt)
+
+
+State 34
+
+   10 dbStmt: CREATE DATABASE dbName .
+
+    $default  reduce using rule 10 (dbStmt)
+
+
+State 35
+
+   14 tbStmt: CREATE TABLE tbName . '(' fieldList keyConstraints ')'
+
+    '('  shift, and go to state 42
+
+
+State 36
+
+   49 idxName: IDENTIFIER .
+
+    $default  reduce using rule 49 (idxName)
+
+
+State 37
+
+   21 idxStmt: CREATE INDEX idxName . ON tbName '(' columnList ')'
+
+    ON  shift, and go to state 43
+
+
+State 38
+
+   11 dbStmt: DROP DATABASE dbName .
+
+    $default  reduce using rule 11 (dbStmt)
+
+
+State 39
+
+   15 tbStmt: DROP TABLE tbName .
+
+    $default  reduce using rule 15 (tbStmt)
+
+
+State 40
+
+   22 idxStmt: DROP INDEX idxName .
+
+    $default  reduce using rule 22 (idxStmt)
+
+
+State 41
+
+   23 alterStmt: ALTER TABLE tbName . ADD PRIMARY '(' columnList ')'
+   24          | ALTER TABLE tbName . DROP PRIMARY
+   25          | ALTER TABLE tbName . ADD CONSTRAINT fkName FOREIGN '(' columnList ')' REFERENCES tbName '(' columnList ')'
+   26          | ALTER TABLE tbName . DROP FOREIGN fkName
+   27          | ALTER TABLE tbName . ADD columnName field
+   28          | ALTER TABLE tbName . DROP columnName
+   29          | ALTER TABLE tbName . CHANGE columnName field
+
+    DROP    shift, and go to state 44
+    ADD     shift, and go to state 45
+    CHANGE  shift, and go to state 46
+
+
+State 42
+
+   14 tbStmt: CREATE TABLE tbName '(' . fieldList keyConstraints ')'
+
+    IDENTIFIER  shift, and go to state 47
+
+    fieldList   go to state 48
+    field       go to state 49
+    columnName  go to state 50
+
+
+State 43
+
+   21 idxStmt: CREATE INDEX idxName ON . tbName '(' columnList ')'
+
+    IDENTIFIER  shift, and go to state 26
+
+    tbName  go to state 51
+
+
+State 44
+
+   24 alterStmt: ALTER TABLE tbName DROP . PRIMARY
+   26          | ALTER TABLE tbName DROP . FOREIGN fkName
+   28          | ALTER TABLE tbName DROP . columnName
+
+    PRIMARY     shift, and go to state 52
+    FOREIGN     shift, and go to state 53
+    IDENTIFIER  shift, and go to state 47
+
+    columnName  go to state 54
+
+
+State 45
+
+   23 alterStmt: ALTER TABLE tbName ADD . PRIMARY '(' columnList ')'
+   25          | ALTER TABLE tbName ADD . CONSTRAINT fkName FOREIGN '(' columnList ')' REFERENCES tbName '(' columnList ')'
+   27          | ALTER TABLE tbName ADD . columnName field
+
+    CONSTRAINT  shift, and go to state 55
+    PRIMARY     shift, and go to state 56
+    IDENTIFIER  shift, and go to state 47
+
+    columnName  go to state 57
+
+
+State 46
+
+   29 alterStmt: ALTER TABLE tbName CHANGE . columnName field
+
+    IDENTIFIER  shift, and go to state 47
+
+    columnName  go to state 58
+
+
+State 47
+
+   47 columnName: IDENTIFIER .
+
+    $default  reduce using rule 47 (columnName)
+
+
+State 48
+
+   14 tbStmt: CREATE TABLE tbName '(' fieldList . keyConstraints ')'
+   31 fieldList: fieldList . ',' field
+
+    ','  shift, and go to state 59
+
+    $default  reduce using rule 17 (keyConstraints)
+
+    keyConstraints  go to state 60
+
+
+State 49
+
+   30 fieldList: field .
+
+    $default  reduce using rule 30 (fieldList)
+
+
+State 50
+
+   32 field: columnName . type
+   33      | columnName . type NOTNULL
+   34      | columnName . type DEFAULT value
+   35      | columnName . type NOTNULL DEFAULT value
+
+    T_INT    shift, and go to state 61
+    T_FLOAT  shift, and go to state 62
+    VARCHAR  shift, and go to state 63
+
+    type  go to state 64
+
+
+State 51
+
+   21 idxStmt: CREATE INDEX idxName ON tbName . '(' columnList ')'
+
+    '('  shift, and go to state 65
+
+
+State 52
+
+   24 alterStmt: ALTER TABLE tbName DROP PRIMARY .
+
+    $default  reduce using rule 24 (alterStmt)
+
+
+State 53
+
+   26 alterStmt: ALTER TABLE tbName DROP FOREIGN . fkName
+
+    IDENTIFIER  shift, and go to state 66
+
+    fkName  go to state 67
+
+
+State 54
+
+   28 alterStmt: ALTER TABLE tbName DROP columnName .
+
+    $default  reduce using rule 28 (alterStmt)
+
+
+State 55
+
+   25 alterStmt: ALTER TABLE tbName ADD CONSTRAINT . fkName FOREIGN '(' columnList ')' REFERENCES tbName '(' columnList ')'
+
+    IDENTIFIER  shift, and go to state 66
+
+    fkName  go to state 68
+
+
+State 56
+
+   23 alterStmt: ALTER TABLE tbName ADD PRIMARY . '(' columnList ')'
+
+    '('  shift, and go to state 69
+
+
+State 57
+
+   27 alterStmt: ALTER TABLE tbName ADD columnName . field
+
+    IDENTIFIER  shift, and go to state 47
+
+    field       go to state 70
+    columnName  go to state 50
+
+
+State 58
+
+   29 alterStmt: ALTER TABLE tbName CHANGE columnName . field
+
+    IDENTIFIER  shift, and go to state 47
+
+    field       go to state 71
+    columnName  go to state 50
+
+
+State 59
+
+   18 keyConstraints: ',' . keyConstrint keyConstraints
+   31 fieldList: fieldList ',' . field
+
+    PRIMARY     shift, and go to state 72
+    FOREIGN     shift, and go to state 73
+    IDENTIFIER  shift, and go to state 47
+
+    keyConstrint  go to state 74
+    field         go to state 75
+    columnName    go to state 50
+
+
+State 60
+
+   14 tbStmt: CREATE TABLE tbName '(' fieldList keyConstraints . ')'
+
+    ')'  shift, and go to state 76
+
+
+State 61
+
+   36 type: T_INT . '(' VALUE_INT ')'
+
+    '('  shift, and go to state 77
+
+
+State 62
+
+   38 type: T_FLOAT .
+
+    $default  reduce using rule 38 (type)
+
+
+State 63
+
+   37 type: VARCHAR . '(' VALUE_INT ')'
+
+    '('  shift, and go to state 78
+
+
+State 64
+
+   32 field: columnName type .
+   33      | columnName type . NOTNULL
+   34      | columnName type . DEFAULT value
+   35      | columnName type . NOTNULL DEFAULT value
+
+    NOTNULL  shift, and go to state 79
+    DEFAULT  shift, and go to state 80
+
+    $default  reduce using rule 32 (field)
+
+
+State 65
+
+   21 idxStmt: CREATE INDEX idxName ON tbName '(' . columnList ')'
+
+    IDENTIFIER  shift, and go to state 47
+
+    columnList  go to state 81
+    columnName  go to state 82
+
+
+State 66
+
+   48 fkName: IDENTIFIER .
+
+    $default  reduce using rule 48 (fkName)
+
+
+State 67
+
+   26 alterStmt: ALTER TABLE tbName DROP FOREIGN fkName .
+
+    $default  reduce using rule 26 (alterStmt)
+
+
+State 68
+
+   25 alterStmt: ALTER TABLE tbName ADD CONSTRAINT fkName . FOREIGN '(' columnList ')' REFERENCES tbName '(' columnList ')'
+
+    FOREIGN  shift, and go to state 83
+
+
+State 69
+
+   23 alterStmt: ALTER TABLE tbName ADD PRIMARY '(' . columnList ')'
+
+    IDENTIFIER  shift, and go to state 47
+
+    columnList  go to state 84
+    columnName  go to state 82
+
+
+State 70
+
+   27 alterStmt: ALTER TABLE tbName ADD columnName field .
+
+    $default  reduce using rule 27 (alterStmt)
+
+
+State 71
+
+   29 alterStmt: ALTER TABLE tbName CHANGE columnName field .
+
+    $default  reduce using rule 29 (alterStmt)
+
+
+State 72
+
+   19 keyConstrint: PRIMARY . '(' columnList ')'
+
+    '('  shift, and go to state 85
+
+
+State 73
+
+   20 keyConstrint: FOREIGN . '(' columnList ')' REFERENCES tbName '(' columnList ')'
+
+    '('  shift, and go to state 86
+
+
+State 74
+
+   18 keyConstraints: ',' keyConstrint . keyConstraints
+
+    ','  shift, and go to state 87
+
+    $default  reduce using rule 17 (keyConstraints)
+
+    keyConstraints  go to state 88
+
+
+State 75
+
+   31 fieldList: fieldList ',' field .
+
+    $default  reduce using rule 31 (fieldList)
+
+
+State 76
+
+   14 tbStmt: CREATE TABLE tbName '(' fieldList keyConstraints ')' .
+
+    $default  reduce using rule 14 (tbStmt)
+
+
+State 77
+
+   36 type: T_INT '(' . VALUE_INT ')'
+
+    VALUE_INT  shift, and go to state 89
+
+
+State 78
+
+   37 type: VARCHAR '(' . VALUE_INT ')'
+
+    VALUE_INT  shift, and go to state 90
+
+
+State 79
+
+   33 field: columnName type NOTNULL .
+   35      | columnName type NOTNULL . DEFAULT value
+
+    DEFAULT  shift, and go to state 91
+
+    $default  reduce using rule 33 (field)
+
+
+State 80
+
+   34 field: columnName type DEFAULT . value
+
+    VALUE_INT     shift, and go to state 92
+    VALUE_FLOAT   shift, and go to state 93
+    VALUE_STRING  shift, and go to state 94
+    VALUE_NULL    shift, and go to state 95
+
+    value  go to state 96
+
+
+State 81
+
+   21 idxStmt: CREATE INDEX idxName ON tbName '(' columnList . ')'
+   44 columnList: columnList . ',' columnName
+
+    ')'  shift, and go to state 97
+    ','  shift, and go to state 98
+
+
+State 82
+
+   43 columnList: columnName .
+
+    $default  reduce using rule 43 (columnList)
+
+
+State 83
+
+   25 alterStmt: ALTER TABLE tbName ADD CONSTRAINT fkName FOREIGN . '(' columnList ')' REFERENCES tbName '(' columnList ')'
+
+    '('  shift, and go to state 99
+
+
+State 84
+
+   23 alterStmt: ALTER TABLE tbName ADD PRIMARY '(' columnList . ')'
+   44 columnList: columnList . ',' columnName
+
+    ')'  shift, and go to state 100
+    ','  shift, and go to state 98
+
+
+State 85
+
+   19 keyConstrint: PRIMARY '(' . columnList ')'
+
+    IDENTIFIER  shift, and go to state 47
+
+    columnList  go to state 101
+    columnName  go to state 82
+
+
+State 86
+
+   20 keyConstrint: FOREIGN '(' . columnList ')' REFERENCES tbName '(' columnList ')'
+
+    IDENTIFIER  shift, and go to state 47
+
+    columnList  go to state 102
+    columnName  go to state 82
+
+
+State 87
+
+   18 keyConstraints: ',' . keyConstrint keyConstraints
+
+    PRIMARY  shift, and go to state 72
+    FOREIGN  shift, and go to state 73
+
+    keyConstrint  go to state 74
+
+
+State 88
+
+   18 keyConstraints: ',' keyConstrint keyConstraints .
+
+    $default  reduce using rule 18 (keyConstraints)
+
+
+State 89
+
+   36 type: T_INT '(' VALUE_INT . ')'
+
+    ')'  shift, and go to state 103
+
+
+State 90
+
+   37 type: VARCHAR '(' VALUE_INT . ')'
+
+    ')'  shift, and go to state 104
+
+
+State 91
+
+   35 field: columnName type NOTNULL DEFAULT . value
+
+    VALUE_INT     shift, and go to state 92
+    VALUE_FLOAT   shift, and go to state 93
+    VALUE_STRING  shift, and go to state 94
+    VALUE_NULL    shift, and go to state 95
+
+    value  go to state 105
+
+
+State 92
+
+   39 value: VALUE_INT .
+
+    $default  reduce using rule 39 (value)
+
+
+State 93
+
+   41 value: VALUE_FLOAT .
+
+    $default  reduce using rule 41 (value)
+
+
+State 94
+
+   40 value: VALUE_STRING .
+
+    $default  reduce using rule 40 (value)
+
+
+State 95
+
+   42 value: VALUE_NULL .
+
+    $default  reduce using rule 42 (value)
+
+
+State 96
+
+   34 field: columnName type DEFAULT value .
+
+    $default  reduce using rule 34 (field)
+
+
+State 97
+
+   21 idxStmt: CREATE INDEX idxName ON tbName '(' columnList ')' .
+
+    $default  reduce using rule 21 (idxStmt)
+
+
+State 98
+
+   44 columnList: columnList ',' . columnName
+
+    IDENTIFIER  shift, and go to state 47
+
+    columnName  go to state 106
+
+
+State 99
+
+   25 alterStmt: ALTER TABLE tbName ADD CONSTRAINT fkName FOREIGN '(' . columnList ')' REFERENCES tbName '(' columnList ')'
+
+    IDENTIFIER  shift, and go to state 47
+
+    columnList  go to state 107
+    columnName  go to state 82
+
+
+State 100
+
+   23 alterStmt: ALTER TABLE tbName ADD PRIMARY '(' columnList ')' .
+
+    $default  reduce using rule 23 (alterStmt)
+
+
+State 101
+
+   19 keyConstrint: PRIMARY '(' columnList . ')'
+   44 columnList: columnList . ',' columnName
+
+    ')'  shift, and go to state 108
+    ','  shift, and go to state 98
+
+
+State 102
+
+   20 keyConstrint: FOREIGN '(' columnList . ')' REFERENCES tbName '(' columnList ')'
+   44 columnList: columnList . ',' columnName
+
+    ')'  shift, and go to state 109
+    ','  shift, and go to state 98
+
+
+State 103
+
+   36 type: T_INT '(' VALUE_INT ')' .
+
+    $default  reduce using rule 36 (type)
+
+
+State 104
+
+   37 type: VARCHAR '(' VALUE_INT ')' .
+
+    $default  reduce using rule 37 (type)
+
+
+State 105
+
+   35 field: columnName type NOTNULL DEFAULT value .
+
+    $default  reduce using rule 35 (field)
+
+
+State 106
+
+   44 columnList: columnList ',' columnName .
+
+    $default  reduce using rule 44 (columnList)
+
+
+State 107
+
+   25 alterStmt: ALTER TABLE tbName ADD CONSTRAINT fkName FOREIGN '(' columnList . ')' REFERENCES tbName '(' columnList ')'
+   44 columnList: columnList . ',' columnName
+
+    ')'  shift, and go to state 110
+    ','  shift, and go to state 98
+
+
+State 108
+
+   19 keyConstrint: PRIMARY '(' columnList ')' .
+
+    $default  reduce using rule 19 (keyConstrint)
+
+
+State 109
+
+   20 keyConstrint: FOREIGN '(' columnList ')' . REFERENCES tbName '(' columnList ')'
+
+    REFERENCES  shift, and go to state 111
+
+
+State 110
+
+   25 alterStmt: ALTER TABLE tbName ADD CONSTRAINT fkName FOREIGN '(' columnList ')' . REFERENCES tbName '(' columnList ')'
+
+    REFERENCES  shift, and go to state 112
+
+
+State 111
+
+   20 keyConstrint: FOREIGN '(' columnList ')' REFERENCES . tbName '(' columnList ')'
+
+    IDENTIFIER  shift, and go to state 26
+
+    tbName  go to state 113
+
+
+State 112
+
+   25 alterStmt: ALTER TABLE tbName ADD CONSTRAINT fkName FOREIGN '(' columnList ')' REFERENCES . tbName '(' columnList ')'
+
+    IDENTIFIER  shift, and go to state 26
+
+    tbName  go to state 114
+
+
+State 113
+
+   20 keyConstrint: FOREIGN '(' columnList ')' REFERENCES tbName . '(' columnList ')'
+
+    '('  shift, and go to state 115
+
+
+State 114
+
+   25 alterStmt: ALTER TABLE tbName ADD CONSTRAINT fkName FOREIGN '(' columnList ')' REFERENCES tbName . '(' columnList ')'
+
+    '('  shift, and go to state 116
+
+
+State 115
+
+   20 keyConstrint: FOREIGN '(' columnList ')' REFERENCES tbName '(' . columnList ')'
+
+    IDENTIFIER  shift, and go to state 47
+
+    columnList  go to state 117
+    columnName  go to state 82
+
+
+State 116
+
+   25 alterStmt: ALTER TABLE tbName ADD CONSTRAINT fkName FOREIGN '(' columnList ')' REFERENCES tbName '(' . columnList ')'
+
+    IDENTIFIER  shift, and go to state 47
+
+    columnList  go to state 118
+    columnName  go to state 82
+
+
+State 117
+
+   20 keyConstrint: FOREIGN '(' columnList ')' REFERENCES tbName '(' columnList . ')'
+   44 columnList: columnList . ',' columnName
+
+    ')'  shift, and go to state 119
+    ','  shift, and go to state 98
+
+
+State 118
+
+   25 alterStmt: ALTER TABLE tbName ADD CONSTRAINT fkName FOREIGN '(' columnList ')' REFERENCES tbName '(' columnList . ')'
+   44 columnList: columnList . ',' columnName
+
+    ')'  shift, and go to state 120
+    ','  shift, and go to state 98
+
+
+State 119
+
+   20 keyConstrint: FOREIGN '(' columnList ')' REFERENCES tbName '(' columnList ')' .
+
+    $default  reduce using rule 20 (keyConstrint)
+
+
+State 120
+
+   25 alterStmt: ALTER TABLE tbName ADD CONSTRAINT fkName FOREIGN '(' columnList ')' REFERENCES tbName '(' columnList ')' .
+
+    $default  reduce using rule 25 (alterStmt)

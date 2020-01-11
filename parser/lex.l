@@ -1,6 +1,7 @@
 %option caseless
 
 %{
+#include "ast.h"
 #include "parser.tab.hpp"
 #include <cstdio>
 #include <cstring>
@@ -51,7 +52,7 @@ VALUE_STRING    '(\\\\|\\n|\\r|\\\"|\\0|\\'|[^'\\])*'
 "-"             { /*printf("- "); */ return yytext[0]; }
 "/"             { /*printf("/ "); */ return yytext[0]; }
 "*"             { /*printf("* "); */ return yytext[0]; }
-QUIT            { /*printf("QUIT");*/return QUIT;       }
+QUIT            { /*printf("QUIT");*/ return QUIT; }
 CREATE          { /*printf("CREATE "); */ return CREATE; }
 DROP            { /*printf("DROP "); */ return DROP; }
 USE             { /*printf("USE "); */ return USE; }
