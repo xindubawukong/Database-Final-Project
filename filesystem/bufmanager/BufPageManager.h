@@ -6,6 +6,9 @@
 #include "../utils/MyLinkList.h"
 #include "../utils/pagedef.h"
 #include "FindReplace.h"
+#include <cstring>
+#include <map>
+#include <set>
 
 namespace filesystem {
 
@@ -19,6 +22,9 @@ struct BufPageManager {
   FileManager* fileManager;
   MyHashMap* hash;
   FindReplace* replace;
+  std::map<int, std::set<int>> fd_to_idx; 
+  std::map<int, int> idx_to_fd;
+  std::map<int, bool> idx_pin;
   // MyLinkList* bpl;
   bool* dirty;
   /*
@@ -31,17 +37,31 @@ struct BufPageManager {
   BufType fetchPage(int typeID, int pageID, int& index) {
     BufType b;
     index = replace->find();
+    while(idx_pin[index]) {
+      index = replace->find();
+    }
+
     b = addr[index];
+    // std::cout << "b: " << b << std::endl;
     if (b == NULL) {
       b = allocMem();
       addr[index] = b;
+      // std::cout << "hehe" << std::endl;
     } else {
+      
       if (dirty[index]) {
         int k1, k2;
         hash->getKeys(index, k1, k2);
         fileManager->writePage(k1, k2, b, 0);
         dirty[index] = false;
+
       }
+
+      int fd = idx_to_fd[index];
+      idx_to_fd[index] = -1;
+      fd_to_idx[fd].erase(index);
+      // memset(b, 0, PAGE_SIZE);
+      // b = nullptr;
     }
     hash->replace(index, typeID, pageID);
     return b;
@@ -63,6 +83,10 @@ struct BufPageManager {
    */
   BufType allocPage(int fileID, int pageID, int& index, bool ifRead = false) {
     BufType b = fetchPage(fileID, pageID, index);
+
+    idx_to_fd[index] = fileID;
+    fd_to_idx[fileID].insert(index);
+
     if (ifRead) {
       fileManager->readPage(fileID, pageID, b, 0);
     }
@@ -84,12 +108,17 @@ struct BufPageManager {
    */
   BufType getPage(int fileID, int pageID, int& index) {
     index = hash->findIndex(fileID, pageID);
+    // std::cout << "index: " << index << std::endl;
     if (index != -1) {
       access(index);
       return addr[index];
     } else {
       BufType b = fetchPage(fileID, pageID, index);
       fileManager->readPage(fileID, pageID, b, 0);
+
+      fd_to_idx[fileID].insert(index);
+      idx_to_fd[index] = fileID;
+
       return b;
     }
   }
@@ -125,6 +154,12 @@ struct BufPageManager {
    */
   void release(int index) {
     dirty[index] = false;
+    // memset(addr[index], 0, PAGE_SIZE);
+    int fd = idx_to_fd[index];
+    idx_to_fd[index] = -1;
+    fd_to_idx[fd].erase(index);
+    //memset(addr[index], 0, PAGE_SIZE);
+
     replace->free(index);
     hash->remove(index);
   }
@@ -140,7 +175,14 @@ struct BufPageManager {
       hash->getKeys(index, f, p);
       fileManager->writePage(f, p, addr[index], 0);
       dirty[index] = false;
+      
     }
+
+    int fd = idx_to_fd[index];
+    idx_to_fd[index] = -1;
+    fd_to_idx[fd].erase(index);
+    //memset(addr[index], 0, PAGE_SIZE);
+
     replace->free(index);
     hash->remove(index);
   }
@@ -153,6 +195,21 @@ struct BufPageManager {
     for (int i = 0; i < CAP; ++i) {
       writeBack(i);
     }
+  }
+
+  void closeFile(int fileID) {
+    for(auto it = fd_to_idx[fileID].begin(); it != fd_to_idx[fileID].end(); it++) {
+      writeBack(*it);
+    }
+    fileManager->closeFile(fileID);
+  }
+
+  void pin(int index) {
+    idx_pin[index] = true;
+  }
+
+  void unpin(int index) {
+    idx_pin[index] = false;
   }
 
   /*

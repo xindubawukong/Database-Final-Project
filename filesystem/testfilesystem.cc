@@ -39,7 +39,8 @@ int main() {
   for (int pageID = 0; pageID < 1000; ++pageID) {
     int index;
     //为pageID获取一个缓存页
-    BufType b = bpm->allocPage(fileID, pageID, index, false);
+    // BufType b = bpm->allocPage(fileID, pageID, index, false);
+    BufType b = bpm->getPage(fileID, pageID, index);
     //注意，在allocPage或者getPage后，千万不要进行delete[] b这样的操作
     //内存的分配和管理都在BufPageManager中做好，不需要关心，如果自行释放会导致问题
     b[0] = pageID;  //对缓存页进行写操作
@@ -47,7 +48,8 @@ int main() {
     bpm->markDirty(index);  //标记脏页
     //在重新调用allocPage获取另一个页的数据时并没有将原先b指向的内存释放掉
     //因为内存管理都在BufPageManager中做好了
-    b = bpm->allocPage(f2, pageID, index, false);
+    // b = bpm->allocPage(f2, pageID, index, false);
+     b = bpm->getPage(f2, pageID, index);
     b[0] = pageID;
     b[1] = f2;
     bpm->markDirty(index);

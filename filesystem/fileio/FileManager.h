@@ -141,7 +141,10 @@ class FileManager {
   bool openFile(const char* name, int& fileID) {
     fileID = fm->findLeftOne();
     fm->setBit(fileID, 0);
-    _openFile(name, fileID);
+    int rc = _openFile(name, fileID);
+    if(rc != 0) {
+      return false;
+    }
     return true;
   }
 
