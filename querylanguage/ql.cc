@@ -177,20 +177,22 @@ int QL_Manager::Select(int nSelAttrs, const RelAttr selAttrs[], int nRelations,
         }
 
         // 左右类型必须相同
-        if (tbinfos[l_rel_id].attrInfos[l_attr_id].attrType != condition.rhsValue.type) return -1;
+        if (tbinfos[l_rel_id].attrInfos[l_attr_id].attrType !=
+            condition.rhsValue.type)
+          return -1;
         AttrType attr_type = tbinfos[l_rel_id].attrInfos[l_attr_id].attrType;
         auto check_f = GetCheckFunction(attr_type, condition.op);
         int length = tbinfos[l_rel_id].attrInfos[l_attr_id].attrLength;
-        char* l_data = new char[length];
-        char* r_data = new char[length];
+        char *l_data = new char[length];
+        char *r_data = new char[length];
         std::memset(l_data, 0, length);
         std::memset(r_data, 0, length);
         std::memcpy(l_data, records_data[l_rel_id] + l_attr_offset, length);
         if (attr_type == AttrType::STRING) {
-          int tmp = std::min(length, (int)std::strlen((char*)condition.rhsValue.data));
+          int tmp = std::min(length,
+                             (int)std::strlen((char *)condition.rhsValue.data));
           std::memcpy(r_data, condition.rhsValue.data, tmp);
-        }
-        else {
+        } else {
           std::memcpy(r_data, condition.rhsValue.data, length);
         }
         flag &= check_f(l_data, r_data, length);
@@ -201,7 +203,8 @@ int QL_Manager::Select(int nSelAttrs, const RelAttr selAttrs[], int nRelations,
     }
     if (flag) {  // 符合条件，输出records
       string output_string;
-      if (nSelAttrs == 1 && std::strcmp(selAttrs[0].attrName, "*") == 0) {  // select *
+      if (nSelAttrs == 1 &&
+          std::strcmp(selAttrs[0].attrName, "*") == 0) {  // select *
         output_string = "[";
         for (int i = 0; i < nRelations; i++) {
           if (i > 0) output_string += ", ";
@@ -209,15 +212,13 @@ int QL_Manager::Select(int nSelAttrs, const RelAttr selAttrs[], int nRelations,
           for (int j = 0, offset = 0; j < tbinfos[i].attrCount; j++) {
             if (j > 0) output_string += ", ";
             if (tbinfos[i].attrInfos[j].attrType == AttrType::INT) {
-              int x = *((int*)(records_data[i] + offset));
+              int x = *((int *)(records_data[i] + offset));
               output_string += std::to_string(x);
-            }
-            else if (tbinfos[i].attrInfos[j].attrType == AttrType::FLOAT) {
-              float x = *((float*)(records_data[i] + offset));
+            } else if (tbinfos[i].attrInfos[j].attrType == AttrType::FLOAT) {
+              float x = *((float *)(records_data[i] + offset));
               output_string += std::to_string(x);
-            }
-            else {
-              char* s = records_data[i] + offset;
+            } else {
+              char *s = records_data[i] + offset;
               output_string += (string)s;
             }
             offset += tbinfos[i].attrInfos[j].attrLength;
@@ -225,8 +226,7 @@ int QL_Manager::Select(int nSelAttrs, const RelAttr selAttrs[], int nRelations,
           output_string += ")";
         }
         output_string += "]";
-      }
-      else {
+      } else {
         output_string = "[";
         for (int kk = 0; kk < nSelAttrs; kk++) {
           if (kk > 0) output_string += ", ";
@@ -235,7 +235,8 @@ int QL_Manager::Select(int nSelAttrs, const RelAttr selAttrs[], int nRelations,
           if (selAttrs[kk].relName == NULL) {
             for (int i = 0; i < nRelations; i++) {
               for (int j = 0, offset = 0; j < tbinfos[i].attrCount; j++) {
-                if (strcmp(selAttrs[kk].attrName, tbinfos[i].attrInfos[j].attrName) == 0) {
+                if (strcmp(selAttrs[kk].attrName,
+                           tbinfos[i].attrInfos[j].attrName) == 0) {
                   rel_id = i;
                   attr_id = j;
                   attr_offset = offset;
@@ -245,8 +246,7 @@ int QL_Manager::Select(int nSelAttrs, const RelAttr selAttrs[], int nRelations,
               }
               if (rel_id != -1) break;
             }
-          }
-          else {
+          } else {
             for (int i = 0; i < nRelations; i++) {
               if (strcmp(selAttrs[kk].relName, relations[i]) == 0) {
                 rel_id = i;
@@ -254,7 +254,8 @@ int QL_Manager::Select(int nSelAttrs, const RelAttr selAttrs[], int nRelations,
               }
             }
             for (int j = 0, offset = 0; j < tbinfos[rel_id].attrCount; j++) {
-              if (strcmp(selAttrs[kk].attrName, tbinfos[rel_id].attrInfos[j].attrName) == 0) {
+              if (strcmp(selAttrs[kk].attrName,
+                         tbinfos[rel_id].attrInfos[j].attrName) == 0) {
                 attr_id = j;
                 attr_offset = offset;
                 break;
@@ -264,15 +265,14 @@ int QL_Manager::Select(int nSelAttrs, const RelAttr selAttrs[], int nRelations,
           }
 
           if (tbinfos[rel_id].attrInfos[attr_id].attrType == AttrType::INT) {
-            int x = *((int*)(records_data[rel_id] + attr_offset));
+            int x = *((int *)(records_data[rel_id] + attr_offset));
             output_string += std::to_string(x);
-          }
-          else if (tbinfos[rel_id].attrInfos[attr_id].attrType == AttrType::FLOAT) {
-            float x = *((float*)(records_data[rel_id] + attr_offset));
+          } else if (tbinfos[rel_id].attrInfos[attr_id].attrType ==
+                     AttrType::FLOAT) {
+            float x = *((float *)(records_data[rel_id] + attr_offset));
             output_string += std::to_string(x);
-          }
-          else {
-            char* s = records_data[rel_id] + attr_offset;
+          } else {
+            char *s = records_data[rel_id] + attr_offset;
             output_string += (string)s;
           }
         }
@@ -308,7 +308,7 @@ int QL_Manager::Insert(const char *relName, int nValues, const Value values[]) {
   for (int i = 0; i < nValues; i++) {
     record_size += table_info.attrInfos[i].attrLength;
   }
-  char* data = new char[record_size];
+  char *data = new char[record_size];
   std::memset(data, 0, record_size);
   int offset = 0;
   for (int i = 0; i < nValues; i++) {
@@ -327,15 +327,13 @@ int QL_Manager::Insert(const char *relName, int nValues, const Value values[]) {
   for (int i = 0, offset = 0; i < table_info.attrCount; i++) {
     if (i > 0) output_string += ", ";
     if (table_info.attrInfos[i].attrType == AttrType::INT) {
-      int x = *((int*)(data + offset));
+      int x = *((int *)(data + offset));
       output_string += std::to_string(x);
-    }
-    else if (table_info.attrInfos[i].attrType == AttrType::FLOAT) {
-      float x = *((float*)(data + offset));
+    } else if (table_info.attrInfos[i].attrType == AttrType::FLOAT) {
+      float x = *((float *)(data + offset));
       output_string += std::to_string(x);
-    }
-    else {
-      char* s = data + offset;
+    } else {
+      char *s = data + offset;
       output_string += (string)s;
     }
     offset += table_info.attrInfos[i].attrLength;
@@ -408,13 +406,16 @@ int QL_Manager::Delete(const char *relName, int nConditions,
           return -1;
         AttrType attr_type = table_info.attrInfos[l_id].attrType;
         auto check_f = GetCheckFunction(attr_type, condition.op);
-        int length = std::max(table_info.attrInfos[l_id].attrLength, table_info.attrInfos[r_id].attrLength);
-        char* l_data = new char[length];
-        char* r_data = new char[length];
+        int length = std::max(table_info.attrInfos[l_id].attrLength,
+                              table_info.attrInfos[r_id].attrLength);
+        char *l_data = new char[length];
+        char *r_data = new char[length];
         std::memset(l_data, 0, length);
         std::memset(r_data, 0, length);
-        std::memcpy(l_data, record_data + l_offset, table_info.attrInfos[l_id].attrLength);
-        std::memcpy(r_data, record_data + r_offset, table_info.attrInfos[r_id].attrLength);
+        std::memcpy(l_data, record_data + l_offset,
+                    table_info.attrInfos[l_id].attrLength);
+        std::memcpy(r_data, record_data + r_offset,
+                    table_info.attrInfos[r_id].attrLength);
         flag &= check_f(l_data, r_data, length);
         delete[] l_data;
         delete[] r_data;
@@ -436,19 +437,20 @@ int QL_Manager::Delete(const char *relName, int nConditions,
         if (attr_type != condition.rhsValue.type) return -1;
         auto check_f = GetCheckFunction(attr_type, condition.op);
         int length = table_info.attrInfos[l_id].attrLength;
-        char* l_data = new char[length];
-        char* r_data = new char[length];
+        char *l_data = new char[length];
+        char *r_data = new char[length];
         std::memset(l_data, 0, length);
         std::memset(r_data, 0, length);
         std::memcpy(l_data, record_data + l_offset, length);
         if (attr_type == AttrType::STRING) {
-          int tmp = std::min(length, (int)std::strlen((char*)condition.rhsValue.data));
+          int tmp = std::min(length,
+                             (int)std::strlen((char *)condition.rhsValue.data));
           std::memcpy(r_data, condition.rhsValue.data, tmp);
-        }
-        else {
+        } else {
           std::memcpy(r_data, condition.rhsValue.data, length);
         }
-        flag &= check_f(record_data + l_offset, condition.rhsValue.data, length);
+        flag &=
+            check_f(record_data + l_offset, condition.rhsValue.data, length);
         delete[] l_data;
         delete[] r_data;
       }
@@ -460,26 +462,24 @@ int QL_Manager::Delete(const char *relName, int nConditions,
   }
   rm_filescan.CloseScan();
 
-  for (const auto& record : records_to_delete) {
+  for (const auto &record : records_to_delete) {
     RID rid;
     record.GetRid(rid);
     rm_filehandle.DeleteRecord(rid);
 
     string output_string = "[";
-    char* data;
+    char *data;
     record.GetData(data);
     for (int i = 0, offset = 0; i < table_info.attrCount; i++) {
       if (i > 0) output_string += ", ";
       if (table_info.attrInfos[i].attrType == AttrType::INT) {
-        int x = *((int*)(data + offset));
+        int x = *((int *)(data + offset));
         output_string += std::to_string(x);
-      }
-      else if (table_info.attrInfos[i].attrType == AttrType::FLOAT) {
-        float x = *((float*)(data + offset));
+      } else if (table_info.attrInfos[i].attrType == AttrType::FLOAT) {
+        float x = *((float *)(data + offset));
         output_string += std::to_string(x);
-      }
-      else {
-        char* s = data + offset;
+      } else {
+        char *s = data + offset;
         output_string += (string)s;
       }
       offset += table_info.attrInfos[i].attrLength;
@@ -553,13 +553,16 @@ int QL_Manager::Update(const char *relName, const RelAttr &updAttr,
           return -1;
         AttrType attr_type = table_info.attrInfos[l_id].attrType;
         auto check_f = GetCheckFunction(attr_type, condition.op);
-        int length = std::max(table_info.attrInfos[l_id].attrLength, table_info.attrInfos[r_id].attrLength);
-        char* l_data = new char[length];
-        char* r_data = new char[length];
+        int length = std::max(table_info.attrInfos[l_id].attrLength,
+                              table_info.attrInfos[r_id].attrLength);
+        char *l_data = new char[length];
+        char *r_data = new char[length];
         std::memset(l_data, 0, length);
         std::memset(r_data, 0, length);
-        std::memcpy(l_data, record_data + l_offset, table_info.attrInfos[l_id].attrLength);
-        std::memcpy(r_data, record_data + r_offset, table_info.attrInfos[r_id].attrLength);
+        std::memcpy(l_data, record_data + l_offset,
+                    table_info.attrInfos[l_id].attrLength);
+        std::memcpy(r_data, record_data + r_offset,
+                    table_info.attrInfos[r_id].attrLength);
         flag &= check_f(l_data, r_data, length);
         delete[] l_data;
         delete[] r_data;
@@ -581,19 +584,20 @@ int QL_Manager::Update(const char *relName, const RelAttr &updAttr,
         if (attr_type != condition.rhsValue.type) return -1;
         auto check_f = GetCheckFunction(attr_type, condition.op);
         int length = table_info.attrInfos[l_id].attrLength;
-        char* l_data = new char[length];
-        char* r_data = new char[length];
+        char *l_data = new char[length];
+        char *r_data = new char[length];
         std::memset(l_data, 0, length);
         std::memset(r_data, 0, length);
         std::memcpy(l_data, record_data + l_offset, length);
         if (attr_type == AttrType::STRING) {
-          int tmp = std::min(length, (int)std::strlen((char*)condition.rhsValue.data));
+          int tmp = std::min(length,
+                             (int)std::strlen((char *)condition.rhsValue.data));
           std::memcpy(r_data, condition.rhsValue.data, tmp);
-        }
-        else {
+        } else {
           std::memcpy(r_data, condition.rhsValue.data, length);
         }
-        flag &= check_f(record_data + l_offset, condition.rhsValue.data, length);
+        flag &=
+            check_f(record_data + l_offset, condition.rhsValue.data, length);
         delete[] l_data;
         delete[] r_data;
       }
@@ -634,15 +638,13 @@ int QL_Manager::Update(const char *relName, const RelAttr &updAttr,
     for (int i = 0, offset = 0; i < table_info.attrCount; i++) {
       if (i > 0) output_string += ", ";
       if (table_info.attrInfos[i].attrType == AttrType::INT) {
-        int x = *((int*)(record_data + offset));
+        int x = *((int *)(record_data + offset));
         output_string += std::to_string(x);
-      }
-      else if (table_info.attrInfos[i].attrType == AttrType::FLOAT) {
-        float x = *((float*)(record_data + offset));
+      } else if (table_info.attrInfos[i].attrType == AttrType::FLOAT) {
+        float x = *((float *)(record_data + offset));
         output_string += std::to_string(x);
-      }
-      else {
-        char* s = record_data + offset;
+      } else {
+        char *s = record_data + offset;
         output_string += (string)s;
       }
       offset += table_info.attrInfos[i].attrLength;

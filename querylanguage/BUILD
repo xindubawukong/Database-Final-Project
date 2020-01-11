@@ -10,3 +10,11 @@ cc_library(
   ],
   visibility = ["//visibility:public"],
 )
+
+cc_binary(
+    name = "test_ql",
+    srcs = ["test_ql.cc"],
+    deps = [
+        ":ql"
+    ],
+)
