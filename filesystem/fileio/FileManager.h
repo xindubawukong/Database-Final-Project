@@ -6,7 +6,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <iostream>
-#include <string>
+#include <cstring>
 #include "../utils/MyBitMap.h"
 #include "../utils/pagedef.h"
 
@@ -99,6 +99,10 @@ class FileManager {
     }
     BufType b = buf + off;
     error = read(f, (void*)b, PAGE_SIZE);
+    // std::cout << "page size: " << error << std::endl;
+    if(error <= 0) {
+      memset(b, 0, PAGE_SIZE);
+    }
     return 0;
   }
 

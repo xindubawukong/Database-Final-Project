@@ -36,9 +36,9 @@ int main() {
 
   string tb1 = "table_1";
 
-  // systemmanager::AttrInfo attr_infos[3];
+  systemmanager::AttrInfo attr_infos[3];
 
-  systemmanager::AttrInfo* attr_infos = new systemmanager::AttrInfo[3];
+  //systemmanager::AttrInfo* attr_infos = new systemmanager::AttrInfo[3];
 
   CopyStr(attr_infos[0].attrName, "name", MAX_LENGTH);
   attr_infos[0].attrType = AttrType::STRING;
@@ -63,7 +63,7 @@ int main() {
   rc = smm->CreateTable(tb1.c_str(), 3, attr_infos, 0, NULL);
   cout << "CreateTable(tb1): " << rc << endl;
 
-  delete[] attr_infos;
+  // delete[] attr_infos;
 
   return 0;
 }
