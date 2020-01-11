@@ -89,6 +89,7 @@ sysStmt: SHOW DATABASES
 
 dbStmt: CREATE DATABASE dbName
         {
+            std::cout << "Create" << std::endl;
             $$ = new parser::CreateDatabase($3);
             parser::Tree::setInstance($$);
             delete $3;
@@ -285,3 +286,22 @@ idxName: IDENTIFIER
             $$ = $1;
         }
         ;
+
+%%
+void yyerror(const char *msg) {
+    printf("YACC error: %s\n", msg);
+}
+
+char start_parse(const char *expr_input)
+{
+    char ret;
+    if(expr_input){
+        YY_BUFFER_STATE my_string_buffer = yy_scan_string(expr_input);
+        yy_switch_to_buffer( my_string_buffer ); // switch flex to the buffer we just created
+        ret = yyparse();
+        yy_delete_buffer(my_string_buffer );
+    }else{
+        ret = yyparse();
+    }
+    return ret;
+}

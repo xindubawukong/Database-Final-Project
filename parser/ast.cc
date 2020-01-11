@@ -21,6 +21,7 @@ namespace parser {
   }
 
   void CreateDatabase::visit() {
+    systemmanager::sm->CreateDb(dbName.c_str());
   }
 
   DropDatabase::DropDatabase(string dbName) {

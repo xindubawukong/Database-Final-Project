@@ -26,7 +26,7 @@ cc_binary(
   name = "sql",
   srcs = ["main.cpp"],
   deps = [
-    "//parser:parser_1",
+    "//parser:parser",
     "//filesystem:filesystem",
   ],
   linkstatic = 1,

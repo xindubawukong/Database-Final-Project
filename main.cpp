@@ -9,7 +9,8 @@ int yyparse();
 
 int main(int args, char **argv) {
     filesystem::MyBitMap::initConst();
-	
+	chdir("/mnt/d/learn/senior/database/Test/");
+    system("rm -rf *");
     if (args > 1) {
         for (int i = 0; i < args - 1; ++i) {
             if (freopen(argv[i + 1], "r", stdin))
@@ -21,7 +22,7 @@ int main(int args, char **argv) {
         }
     }
     else {
-//		freopen("../test/small_dataset/create.sql", "r", stdin);
+        freopen("../create.sql", "r", stdin);
         int rc = yyparse();
         while(rc) {
             rc = yyparse();

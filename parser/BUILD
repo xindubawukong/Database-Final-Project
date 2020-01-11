@@ -12,22 +12,16 @@ cc_library(
 
 cc_library(
   name = "parser",
-  srcs = ["parser.yy.cpp", "parser.tab.cpp", "parser.tab.hpp"],
-  hdrs = ["parser.yy.cpp", "parser.tab.cpp", "parser.tab.hpp"],
+  srcs = [ "parser.tab.cpp"],
+  hdrs = ["parser.tab.hpp", "stack.hh", "parser.yy.cpp"],
   deps = [
     "//:global",
     "//parser:ast",
   ],
-  linkstatic = True,
 
   visibility = ["//visibility:public"],
 )
 
-cc_import(
-  name = "parser_1",
-  static_library = "libSqlParser.a",
-  visibility = ["//visibility:public"],
-)
 
 
 

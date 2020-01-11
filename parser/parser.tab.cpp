@@ -480,11 +480,11 @@ static const yytype_uint8 yytranslate[] =
 static const yytype_uint16 yyrline[] =
 {
        0,    48,    48,    52,    58,    62,    66,    70,    74,    78,
-      84,    90,    97,   104,   111,   117,   121,   125,   131,   135,
-     141,   145,   151,   155,   161,   165,   169,   173,   177,   181,
-     185,   191,   195,   201,   205,   209,   213,   219,   223,   227,
-     233,   237,   241,   245,   251,   255,   261,   266,   271,   277,
-     283
+      84,    90,    98,   105,   112,   118,   122,   126,   132,   136,
+     142,   146,   152,   156,   162,   166,   170,   174,   178,   182,
+     186,   192,   196,   202,   206,   210,   214,   220,   224,   228,
+     234,   238,   242,   246,   252,   256,   262,   267,   272,   278,
+     284
 };
 #endif
 
@@ -1404,334 +1404,335 @@ yyreduce:
   case 11:
 #line 91 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
+            std::cout << "Create" << std::endl;
             (yyval.tree) = new parser::CreateDatabase((yyvsp[0].string));
             parser::Tree::setInstance((yyval.tree));
             delete (yyvsp[0].string);
             parser::Tree::run();
         }
-#line 1413 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+#line 1414 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 12:
-#line 98 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+#line 99 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
             (yyval.tree) = new parser::DropDatabase((yyvsp[0].string));
             parser::Tree::setInstance((yyval.tree));
             delete (yyvsp[0].string);
             parser::Tree::run();
         }
-#line 1424 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+#line 1425 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 13:
-#line 105 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+#line 106 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
             (yyval.tree) = new parser::UseDatabase((yyvsp[0].string));
             parser::Tree::setInstance((yyval.tree));
             delete (yyvsp[0].string);
             parser::Tree::run();
         }
-#line 1435 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+#line 1436 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 14:
-#line 112 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+#line 113 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
 
         }
-#line 1443 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+#line 1444 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 15:
-#line 118 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+#line 119 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
 
         }
-#line 1451 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+#line 1452 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 16:
-#line 122 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+#line 123 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
 
         }
-#line 1459 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+#line 1460 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 17:
-#line 126 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+#line 127 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
 
         }
-#line 1467 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+#line 1468 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 18:
-#line 132 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+#line 133 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
 
                 }
-#line 1475 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+#line 1476 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 19:
-#line 136 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+#line 137 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
 
                 }
-#line 1483 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+#line 1484 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 20:
-#line 142 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+#line 143 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
 
             }
-#line 1491 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+#line 1492 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 21:
-#line 146 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+#line 147 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
 
             }
-#line 1499 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+#line 1500 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 22:
-#line 152 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+#line 153 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
 
         }
-#line 1507 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+#line 1508 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 23:
-#line 156 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+#line 157 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
 
         }
-#line 1515 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+#line 1516 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 24:
-#line 162 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+#line 163 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
 
         }
-#line 1523 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+#line 1524 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 25:
-#line 166 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+#line 167 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
 
         }
-#line 1531 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+#line 1532 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 26:
-#line 170 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+#line 171 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
 
         }
-#line 1539 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+#line 1540 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 27:
-#line 174 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+#line 175 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
 
         }
-#line 1547 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+#line 1548 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 28:
-#line 178 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+#line 179 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
 
         }
-#line 1555 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+#line 1556 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 29:
-#line 182 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+#line 183 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
 
         }
-#line 1563 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+#line 1564 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 30:
-#line 186 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+#line 187 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
 
         }
-#line 1571 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+#line 1572 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 31:
-#line 192 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+#line 193 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
 
           }
-#line 1579 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+#line 1580 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 32:
-#line 196 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+#line 197 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
 
           }
-#line 1587 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+#line 1588 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 33:
-#line 202 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+#line 203 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
 
       }
-#line 1595 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+#line 1596 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 34:
-#line 206 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+#line 207 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
 
       }
-#line 1603 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+#line 1604 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 35:
-#line 210 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+#line 211 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
 
       }
-#line 1611 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+#line 1612 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 36:
-#line 214 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+#line 215 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
 
       }
-#line 1619 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+#line 1620 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 37:
-#line 220 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+#line 221 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
 
       }
-#line 1627 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+#line 1628 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 38:
-#line 224 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+#line 225 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
 
       }
-#line 1635 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+#line 1636 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 39:
-#line 228 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+#line 229 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
 
       }
-#line 1643 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+#line 1644 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 40:
-#line 234 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+#line 235 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
 
       }
-#line 1651 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+#line 1652 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 41:
-#line 238 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+#line 239 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
 
       }
-#line 1659 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+#line 1660 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 42:
-#line 242 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+#line 243 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
 
       }
-#line 1667 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+#line 1668 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 43:
-#line 246 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+#line 247 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
 
       }
-#line 1675 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+#line 1676 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 44:
-#line 252 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+#line 253 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
 
             }
-#line 1683 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+#line 1684 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 45:
-#line 256 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+#line 257 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
 
             }
-#line 1691 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+#line 1692 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 46:
-#line 262 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+#line 263 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
             (yyval.string) = (yyvsp[0].string);
         }
-#line 1699 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+#line 1700 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 47:
-#line 267 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+#line 268 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
             (yyval.string) = (yyvsp[0].string);
         }
-#line 1707 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+#line 1708 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 48:
-#line 272 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+#line 273 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
                 (yyval.string) = (yyvsp[0].string);
             }
-#line 1715 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+#line 1716 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 49:
-#line 278 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+#line 279 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
             (yyval.string) = (yyvsp[0].string);
         }
-#line 1723 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+#line 1724 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 50:
-#line 284 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+#line 285 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
             (yyval.string) = (yyvsp[0].string);
         }
-#line 1731 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+#line 1732 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
 
-#line 1735 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+#line 1736 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1958,4 +1959,23 @@ yyreturn:
     YYSTACK_FREE (yymsg);
 #endif
   return yyresult;
+}
+#line 290 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1906  */
+
+void yyerror(const char *msg) {
+    printf("YACC error: %s\n", msg);
+}
+
+char start_parse(const char *expr_input)
+{
+    char ret;
+    if(expr_input){
+        YY_BUFFER_STATE my_string_buffer = yy_scan_string(expr_input);
+        yy_switch_to_buffer( my_string_buffer ); // switch flex to the buffer we just created
+        ret = yyparse();
+        yy_delete_buffer(my_string_buffer );
+    }else{
+        ret = yyparse();
+    }
+    return ret;
 }
