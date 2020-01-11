@@ -46,7 +46,7 @@ namespace systemmanager {
         std::cout << *((int*)attrInfo.defaultValue);
         break;
       case FLOAT:
-        std::cout << *((float*)attrInfo.defaultValue);
+        std::cout << std::to_string(*((float*)attrInfo.defaultValue));
         break;
       case STRING:
         std::cout << attrInfo.defaultValue;
@@ -217,6 +217,7 @@ namespace systemmanager {
     _bpm->closeFile(fileID);
 
     rc = chdir("..");
+    std::cout << std::endl;
     return rc;
   }
 
@@ -235,24 +236,19 @@ namespace systemmanager {
       }
     }
     
+    std::cout << std::endl;
     return 0;
   }
 
   int SM_Manager::CreateTable(const char *relName, int attrCount, AttrInfo* attrInfos, int constraintCount, Constraint* constraints) {
     int fileID;
     int rc = _fm->openFile("TableList", fileID);
-    // std::cout << "Open TableList: " << rc << std::endl;
     if(rc == 0) {
       return -1;
     }
     
     int index;
     TableList* tableList = (TableList*) _bpm->getPage(fileID, 0, index);
-    // std::cout << tableList << std::endl;
-    // std::cout << "Table FileID: " << fileID << std::endl;
-    // std::cout << "Table index: " << index << std::endl;
-    // std::cout << tableList->tableCount << std::endl;
-    // std::cout << tableList->tableName[0] << std::endl;
 
     for(int i = 0; i < tableList->tableCount; ++i) {
       if(strcmp(relName, tableList->tableName[i]) == 0) {
@@ -287,6 +283,9 @@ namespace systemmanager {
           for(int k = 0; k < attrCount; ++k) {
             if(strcmp(attrInfos[k].attrName, constraints[i].thisNameList.names[j]) == 0) {
               find = true;
+              if(!attrInfos[k].notNullFlag) {
+                return -1;
+              }
               break;
             }
           }
@@ -319,11 +318,34 @@ namespace systemmanager {
           }
         }
 
-        for(int j = 0; j < constraints[i].referencesNameList.attrCount; ++i) {
-          if(!AttrExist(constraints[i].foreignTableName, 
-          constraints[i].referencesNameList.names[j])) {
-            return -1;
+        // for(int j = 0; j < constraints[i].referencesNameList.attrCount; ++i) {
+        //   if(!AttrExist(constraints[i].foreignTableName, 
+        //   constraints[i].referencesNameList.names[j])) {
+        //     return -1;
+        //   }
+        // }
+
+        int fileID, index;
+        std::string fkMetaFile = std::string(constraints[i].foreignTableName) + "_meta";
+        _fm->openFile(fkMetaFile.c_str(), fileID);
+        TableInfo *info = (TableInfo*) _bpm->getPage(fileID, 0, index);
+        _bpm->pin(index);
+        int find = false;
+        for(int j = 0; j < info->constraintCount; ++j) {
+          int index;
+          Constraint *cons = (Constraint*) _bpm->getPage(fileID, j + 1, index);
+          if(cons->isPrimary) {
+            find = true;
+            if(!AttrListEqual(cons->thisNameList, constraints[i].referencesNameList)) {
+              find = false;
+            }
+            break;
           }
+        }
+        _bpm->unpin(index);
+        _bpm->closeFile(fileID);
+        if(!find) {
+          return -1;
         }
       }
     }
@@ -446,6 +468,8 @@ namespace systemmanager {
     fileScan.CloseScan();
     _rmm->CloseFile(fileHandle);
 
+    std::cout << std::endl;
+
     return 0;
   }
 
@@ -463,6 +487,7 @@ namespace systemmanager {
         return -1;
       }
     }
+    std::cout << std::endl;
     return 0;
   }
 
@@ -495,6 +520,9 @@ namespace systemmanager {
         for(int j = 0; j < info->attrCount; ++j) {
           if(strcmp(info->attrInfos[j].attrName, attrList->names[i])==0) {
             find = true;
+            if(!info->attrInfos[j].notNullFlag) {
+              find = false;
+            }
             break;
           }
         }
@@ -504,9 +532,7 @@ namespace systemmanager {
       }
       _bpm->unpin(index);
       indexPri = ++info->constraintCount;
-      // info->constraintCount++;
       _bpm->markDirty(index);
-      // _bpm->writeBack(index);
       
 
       Constraint *newCons = (Constraint*) _bpm->getPage(fileID, indexPri, index);
@@ -514,7 +540,6 @@ namespace systemmanager {
       newCons->isPrimary = true;
       newCons->thisNameList = *attrList;
       _bpm->markDirty(index);
-      // _bpm->writeBack(index);
       _bpm->closeFile(fileID);
 
     }  else {
@@ -623,7 +648,7 @@ namespace systemmanager {
     
     info->indexedAttr[info->indexSize++] = attrIndex;
     rc = _ixm->CreateIndex(relName, attrIndex, info->attrInfos[attrIndex].attrType, info->attrInfos[attrIndex].attrLength);
-    
+
     if(rc != 0) {
       return rc;
     }
@@ -716,6 +741,22 @@ namespace systemmanager {
     _bpm->release(index);
     _bpm->closeFile(fileID);
     return res;
+  }
+
+  bool SM_Manager::AttrListEqual(AttrList a, AttrList b) {
+    if(a.attrCount != b.attrCount) {
+      return false;
+    }
+    std::set<std::string> cmp;
+    for(int i = 0; i < a.attrCount; ++i) {
+      cmp.insert(std::string(a.names[i]));
+    }
+    for(int i = 0; i < b.attrCount; ++i) {
+      if(cmp.count(std::string(b.names[i])) == 0) {
+        return false;
+      }
+    }
+    return true;
   }
 
 

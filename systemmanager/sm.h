@@ -103,6 +103,7 @@ namespace systemmanager {
 
       bool TableExist(const char *tableName);
       bool AttrExist(const char* tableName, const char *attrName);
+      bool AttrListEqual(AttrList a, AttrList b);
     
     private:
       filesystem::FileManager* _fm;
