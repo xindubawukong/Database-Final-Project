@@ -65,9 +65,18 @@ REFERENCES      { /*printf("REFERENCES "); */ return REFERENCES; }
 "NOT NULL"      { /*printf("NOT_NULL "); */ return NOTNULL; }
 "PRIMARY KEY"   { /*printf("PRIMARY_KEY "); */ return PRIMARY; }
 "FOREIGN KEY"   { /*printf("FOREIGN_KEY "); */ return FOREIGN; }
+">="            { return LEX_GE; }
+"<="            { return LEX_LE; }
+"<>"            { return LEX_NE; }
 CHANGE          { return CHANGE; }
 DESC            { return DESC; }
 CONSTRAINT      { return CONSTRAINT; }
+SELECT          { return SELECT; }
+INSERT          { /*printf("lex insert\n");*/ return INSERT; }
+INTO            { return INTO; }
+VALUES          { return VALUES; }
+DELETE          { return DELETE; }
+UPDATE          { return UPDATE; }
 INDEX           { /*printf("INDEX "); */ return INDEX; }
 NULL            { /*printf("NULL "); */ return VALUE_NULL; }
 int             { /*printf("int "); */ return INT; }

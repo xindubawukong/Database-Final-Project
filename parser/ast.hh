@@ -227,6 +227,55 @@ class KeyConstraintList: public Tree {
     std::vector<KeyConstraint*> constraintList;
 };
 
+struct Value {
+  int int_val;
+  float float_val;
+  std::string string_val;
+  bool is_null_val;
+  AttrType type;
+};
+
+class ValueList: public Tree {
+ public:
+  std::vector<Value> values;
+
+  ValueList(Value* value) {
+    values.clear();
+    values.push_back(*value);
+  }
+
+  void AddValue(Value* value) {
+    values.push_back(*value);
+  }
+};
+
+class ValueLists: public Tree {
+ public:
+  std::vector<ValueList*> valuelists;
+
+  ValueLists(ValueList* valuelist) {
+    valuelists.clear();
+    valuelists.push_back(valuelist);
+  }
+
+  void AddValueList(ValueList* valuelist) {
+    valuelists.push_back(valuelist);
+  }
+};
+
+class Insert: public Tree {
+ public:
+  std::string tbname;
+  ValueLists* valuelists;
+
+  Insert(char* tbname, ValueLists* valuelists) {
+    this->tbname = tbname;
+    this->valuelists = valuelists;
+  }
+
+  void visit();
+};
+
 
 }
 

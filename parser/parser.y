@@ -24,12 +24,17 @@ void yyerror(const char *);
     float fvalue;
     char *string;
     parser::Tree* tree;
+    parser::ValueLists* valueliststree;
+    parser::ValueList* valuelisttree;
+    parser::Value* my_value;
 }
 
 /* keyword */
 %token QUIT
-%token CREATE DROP USE SHOW TABLES DESC ADD CHANGE ALTER 
+%token CREATE DROP USE SHOW TABLES DESC ADD CHANGE ALTER
 %token DATABASES DATABASE TABLE INDEX ON CONSTRAINT
+%token SELECT FROM WHERE IS NOT AND LEX_GE LEX_LE LEX_NE INSERT
+%token INTO VALUES DELETE SET UPDATE
 
 /* COLUMN DESCPRITION */
 %token T_INT T_FLOAT VARCHAR PRIMARY FOREIGN REFERENCES NOTNULL DEFAULT
@@ -41,8 +46,11 @@ void yyerror(const char *);
 %token <string> VALUE_STRING IDENTIFIER VALUE_NULL
 
 /* type */
-%type <tree> dbStmt
+%type <tree> dbStmt tbStmt
 %type <string> tbName dbName idxName fkName columnName
+%type <valueliststree> valueLists
+%type <valuelisttree> valueList
+%type <my_value> value
 %%
 
 program: %empty 
@@ -124,6 +132,149 @@ tbStmt: CREATE TABLE tbName '(' fieldList keyConstraints ')'
 
         }
         | DESC tbName 
+        {
+
+        }
+        | SELECT selector FROM tableList WHERE whereClause
+        {
+
+        }
+        | INSERT INTO tbName VALUES valueLists
+        {
+          std::cout << "insert" << std::endl;
+          $$ = new parser::Insert($3, $5);
+          parser::Tree::setInstance($$);
+          delete $3;
+          parser::Tree::run();
+        }
+        | DELETE FROM tbName WHERE whereClause
+        {
+
+        }
+        | UPDATE tbName SET setClause
+        {
+
+        }
+        ;
+
+setClause:      columnName '=' value
+                {
+
+                }
+                | setClause ',' columnName '=' value
+                {
+
+                }
+                ;
+
+valueLists:     '(' valueList ')'
+                {
+                  $$ = new parser::ValueLists($2);
+                }
+                | valueLists ',' '(' valueList ')'
+                {
+                  $$ = $1;
+                  $$->AddValueList($4);
+                }
+                ;
+
+valueList:      value
+                {
+                  $$ = new parser::ValueList($1);
+                }
+                | valueList ',' value
+                {
+                  $$ = $1;
+                  $$->AddValue($3);
+                }
+                ;
+
+selector:       '*'
+                | cols
+                {
+
+                }
+                ;
+
+cols:   col
+        {
+
+        }
+        | cols ',' col
+        {
+
+        }
+        ;
+
+col:    columnName
+        {
+
+        }
+        | tbName '.' columnName
+        {
+
+        }
+        ;
+
+tableList:      tbName
+                {
+
+                }
+                | tableList ',' tbName
+                {
+
+                }
+                ;
+
+whereClause:    col op expr
+                {
+
+                }
+                | col IS VALUE_NULL
+                {
+
+                }
+                | col IS NOT VALUE_NULL
+                {
+
+                }
+                | whereClause AND whereClause
+                {
+
+                }
+                ;
+
+op:     '='
+        {
+
+        }
+        | LEX_GE
+        {
+
+        }
+        | LEX_LE
+        {
+
+        }
+        | LEX_NE
+        {
+
+        }
+        | '>'
+        {
+
+        }
+        | '<'
+        {
+
+        }
+        ;
+
+expr:   col
+        {
+
+        }
+        | value
         {
 
         }
@@ -233,19 +384,29 @@ type: T_INT '(' VALUE_INT ')'
 
 value: VALUE_INT
       {
-
+        $$ = new parser::Value();
+        $$->type = AttrType::INT;
+        $$->int_val = $1;
+        $$->is_null_val = false;
       }
       | VALUE_STRING
       {
-
+        $$ = new parser::Value();
+        $$->type = AttrType::STRING;
+        $$->string_val = $1;
+        $$->is_null_val = false;
       }
       | VALUE_FLOAT
       {
-
+        $$ = new parser::Value();
+        $$->type = AttrType::FLOAT;
+        $$->float_val = $1;
+        $$->is_null_val = false;
       }
       | VALUE_NULL
       {
-
+        $$ = new parser::Value();
+        $$->is_null_val = true;
       }
       ;
 
