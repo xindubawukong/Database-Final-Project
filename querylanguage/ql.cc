@@ -323,6 +323,26 @@ int QL_Manager::Insert(const char *relName, int nValues, const Value values[]) {
   rc = rm_filehandle.InsertRecord(data, rid);
   if (rc) return rc;
 
+  string output_string = "[";
+  for (int i = 0, offset = 0; i < table_info.attrCount; i++) {
+    if (i > 0) output_string += ", ";
+    if (table_info.attrInfos[i].attrType == AttrType::INT) {
+      int x = *((int*)(data + offset));
+      output_string += std::to_string(x);
+    }
+    else if (table_info.attrInfos[i].attrType == AttrType::FLOAT) {
+      float x = *((float*)(data + offset));
+      output_string += std::to_string(x);
+    }
+    else {
+      char* s = data + offset;
+      output_string += (string)s;
+    }
+    offset += table_info.attrInfos[i].attrLength;
+  }
+  output_string += "]";
+  std::cout << output_string << std::endl;
+
   delete[] data;
 
   return NO_ERROR;
@@ -350,7 +370,7 @@ int QL_Manager::Delete(const char *relName, int nConditions,
                             &value);
   if (rc) return rc;
   recordmanager::RM_Record record;
-  std::vector<RID> rids_to_delete;
+  std::vector<recordmanager::RM_Record> records_to_delete;
   while (rm_filescan.GetNextRecord(record) != RM_EOF) {
     char *record_data;
     record.GetData(record_data);
@@ -435,15 +455,37 @@ int QL_Manager::Delete(const char *relName, int nConditions,
       if (!flag) break;
     }
     if (flag) {
-      RID rid;
-      record.GetRid(rid);
-      rids_to_delete.push_back(rid);
+      records_to_delete.push_back(record);
     }
   }
   rm_filescan.CloseScan();
 
-  for (const auto &rid : rids_to_delete) {
+  for (const auto& record : records_to_delete) {
+    RID rid;
+    record.GetRid(rid);
     rm_filehandle.DeleteRecord(rid);
+
+    string output_string = "[";
+    char* data;
+    record.GetData(data);
+    for (int i = 0, offset = 0; i < table_info.attrCount; i++) {
+      if (i > 0) output_string += ", ";
+      if (table_info.attrInfos[i].attrType == AttrType::INT) {
+        int x = *((int*)(data + offset));
+        output_string += std::to_string(x);
+      }
+      else if (table_info.attrInfos[i].attrType == AttrType::FLOAT) {
+        float x = *((float*)(data + offset));
+        output_string += std::to_string(x);
+      }
+      else {
+        char* s = data + offset;
+        output_string += (string)s;
+      }
+      offset += table_info.attrInfos[i].attrLength;
+    }
+    output_string += "]";
+    std::cout << output_string << std::endl;
   }
 
   return NO_ERROR;
@@ -587,6 +629,26 @@ int QL_Manager::Update(const char *relName, const RelAttr &updAttr,
     }
 
     rm_filehandle.UpdateRecord(record);
+
+    string output_string = "[";
+    for (int i = 0, offset = 0; i < table_info.attrCount; i++) {
+      if (i > 0) output_string += ", ";
+      if (table_info.attrInfos[i].attrType == AttrType::INT) {
+        int x = *((int*)(record_data + offset));
+        output_string += std::to_string(x);
+      }
+      else if (table_info.attrInfos[i].attrType == AttrType::FLOAT) {
+        float x = *((float*)(record_data + offset));
+        output_string += std::to_string(x);
+      }
+      else {
+        char* s = record_data + offset;
+        output_string += (string)s;
+      }
+      offset += table_info.attrInfos[i].attrLength;
+    }
+    output_string += "]";
+    std::cout << output_string << std::endl;
   }
 
   return NO_ERROR;

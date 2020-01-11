@@ -12,7 +12,7 @@ RM_Record::RM_Record() {
 }
 
 RM_Record::~RM_Record() {
-  delete[] data_;
+  if (data_ != nullptr) delete[] data_;
 }
 
 int RM_Record::Set(int length, char* data, RID rid) {
