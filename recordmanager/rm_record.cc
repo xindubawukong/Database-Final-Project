@@ -12,13 +12,14 @@ RM_Record::RM_Record() {
 }
 
 RM_Record::~RM_Record() {
-  delete[] data_;
+  if (data_ != nullptr) delete[] data_;
 }
 
 int RM_Record::Set(int length, char* data, RID rid) {
   if (length <= 0) return RM_RECORD_INVALID_LENGTH_ERROR;
   length_ = length;
   data_ = new char[length]();
+  std::memset(data_, 0, length);
   std::memcpy(data_, data, length);
   rid_ = rid;
   return NO_ERROR;
@@ -41,6 +42,7 @@ void RM_Record::operator =(const RM_Record& record) {
   length_ = record.length_;
   delete[] data_;
   data_ = new char[length_]();
+  std::memset(data_, 0, length_);
   std::memcpy(data_, record.data_, length_);
 }
 
