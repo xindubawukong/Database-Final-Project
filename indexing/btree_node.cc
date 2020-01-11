@@ -13,7 +13,7 @@ BTreeNode::BTreeNode(AttrType attrType, int attrLength,
                     int pageID, bool newPage) 
 : keys(nullptr), rids(nullptr), attrLength(attrLength), attrType(attrType) {
 
-  capacity = (int) std::floor (
+  capacity = (int) (
     (kPageSize - sizeof(numKeys) - 2 * sizeof(int)) / 
     (attrLength + sizeof(recordmanager::RID))
   );

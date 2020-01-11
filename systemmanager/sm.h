@@ -20,7 +20,7 @@ namespace systemmanager {
   void SM_PrintError(int rc);
 
   struct AttrInfo {
-    char attrName[MAX_LENGTH + 1];
+    char attrName[MAX_LENGTH];
     AttrType attrType;
     int attrLength;
     bool notNullFlag;
@@ -58,6 +58,19 @@ namespace systemmanager {
     int constraintCount;
   };
 
+  void Print(TableInfo tableInfo);
+  void Print(AttrInfo attrInfo);
+  void Print(Constraint constraint);
+  void Print(AttrList attrList);
+  void CopyStr(char *dst, const char *src, int maxLength);
+
+
+  enum AlterType {
+    ADD,
+    DELETE,
+    ALTER
+  };
+
   class SM_Manager {
     public:
       SM_Manager(filesystem::FileManager* fm, filesystem::BufPageManager* bpm, indexing::IX_Manager* ixm, recordmanager::RM_Manager* rmm);
@@ -69,19 +82,28 @@ namespace systemmanager {
       int ShowDb(const char* dbName);
       int ShowAllDb();
       int CloseDb();
+
       int CreateTable(const char *relName, int attrCount, AttrInfo* attrInfos, int constraintCount, Constraint* constraints);
-      int AlterTable();
+      int ShowTable(const char *relName);
+      int ShowAllTable();
       int DropTable(const char *relName);
+      int AlterPrimaryKey(const char *relName, bool add = false, AttrList* attrList = nullptr);
+      int AlterForeignKey(const char *relName, const char *fkName, const char *tbName = nullptr, AttrList* thisList = nullptr, AttrList* otherList = nullptr);
+      int AlterColumn(const char *relName, AlterType type, const char *attrName, Constraint* cons = nullptr, const char *newName = nullptr);
+
+      
       int CreateIndex(const char  *relName, const char *attrName);
       int DropIndex(const char *relName, const char *attrName);
+
       int Load(const char *relName, const char* fileName);
       int Help();
       int Help(const char *relName);
-      int Print(const char *relName);
+      // int Print(const char *relName);
       int Set(const char *paramName, const char *value);
 
       bool TableExist(const char *tableName);
       bool AttrExist(const char* tableName, const char *attrName);
+      bool AttrListEqual(AttrList a, AttrList b);
     
     private:
       filesystem::FileManager* _fm;
