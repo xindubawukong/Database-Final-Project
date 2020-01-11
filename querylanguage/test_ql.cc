@@ -1,4 +1,5 @@
 #include <iostream>
+#include <vector>
 #include <string>
 
 #include "ql.h"
@@ -15,7 +16,8 @@ int main() {
   
   filesystem::MyBitMap::initConst();
 
-  chdir("/Users/xdbwk/Desktop/thu41/database/test_dir");
+  // chdir("/Users/xdbwk/Desktop/thu41/database/test_dir");
+
   auto fm = new filesystem::FileManager();
   auto bpm = new filesystem::BufPageManager(fm);
 
@@ -34,22 +36,34 @@ int main() {
 
   string tb1 = "table_1";
 
-  systemmanager::AttrInfo attr_infos[3];
+  // systemmanager::AttrInfo attr_infos[3];
+
+  systemmanager::AttrInfo* attr_infos = new systemmanager::AttrInfo[3];
 
   CopyStr(attr_infos[0].attrName, "name", MAX_LENGTH);
   attr_infos[0].attrType = AttrType::STRING;
   attr_infos[0].attrLength = 10;
+  // attr_infos[0].notNullFlag = true;
+  // std::memset(attr_infos[0].defaultValue, 0, MAX_LENGTH);
 
   CopyStr(attr_infos[1].attrName, "age", MAX_LENGTH);
   attr_infos[1].attrType = AttrType::INT;
   attr_infos[1].attrLength = 4;
+  // attr_infos[1].notNullFlag = true;
+  // std::memset(attr_infos[1].defaultValue, 0, MAX_LENGTH);
 
   CopyStr(attr_infos[2].attrName, "score", MAX_LENGTH);
   attr_infos[2].attrType = AttrType::FLOAT;
   attr_infos[2].attrLength = 4;
+  // attr_infos[2].notNullFlag = true;
+  // std::memset(attr_infos[2].defaultValue, 0, MAX_LENGTH);
+
+  for (int i = 0; i < 3; i++) systemmanager::Print(attr_infos[i]);
 
   rc = smm->CreateTable(tb1.c_str(), 3, attr_infos, 0, NULL);
   cout << "CreateTable(tb1): " << rc << endl;
+
+  delete[] attr_infos;
 
   return 0;
 }
