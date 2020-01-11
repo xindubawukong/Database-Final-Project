@@ -1,3 +1,5 @@
+#include <vector>
+
 #include "ql.h"
 #include "return_code.h"
 
@@ -83,10 +85,72 @@ int QL_Manager::Delete(const char *relName, int nConditions,
                             &value);
   if (rc) return rc;
   recordmanager::RM_Record record;
+  std::vector<RID> rids_to_delete;
   while (rm_filescan.GetNextRecord(record) != RM_EOF) {
-    if (true) {
-      // rm_filehandle.DeleteRecord(rid);
+    char* record_data;
+    record.GetData(record_data);
+    bool flag = true;
+    for (int condition_id = 0; condition_id < nConditions; condition_id++) {
+      auto& condition = conditions[condition_id];
+      if (condition.bRhsIsAttr) {
+        int l_id = -1, l_offset = 0;
+        for (int i = 0, offset = 0; i < table_info.attrCount; i++) {
+          if (strcmp(condition.lhsAttr.attrName, table_info.attrInfos[i].attrName) == 0) {
+            l_id = i;
+            l_offset = offset;
+            break;
+          }
+          offset += table_info.attrInfos[i].attrLength;
+        }
+        if (l_id == -1) return -1;
+
+        int r_id = -1, r_offset = 0;
+        for (int i = 0, offset = 0; i < table_info.attrCount; i++) {
+          if (strcmp(condition.rhsAttr.attrName, table_info.attrInfos[i].attrName) == 0) {
+            r_id = i;
+            r_offset = offset;
+            break;
+          }
+          offset += table_info.attrInfos[i].attrLength;
+        }
+        if (r_id == -1) return -1;
+
+        // 左右两个属性必须类型相同
+        if (table_info.attrInfos[l_id].attrType != table_info.attrInfos[r_id].attrType) return -1;
+        AttrType attr_type = table_info.attrInfos[l_id].attrType;
+        auto check_f = GetCheckFunction(attr_type, condition.op);
+        int attr_length = table_info.attrInfos[l_id].attrLength;
+        flag &= check_f(record_data + l_offset, record_data + r_offset, attr_length);
+      }
+      else {
+        int l_id = -1, l_offset = 0;
+        for (int i = 0, offset = 0; i < table_info.attrCount; i++) {
+          if (strcmp(condition.lhsAttr.attrName, table_info.attrInfos[i].attrName) == 0) {
+            l_id = i;
+            l_offset = offset;
+            break;
+          }
+          offset += table_info.attrInfos[i].attrLength;
+        }
+        if (l_id == -1) return -1;
+
+        // 左边属性的类型必须与右边value的类型相同
+        AttrType attr_type = table_info.attrInfos[l_id].attrType;
+        if (attr_type != condition.rhsValue.type) return -1;
+        auto check_f = GetCheckFunction(attr_type, condition.op);
+        int attr_length = table_info.attrInfos[l_id].attrLength;
+        flag &= check_f(record_data + l_offset, condition.rhsValue.data, attr_length);
+      }
+      if (!flag) break;
     }
+    if (flag) {
+      RID rid;
+      record.GetRid(rid);
+      rids_to_delete.push_back(rid);
+    }
+  }
+  for (const auto& rid : rids_to_delete) {
+    rm_filehandle.DeleteRecord(rid);
   }
 }
 

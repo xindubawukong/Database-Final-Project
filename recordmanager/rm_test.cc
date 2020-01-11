@@ -15,6 +15,7 @@ TEST(TestPrintError, SimpleTest) {
 }
 
 TEST(TestRMFileHandle, SimpleTest) {
+  filesystem::MyBitMap::initConst();
   FileManager* fm = new FileManager();
   BufPageManager* bpm = new BufPageManager(fm);
   std::string file_name = "test.txt";
@@ -84,6 +85,7 @@ TEST(TestRMFileHandle, SimpleTest) {
 }
 
 TEST(TestRMFileHandle, TestMoreData) {
+  filesystem::MyBitMap::initConst();
   FileManager* fm = new FileManager();
   BufPageManager* bpm = new BufPageManager(fm);
   std::string file_name = "test.txt";
@@ -128,6 +130,7 @@ TEST(TestRMFileHandle, TestMoreData) {
 }
 
 TEST(TestRMManager, SimpleTest) {
+  filesystem::MyBitMap::initConst();
   FileManager* fm = new FileManager();
   BufPageManager* bpm = new BufPageManager(fm);
   RM_Manager rm_manager(fm, bpm);
@@ -142,6 +145,7 @@ TEST(TestRMManager, SimpleTest) {
 }
 
 TEST(TestRMFileScan, SimpleTest) {
+  filesystem::MyBitMap::initConst();
   FileManager* fm = new FileManager();
   BufPageManager* bpm = new BufPageManager(fm);
   RM_Manager manager(fm, bpm);
@@ -191,6 +195,40 @@ TEST(TestRMFileScan, SimpleTest) {
     else
       x -= 2;
   }
+}
+
+TEST(TestRMFileScan, TestString) {
+  filesystem::MyBitMap::initConst();
+  FileManager* fm = new FileManager();
+  BufPageManager* bpm = new BufPageManager(fm);
+  RM_Manager manager(fm, bpm);
+  RM_FileHandle file_handle;
+  std::string file_name = "test.txt";
+  EXPECT_EQ(manager.CreateFile(file_name, 100), NO_ERROR);
+  EXPECT_EQ(manager.OpenFile(file_name, file_handle), NO_ERROR);
+  for (int i = 0; i < 300; i++) {
+    char a[11];
+    for (int j = 0; j < 10; j++) a[j] = 'a' + (i % 26);
+    RID rid;
+    EXPECT_EQ(file_handle.InsertRecord(a, rid), NO_ERROR);
+    int page_num, slot_num;
+    EXPECT_EQ(rid.GetPageNum(page_num), NO_ERROR);
+    EXPECT_EQ(rid.GetSlotNum(slot_num), NO_ERROR);
+    std::cout << "page_num: " << page_num << "  slot_num: " << slot_num
+              << std::endl;
+  }
+  RM_FileScan file_scan;
+  char b[11] = "qqqqqqqqqq";
+  EXPECT_EQ(file_scan.OpenScan(&file_handle, AttrType::STRING, 10, 0,
+                               CompOp::GE_OP, (void*)b),
+            NO_ERROR);
+  RM_Record record;
+  while (file_scan.GetNextRecord(record) != RM_EOF) {
+    char* data;
+    EXPECT_EQ(record.GetData(data), NO_ERROR);
+    std::cout << "data: " << data << std::endl;
+  }
+  EXPECT_EQ(file_scan.CloseScan(), NO_ERROR);
 }
 
 }  // namespace recordmanager
