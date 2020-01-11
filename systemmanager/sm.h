@@ -20,7 +20,7 @@ namespace systemmanager {
   void SM_PrintError(int rc);
 
   struct AttrInfo {
-    char attrName[MAX_LENGTH + 1];
+    char attrName[MAX_LENGTH];
     AttrType attrType;
     int attrLength;
     bool notNullFlag;
