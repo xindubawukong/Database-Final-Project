@@ -22,7 +22,7 @@ int main(int args, char **argv) {
         }
     }
     else {
-        freopen("../go.txt", "r", stdin);
+        freopen("../generated.txt", "r", stdin);
         int rc = yyparse();
         while(rc) {
             rc = yyparse();
