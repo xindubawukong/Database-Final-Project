@@ -70,20 +70,19 @@ int IX_IndexHandle::InsertEntry(void* pData, recordmanager::RID &r) {
   BTreeNode* node = FindLeaf(pData);
   BTreeNode* newNode = nullptr;
 
-  // if(node->FindKey((const void* &)pData) != -1) {
-  //   return IX_KEY_EXISTING_ERROR;
-  // }
-
+  
   if(node->GetNumKeys() == 0 || node->CmpKey(pData, treeLargest) > 0) {
     newLargest = true;
     prevKey = treeLargest;
   }
 
   int ret = node->Insert(pData, r);
+  std::cout << "now: " << *(int*)prevKey << std::endl;
 
   if(newLargest) {
     for(int i = 0; i < header.height - 1; ++i) {
       int pos = path[i]->FindKey((const void* &)prevKey);
+      std::cout << path[i]->GetNumKeys() << std::endl;
       std::cout << "Pos:" << pos << std::endl;
       path[i]->SetKey(pos, pData);
     }
@@ -111,6 +110,7 @@ int IX_IndexHandle::InsertEntry(void* pData, recordmanager::RID &r) {
     newNode = new BTreeNode(header.attrType, header.attrLength, bpm, fileID, pageNum);
 
     node->Split(newNode);
+    std::cout << "why: " << newNode->GetNumKeys() << std::endl;
 
     BTreeNode* curRight = FetchNode(newNode->GetRight());
     if(curRight != nullptr) {
@@ -122,6 +122,8 @@ int IX_IndexHandle::InsertEntry(void* pData, recordmanager::RID &r) {
     node->GetKey(node->GetNumKeys() - 1, largestKey);
     if(node->CmpKey(pData, largestKey) >= 0) {
       newNode->Insert(insertKey, insertRid);
+      std::cout <<"Yes" << std::endl;
+      std::cout << *(int*)insertKey << std::endl;
     } else {
       node->Insert(insertKey, insertRid);
     }
@@ -133,6 +135,7 @@ int IX_IndexHandle::InsertEntry(void* pData, recordmanager::RID &r) {
     parent->Remove(posAtParent);
     ret = parent->Insert(node->LargestKey(), node->GetPageRID());
     ret = parent->Insert(newNode->LargestKey(), newNode->GetPageRID());
+    std::cout << "large: " << *(int*)node->LargestKey() << ", " << *(int*)newNode->LargestKey() << std::endl;
     node = parent;
     insertKey = newNode->LargestKey();
     insertRid = newNode->GetPageRID();
@@ -148,13 +151,15 @@ if(level < 0 ) {
     int pageNum;
     int index;
     GetNewPage(pageNum);
-    bpm->getPage(fileID, pageNum, index);
+    // bpm->getPage(fileID, pageNum, index);
     // std::cout << pageNum << "," << header.rootPageNum << std::endl;
   
     root = new BTreeNode(header.attrType, header.attrLength, bpm, fileID, pageNum);
     
     root->Insert(node->LargestKey(), node->GetPageRID());
     root->Insert(newNode->LargestKey(), newNode->GetPageRID());
+    std::cout << newNode->GetNumKeys() << std::endl;
+    std::cout << *(int*)node->LargestKey() << ", " << *(int*)newNode->LargestKey() << std::endl;
     
 
     header.rootPageNum = root->GetPageNum();
@@ -165,6 +170,7 @@ if(level < 0 ) {
       newNode = nullptr;
     }
     SetHeight(header.height + 1);
+    std::cout << "hi:" << GetHeight() << std::endl;
     
   }
   return NO_ERROR;
@@ -381,8 +387,8 @@ int IX_IndexHandle::GetNewPage(int &pageNum) {
   bitmap.SetOne(pageNum);
   header.maxPageNum = std::max(header.maxPageNum, pageNum);
 
-  int index;
-  bpm->getPage(fileID, pageNum, index);
+  // int index;
+  ///bpm->getPage(fileID, pageNum, index);
   header.numPages++;
   bHeaderChanged = true;
   return NO_ERROR;
@@ -469,9 +475,9 @@ int IX_IndexHandle::ForcePages() {
 int IX_IndexHandle::DisposePage(const int& pageNum) {
   utils::BitMap bitmap(header.pageNumBitMap, 32768);
   bitmap.SetZero(pageNum);
-  int index;
-  bpm->getPage(fileID, pageNum, index);
-  bpm->release(index);
+  // int index;
+  // bpm->getPage(fileID, pageNum, index);
+  // bpm->release(index);
   header.numPages--;
   bHeaderChanged = true;
   return NO_ERROR;
@@ -491,19 +497,20 @@ BTreeNode* IX_IndexHandle::FindLeaf(const void* pData) {
     recordmanager::RID r;
     path[i - 1]->FindAddrByKey(pData, r);
     int pos = path[i - 1]->FindPositionByKey(pData);
+    std::cout << pos << std::endl;
 
-    if(pos == path[i-1]->GetNumKeys()) {
-      pos = path[i - 1]->GetNumKeys() - 1;
+    if(pos == path[i - 1]->GetNumKeys()) {
+      pos--;
       path[i - 1]->GetAddrByPosition(pos, r);
     }
     if(path[i] != nullptr) {
-      WriteBack(path[i]->GetPageNum());
+      // WriteBack(path[i]->GetPageNum());
       delete path[i];
       path[i] = nullptr;
     }
     path[i] = FetchNode(r);
-    int index;
-    bpm->getPage(fileID, path[i]->GetPageNum(), index);
+    // int index;
+    // bpm->getPage(fileID, path[i]->GetPageNum(), index);
     pathPos[i - 1] = pos;
   }
 
@@ -533,7 +540,7 @@ BTreeNode* IX_IndexHandle::FindSmallestLeaf() {
     }
     path[i] = FetchNode(r);
     int index;
-    bpm->getPage(fileID, path[i]->GetPageNum(), index);
+    // bpm->getPage(fileID, path[i]->GetPageNum(), index);
     pathPos[i - 1] = 0;
   }
 
@@ -562,8 +569,8 @@ BTreeNode* IX_IndexHandle::FindLargestLeaf() {
       path[i] = nullptr;
     }
     path[i] = FetchNode(r);
-    int index;
-    bpm->getPage(fileID, path[i]->GetPageNum(), index);
+    // int index;
+    // bpm->getPage(fileID, path[i]->GetPageNum(), index);
     pathPos[i - 1] = path[i - 1]->GetNumKeys() - 1;
   }
 
@@ -576,8 +583,9 @@ BTreeNode* IX_IndexHandle::FetchNode(recordmanager::RID r) const {
   if(pageNum < 0) {
     return nullptr;
   }
-  int index;
-  bpm->getPage(fileID, pageNum, index);
+  // int index;
+  //bpm->getPage(fileID, pageNum, index);
+  //bpm->access(index);
   return new BTreeNode(header.attrType, header.attrLength, bpm, fileID, pageNum, false);
 }
 
@@ -585,8 +593,8 @@ BTreeNode* IX_IndexHandle::FetchNode(int pageNum) const {
   if(pageNum < 0) {
     return nullptr;
   }
-  int index;
-  bpm->getPage(fileID, pageNum, index);
+  // int index;
+  // bpm->getPage(fileID, pageNum, index);
   return new BTreeNode(header.attrType, header.attrLength, bpm, fileID, pageNum, false);
 }
 

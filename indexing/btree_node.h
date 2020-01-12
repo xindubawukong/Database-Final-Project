@@ -64,7 +64,8 @@ class BTreeNode {
     AttrType attrType;
     int capacity;
     recordmanager::RID pageRID;
-
+    filesystem::BufPageManager *_bpm;
+    int fileID;
 };
 
 }
