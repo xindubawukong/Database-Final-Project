@@ -121,8 +121,9 @@ union YYSTYPE
     parser::FieldList* fieldList;
     parser::Constraint* cons;
     parser::ConstraintList* consList;
+    parser::SetClause* setclause;
 
-#line 126 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.hpp"
+#line 127 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.hpp"
 
 };
 typedef union YYSTYPE YYSTYPE;

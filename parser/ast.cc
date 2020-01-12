@@ -204,11 +204,20 @@ void Delete::visit() {
   for (int i = 0; i < n; i++) {
     conditions[i] = *this->whereclause->conditions[i];
   }
-  std::cout << conditions[0].lhsAttr.attrName << std::endl;
-  std::cout << (char*)conditions[0].rhsValue.data << std::endl;
-  std::cout << conditions[0].op<< std::endl;
-  std::cout << conditions[0].bRhsIsAttr << std::endl;
   qlm->Delete(this->tbname.c_str(), n, conditions);
+}
+
+void Update::visit() {
+  for (auto& tmp : this->setclause->list) {
+    char* colname = tmp.first;
+    querylanguage::Value value = *tmp.second;
+    querylanguage::RelAttr updAttr;
+    updAttr.relName = NULL;
+    updAttr.attrName = colname;
+    querylanguage::RelAttr rhsRelAttr;
+    querylanguage::Condition conditions[1];
+    qlm->Update(this->tbname, updAttr, 1, rhsRelAttr, value, 0, conditions);
+  }
 }
 
 

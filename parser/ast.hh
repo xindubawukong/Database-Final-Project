@@ -288,9 +288,6 @@ class WhereClause: public Tree {
       condition->rhsAttr.relName = expr->col->tbname;
       condition->rhsAttr.attrName = expr->col->colname;
     }
-    std::cout << condition->op << std::endl;
-    std::cout << condition->lhsAttr.attrName << std::endl;
-    std::cout << (char*)condition->rhsValue.data << std::endl;
     conditions.clear();
     conditions.push_back(condition);
   }
@@ -310,6 +307,33 @@ class Delete : public Tree {
   Delete(char* tbname, WhereClause* whereclause) {
     this->tbname = tbname;
     this->whereclause = whereclause;
+  }
+
+  void visit();
+};
+
+class SetClause {
+ public:
+  std::vector<std::pair<char*, querylanguage::Value*>> list;
+
+  SetClause(char* colname, querylanguage::Value* value) {
+    list.clear();
+    list.push_back(std::make_pair(colname, value));
+  }
+
+  void Add(char* colname, querylanguage::Value* value) {
+    list.push_back(std::make_pair(colname, value));
+  }
+};
+
+class Update: public Tree {
+ public:
+  char* tbname;
+  SetClause* setclause;
+
+  Update(char* tbname, SetClause* setclause) {
+    this->tbname = tbname;
+    this->setclause = setclause;
   }
 
   void visit();

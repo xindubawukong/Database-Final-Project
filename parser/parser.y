@@ -38,6 +38,7 @@ void yyerror(const char *);
     parser::FieldList* fieldList;
     parser::Constraint* cons;
     parser::ConstraintList* consList;
+    parser::SetClause* setclause;
 }
 
 /* keyword */
@@ -72,6 +73,7 @@ void yyerror(const char *);
 %type <cons> keyConstrint
 %type <field> field
 %type <fieldList> fieldList
+%type <setclause> setClause
 %%
 
 program: %empty 
@@ -207,17 +209,21 @@ tbStmt: CREATE TABLE tbName '(' fieldList ',' keyConstraints ')'
         }
         | UPDATE tbName SET setClause
         {
-
+          std::cout << "yacc update" << std::endl;
+          $$ = new parser::Update($2, $4);
+          parser::Tree::setInstance($$);
+          parser::Tree::run();
         }
         ;
 
 setClause:      columnName '=' value
                 {
-
+                  $$ = new parser::SetClause($1, $3);
                 }
                 | setClause ',' columnName '=' value
                 {
-
+                  $$ = $1;
+                  $$->Add($3, $5);
                 }
                 ;
 
