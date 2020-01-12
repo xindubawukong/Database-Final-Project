@@ -26,7 +26,11 @@ void yyerror(const char *);
     parser::Tree* tree;
     parser::ValueLists* valueliststree;
     parser::ValueList* valuelisttree;
-    parser::Value* my_value;
+    querylanguage::Value* my_value;
+    CompOp compop;
+    parser::Col* my_col;
+    parser::Expr* my_expr;
+    parser::WhereClause* whereclause;
 }
 
 /* keyword */
@@ -51,6 +55,10 @@ void yyerror(const char *);
 %type <valueliststree> valueLists
 %type <valuelisttree> valueList
 %type <my_value> value
+%type <compop> op
+%type <my_col> col
+%type <my_expr> expr
+%type <whereclause> whereClause;
 %%
 
 program: %empty 
@@ -149,7 +157,7 @@ tbStmt: CREATE TABLE tbName '(' fieldList keyConstraints ')'
         }
         | DELETE FROM tbName WHERE whereClause
         {
-
+          $$ = new parser::Delete($3, $5);
         }
         | UPDATE tbName SET setClause
         {
@@ -208,11 +216,11 @@ cols:   col
 
 col:    columnName
         {
-
+          $$ = new parser::Col(NULL, $1);
         }
         | tbName '.' columnName
         {
-
+          $$ = new parser::Col($1, $3);
         }
         ;
 
@@ -228,55 +236,59 @@ tableList:      tbName
 
 whereClause:    col op expr
                 {
-
+                  $$ = new parser::WhereClause($1, $2, $3);
                 }
                 | col IS VALUE_NULL
                 {
-
+                  // TBD
                 }
                 | col IS NOT VALUE_NULL
                 {
-
+                  // TBD
                 }
                 | whereClause AND whereClause
                 {
-
+                  $$ = new parser::WhereClause($1, $3);
                 }
                 ;
 
 op:     '='
         {
-
+          $$ = CompOp::EQ_OP;
         }
         | LEX_GE
         {
-
+          $$ = CompOp::GE_OP;
         }
         | LEX_LE
         {
-
+          $$ = CompOp::LE_OP;
         }
         | LEX_NE
         {
-
+          $$ = CompOp::NE_OP;
         }
         | '>'
         {
-
+          $$ = CompOp::GT_OP;
         }
         | '<'
         {
-
+          $$ = CompOp::LT_OP;
         }
         ;
 
 expr:   col
         {
-
+          $$ = new parser::Expr();
+          $$->col = $1;
+          $$->is_value = false;
         }
         | value
         {
-
+          $$ = new parser::Expr();
+          $$->value = $1;
+          $$->is_value = true;
         }
         ;
 
@@ -384,29 +396,26 @@ type: T_INT '(' VALUE_INT ')'
 
 value: VALUE_INT
       {
-        $$ = new parser::Value();
+        $$ = new querylanguage::Value();
         $$->type = AttrType::INT;
-        $$->int_val = $1;
-        $$->is_null_val = false;
+        $$->data = new int($1);
       }
       | VALUE_STRING
       {
-        $$ = new parser::Value();
+        $$ = new querylanguage::Value();
         $$->type = AttrType::STRING;
-        $$->string_val = $1;
-        $$->is_null_val = false;
+        $$->data = (void*)$1;
       }
       | VALUE_FLOAT
       {
-        $$ = new parser::Value();
+        $$ = new querylanguage::Value();
         $$->type = AttrType::FLOAT;
-        $$->float_val = $1;
-        $$->is_null_val = false;
+        $$->data = new float($1);
       }
       | VALUE_NULL
       {
-        $$ = new parser::Value();
-        $$->is_null_val = true;
+        $$ = new querylanguage::Value();
+        $$->data = NULL;
       }
       ;
 

@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <assert.h>
+#include <cstring>
 #include "../global.h"
 #include "../systemmanager/sm.h"
 #include "../recordmanager/rm.h"
@@ -227,29 +228,21 @@ class KeyConstraintList: public Tree {
     std::vector<KeyConstraint*> constraintList;
 };
 
-struct Value {
-  int int_val;
-  float float_val;
-  std::string string_val;
-  bool is_null_val;
-  AttrType type;
-};
-
-class ValueList: public Tree {
+class ValueList {
  public:
-  std::vector<Value> values;
+  std::vector<querylanguage::Value*> values;
 
-  ValueList(Value* value) {
+  ValueList(querylanguage::Value* value) {
     values.clear();
-    values.push_back(*value);
+    values.push_back(value);
   }
 
-  void AddValue(Value* value) {
-    values.push_back(*value);
+  void AddValue(querylanguage::Value* value) {
+    values.push_back(value);
   }
 };
 
-class ValueLists: public Tree {
+class ValueLists {
  public:
   std::vector<ValueList*> valuelists;
 
@@ -276,6 +269,65 @@ class Insert: public Tree {
   void visit();
 };
 
+class Col {
+ public:
+  char* tbname;
+  char* colname;
+
+  Col(char* tbname = NULL, char* colname = NULL) {
+    this->tbname = tbname;
+    this->colname = colname;
+  }
+};
+
+class Expr {
+ public:
+  Col* col;
+  querylanguage::Value* value;
+  bool is_value;
+};
+
+class WhereClause: public Tree {
+ public:
+  std::vector<querylanguage::Condition*> conditions;
+
+  WhereClause(Col* col, CompOp op, Expr* expr) {
+    auto condition = new querylanguage::Condition();
+    condition->lhsAttr.relName = col->tbname;
+    condition->lhsAttr.attrName = col->colname;
+    condition->op = op;
+    if (expr->is_value) {
+      condition->bRhsIsAttr = false;
+      condition->rhsValue = *expr->value;
+    }
+    else {
+      condition->bRhsIsAttr = true;
+      condition->rhsAttr.relName = expr->col->tbname;
+      condition->rhsAttr.attrName = expr->col->colname;
+    }
+    conditions.clear();
+    conditions.push_back(condition);
+  }
+
+  WhereClause(WhereClause* w1, WhereClause* w2) {
+    conditions.clear();
+    for (auto t : w1->conditions) conditions.push_back(t);
+    for (auto t : w2->conditions) conditions.push_back(t);
+  }
+};
+
+class Delete : public Tree {
+ public:
+  std::string tbname;
+  WhereClause* whereclause;
+
+  Delete(char* tbname, WhereClause* whereclause) {
+    this->tbname = tbname;
+    this->whereclause = whereclause;
+  }
+
+  void visit();
+};
 
 }
 

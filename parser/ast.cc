@@ -53,15 +53,21 @@ void Insert::visit() {
     int nValues = valuelist->values.size();
     querylanguage::Value values[nValues];
     for (int i = 0; i < nValues; i++) {
-      auto& tmp = valuelist->values[i];
-      values[i].type = tmp.type;
-      if (tmp.is_null_val) values[i].data = NULL;
-      else if (tmp.type == AttrType::INT) values[i].data = &tmp.int_val;
-      else if (tmp.type == AttrType::FLOAT) values[i].data = &tmp.float_val;
-      else values[i].data = (void*)tmp.string_val.c_str();
+      querylanguage::Value* tmp = valuelist->values[i];
+      values[i].type = tmp->type;
+      values[i].data = tmp->data;
     }
     qlm->Insert(this->tbname.c_str(), nValues, values);
   }
+}
+
+void Delete::visit() {
+  int n = this->whereclause->conditions.size();
+  querylanguage::Condition conditions[n];
+  for (int i = 0; i < n; i++) {
+    conditions[i] = *this->whereclause->conditions[i];
+  }
+  qlm->Delete(this->tbname.c_str(), n, conditions);
 }
 
 
