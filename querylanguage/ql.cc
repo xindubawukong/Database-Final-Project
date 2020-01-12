@@ -182,28 +182,38 @@ int QL_Manager::Select(int nSelAttrs, const RelAttr selAttrs[], int nRelations,
           }
         }
 
-        // 左右类型必须相同
-        if (tbinfos[l_rel_id].attrInfos[l_attr_id].attrType !=
-            condition.rhsValue.type)
-          return -1;
-        AttrType attr_type = tbinfos[l_rel_id].attrInfos[l_attr_id].attrType;
-        auto check_f = GetCheckFunction(attr_type, condition.op);
-        int length = tbinfos[l_rel_id].attrInfos[l_attr_id].attrLength;
-        char *l_data = new char[length];
-        char *r_data = new char[length];
-        std::memset(l_data, 0, length);
-        std::memset(r_data, 0, length);
-        std::memcpy(l_data, records_data[l_rel_id] + l_attr_offset, length);
-        if (attr_type == AttrType::STRING) {
-          int tmp = std::min(length,
-                             (int)std::strlen((char *)condition.rhsValue.data));
-          std::memcpy(r_data, condition.rhsValue.data, tmp);
-        } else {
-          std::memcpy(r_data, condition.rhsValue.data, length);
+        if (condition.rhsValue.data == NULL) {
+          if (tbinfos[l_rel_id].attrInfos[l_attr_id].attrType != AttrType::STRING) {
+            std::cout << "We don't know if INT and FLOAT is NULL or 0." << std::endl;
+            return -1;
+          }
+          int len = std::strlen(records_data[l_rel_id] + l_attr_offset);
+          flag &= (condition.op == CompOp::EQ_OP && len == 0) || (condition.op == CompOp::NE_OP && len > 0);
         }
-        flag &= check_f(l_data, r_data, length);
-        delete[] l_data;
-        delete[] r_data;
+        else {
+          // 左右类型必须相同
+          if (tbinfos[l_rel_id].attrInfos[l_attr_id].attrType !=
+              condition.rhsValue.type)
+            return -1;
+          AttrType attr_type = tbinfos[l_rel_id].attrInfos[l_attr_id].attrType;
+          auto check_f = GetCheckFunction(attr_type, condition.op);
+          int length = tbinfos[l_rel_id].attrInfos[l_attr_id].attrLength;
+          char *l_data = new char[length];
+          char *r_data = new char[length];
+          std::memset(l_data, 0, length);
+          std::memset(r_data, 0, length);
+          std::memcpy(l_data, records_data[l_rel_id] + l_attr_offset, length);
+          if (attr_type == AttrType::STRING) {
+            int tmp = std::min(length,
+                              (int)std::strlen((char *)condition.rhsValue.data));
+            std::memcpy(r_data, condition.rhsValue.data, tmp);
+          } else {
+            std::memcpy(r_data, condition.rhsValue.data, length);
+          }
+          flag &= check_f(l_data, r_data, length);
+          delete[] l_data;
+          delete[] r_data;
+        }
       }
       if (!flag) break;
     }
@@ -313,7 +323,7 @@ int QL_Manager::Insert(const char *relName, int nValues, const Value values[]) {
   // 检测属性个数及类型是否一致
   if (nValues != table_info.attrCount) return -1;
   for (int i = 0; i < nValues; i++) {
-    if (values[i].type != table_info.attrInfos[i].attrType) return -1;
+    if (values[i].type != table_info.attrInfos[i].attrType && values[i].data != NULL) return -1;
   }
 
   // 得到要插入的data
@@ -324,7 +334,16 @@ int QL_Manager::Insert(const char *relName, int nValues, const Value values[]) {
   char *data = new char[record_size];
   std::memset(data, 0, record_size);
   for (int i = 0, offset = 0; i < nValues; i++) {
-    std::memcpy(data + offset, values[i].data, table_info.attrInfos[i].attrLength);
+    if (values[i].data != NULL) {
+      std::memcpy(data + offset, values[i].data, table_info.attrInfos[i].attrLength);
+    }
+    else {
+      if (table_info.attrInfos[i].notNullFlag) {
+        std::cout << "Can't insert record with NULL '" << table_info.attrInfos[i].attrName << "'" << std::endl;
+        return -1;
+      }
+      std::memset(data + offset, 0, table_info.attrInfos[i].attrLength);
+    }
     offset += table_info.attrInfos[i].attrLength;
   }
 
@@ -448,26 +467,36 @@ int QL_Manager::Delete(const char *relName, int nConditions,
         }
         if (l_id == -1) return -1;
 
-        // 左边属性的类型必须与右边value的类型相同
-        AttrType attr_type = table_info.attrInfos[l_id].attrType;
-        if (attr_type != condition.rhsValue.type) return -1;
-        auto check_f = GetCheckFunction(attr_type, condition.op);
-        int length = table_info.attrInfos[l_id].attrLength;
-        char *l_data = new char[length];
-        char *r_data = new char[length];
-        std::memset(l_data, 0, length);
-        std::memset(r_data, 0, length);
-        std::memcpy(l_data, record_data + l_offset, length);
-        if (attr_type == AttrType::STRING) {
-          int tmp = std::min(length,
-                             (int)std::strlen((char *)condition.rhsValue.data));
-          std::memcpy(r_data, condition.rhsValue.data, tmp);
-        } else {
-          std::memcpy(r_data, condition.rhsValue.data, length);
+        if (condition.rhsValue.data == NULL) {
+          if (table_info.attrInfos[l_id].attrType != AttrType::STRING) {
+            std::cout << "We don't know if INT and FLOAT is NULL or 0." << std::endl;
+            return -1;
+          }
+          int len = std::strlen(record_data + l_offset);
+          flag &= (condition.op == CompOp::EQ_OP && len == 0) || (condition.op == CompOp::NE_OP && len > 0);
         }
-        flag &= check_f(l_data, r_data, length);
-        delete[] l_data;
-        delete[] r_data;
+        else {
+          // 左边属性的类型必须与右边value的类型相同
+          AttrType attr_type = table_info.attrInfos[l_id].attrType;
+          if (attr_type != condition.rhsValue.type) return -1;
+          auto check_f = GetCheckFunction(attr_type, condition.op);
+          int length = table_info.attrInfos[l_id].attrLength;
+          char *l_data = new char[length];
+          char *r_data = new char[length];
+          std::memset(l_data, 0, length);
+          std::memset(r_data, 0, length);
+          std::memcpy(l_data, record_data + l_offset, length);
+          if (attr_type == AttrType::STRING) {
+            int tmp = std::min(length,
+                              (int)std::strlen((char *)condition.rhsValue.data));
+            std::memcpy(r_data, condition.rhsValue.data, tmp);
+          } else {
+            std::memcpy(r_data, condition.rhsValue.data, length);
+          }
+          flag &= check_f(l_data, r_data, length);
+          delete[] l_data;
+          delete[] r_data;
+        }
       }
       if (!flag) break;
     }

@@ -66,6 +66,7 @@ DATABASE        { /*printf("DATABASE "); */ return DATABASE; }
 TABLE           { /*printf("TABLE "); */ return TABLE; }
 TABLES          { /*printf("TABLES "); */ return TABLES; }
 DEFAULT         { return DEFAULT; }
+IS              { return IS; }
 REFERENCES      { /*printf("REFERENCES "); */ return REFERENCES; }
 "NOT NULL"      { /*printf("NOT_NULL "); */ return NOTNULL; }
 "PRIMARY KEY"   { /*printf("PRIMARY_KEY "); */ return PRIMARY; }

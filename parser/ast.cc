@@ -193,7 +193,8 @@ void Insert::visit() {
       values[i].type = tmp->type;
       values[i].data = tmp->data;
     }
-    qlm->Insert(this->tbname.c_str(), nValues, values);
+    int rc = qlm->Insert(this->tbname.c_str(), nValues, values);
+    if (rc) std::cout << "Error " << rc << " in Insert" << std::endl;
   }
 }
 
@@ -204,7 +205,8 @@ void Delete::visit() {
   for (int i = 0; i < n; i++) {
     conditions[i] = *this->whereclause->conditions[i];
   }
-  qlm->Delete(this->tbname.c_str(), n, conditions);
+  int rc = qlm->Delete(this->tbname.c_str(), n, conditions);
+  if (rc) std::cout << "Error " << rc << " in Delete" << std::endl;
 }
 
 void Update::visit() {
@@ -216,7 +218,8 @@ void Update::visit() {
     updAttr.attrName = colname;
     querylanguage::RelAttr rhsRelAttr;
     querylanguage::Condition conditions[1];
-    qlm->Update(this->tbname, updAttr, 1, rhsRelAttr, value, 0, conditions);
+    int rc = qlm->Update(this->tbname, updAttr, 1, rhsRelAttr, value, 0, conditions);
+    if (rc) std::cout << "Error " << rc << " in Update" << std::endl;
   }
 }
 
@@ -248,7 +251,8 @@ void Select::visit() {
     conditions[i] = *this->whereclause->conditions[i];
   }
 
-  qlm->Select(nSelAttrs, selAttrs, nRelations, relations, nConditions, conditions);
+  int rc = qlm->Select(nSelAttrs, selAttrs, nRelations, relations, nConditions, conditions);
+  if (rc) std::cout << "Error " << rc << " in Select" << std::endl;
 }
 
 

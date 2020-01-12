@@ -48,7 +48,7 @@ void yyerror(const char *);
 %token QUIT
 %token CREATE DROP USE SHOW TABLES DESC ADD CHANGE ALTER CLOSE
 %token DATABASES DATABASE TABLE INDEX ON CONSTRAINT
-%token SELECT FROM WHERE IS NOT AND LEX_GE LEX_LE LEX_NE INSERT
+%token SELECT FROM WHERE IS AND LEX_GE LEX_LE LEX_NE INSERT
 %token INTO VALUES DELETE SET UPDATE
 
 /* COLUMN DESCPRITION */
@@ -311,11 +311,11 @@ whereClause:    col op expr
                 }
                 | col IS VALUE_NULL
                 {
-                  // TBD
+                  $$ = new parser::WhereClause($1, true);
                 }
-                | col IS NOT VALUE_NULL
+                | col IS NOTNULL
                 {
-                  // TBD
+                  $$ = new parser::WhereClause($1, false);
                 }
                 | whereClause AND whereClause
                 {
@@ -503,6 +503,7 @@ value: VALUE_INT
       {
         $$ = new querylanguage::Value();
         $$->data = NULL;
+        std::cout << "null!" << std::endl;
       }
       ;
 

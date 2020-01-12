@@ -292,6 +292,23 @@ class WhereClause: public Tree {
     conditions.push_back(condition);
   }
 
+  WhereClause(Col* col, bool is_null) {
+    auto condition = new querylanguage::Condition();
+    condition->lhsAttr.relName = col->tbname;
+    condition->lhsAttr.attrName = col->colname;
+    condition->bRhsIsAttr = false;
+    if (is_null) {
+      condition->op = CompOp::EQ_OP;
+    }
+    else {
+      condition->op = CompOp::NE_OP;
+    }
+    condition->rhsValue.data = NULL;
+    
+    conditions.clear();
+    conditions.push_back(condition);
+  }
+
   WhereClause(WhereClause* w1, WhereClause* w2) {
     conditions.clear();
     for (auto t : w1->conditions) conditions.push_back(t);
