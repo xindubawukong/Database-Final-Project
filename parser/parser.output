@@ -210,16 +210,16 @@ Nonterminals, with rules where they appear
     valueList <valuelisttree> (65)
         on left: 28 29
         on right: 26 27 29
-    selector (66)
+    selector <my_selector> (66)
         on left: 30 31
         on right: 20
-    cols (67)
+    cols <vector_of_col> (67)
         on left: 32 33
         on right: 31 33
     col <my_col> (68)
         on left: 34 35
         on right: 32 33 38 39 40 48
-    tableList (69)
+    tableList <vector_of_char> (69)
         on left: 36 37
         on right: 20 37
     whereClause <whereclause> (70)

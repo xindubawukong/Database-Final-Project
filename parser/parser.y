@@ -39,6 +39,9 @@ void yyerror(const char *);
     parser::Constraint* cons;
     parser::ConstraintList* consList;
     parser::SetClause* setclause;
+    std::vector<parser::Col*>* vector_of_col;
+    parser::Selector* my_selector;
+    std::vector<char*>* vector_of_char;
 }
 
 /* keyword */
@@ -74,6 +77,9 @@ void yyerror(const char *);
 %type <field> field
 %type <fieldList> fieldList
 %type <setclause> setClause
+%type <vector_of_col> cols
+%type <my_selector> selector
+%type <vector_of_char> tableList
 %%
 
 program: %empty 
@@ -191,11 +197,14 @@ tbStmt: CREATE TABLE tbName '(' fieldList ',' keyConstraints ')'
         }
         | SELECT selector FROM tableList WHERE whereClause
         {
-
+          std::cout << "yacc select" << std::endl;
+          $$ = new parser::Select($2, $4, $6);
+          parser::Tree::setInstance($$);
+          parser::Tree::run();
         }
         | INSERT INTO tbName VALUES valueLists
         {
-          std::cout << "insert" << std::endl;
+          std::cout << "yacc insert" << std::endl;
           $$ = new parser::Insert($3, $5);
           parser::Tree::setInstance($$);
           parser::Tree::run();
@@ -250,19 +259,27 @@ valueList:      value
                 ;
 
 selector:       '*'
+                {
+                  $$ = new parser::Selector();
+                  $$->is_xing = true;
+                }
                 | cols
                 {
-
+                  $$ = new parser::Selector();
+                  $$->is_xing = false;
+                  $$->cols = $1;
                 }
                 ;
 
 cols:   col
         {
-
+          $$ = new std::vector<parser::Col*>();
+          $$->push_back($1);
         }
         | cols ',' col
         {
-
+          $$ = $1;
+          $$->push_back($3);
         }
         ;
 
@@ -278,11 +295,13 @@ col:    columnName
 
 tableList:      tbName
                 {
-
+                  $$ = new std::vector<char*>();
+                  $$->push_back($1);
                 }
                 | tableList ',' tbName
                 {
-
+                  $$ = $1;
+                  $$->push_back($3);
                 }
                 ;
 

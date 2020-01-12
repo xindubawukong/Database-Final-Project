@@ -220,5 +220,36 @@ void Update::visit() {
   }
 }
 
+void Select::visit() {
+  int nSelAttrs;
+  if (this->selector->is_xing) nSelAttrs = 1;
+  else nSelAttrs = this->selector->cols->size();
+  querylanguage::RelAttr selAttrs[nSelAttrs];
+  if (this->selector->is_xing) {
+    selAttrs[0].relName = NULL;
+    selAttrs[0].attrName = "*";
+  }
+  else {
+    for (int i = 0; i < nSelAttrs; i++) {
+      selAttrs[i].relName = this->selector->cols->at(i)->tbname;
+      selAttrs[i].attrName = this->selector->cols->at(i)->colname;
+    }
+  }
+
+  int nRelations = this->tablelist->size();
+  char* relations[nRelations];
+  for (int i = 0; i < nRelations; i++) {
+    relations[i] = this->tablelist->at(i);
+  }
+
+  int nConditions = this->whereclause->conditions.size();
+  querylanguage::Condition conditions[nConditions];
+  for (int i = 0; i < nConditions; i++) {
+    conditions[i] = *this->whereclause->conditions[i];
+  }
+
+  qlm->Select(nSelAttrs, selAttrs, nRelations, relations, nConditions, conditions);
+}
+
 
 };

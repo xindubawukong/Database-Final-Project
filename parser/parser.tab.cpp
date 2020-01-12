@@ -208,8 +208,11 @@ union YYSTYPE
     parser::Constraint* cons;
     parser::ConstraintList* consList;
     parser::SetClause* setclause;
+    std::vector<parser::Col*>* vector_of_col;
+    parser::Selector* my_selector;
+    std::vector<char*>* vector_of_char;
 
-#line 213 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 216 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -589,15 +592,15 @@ static const yytype_int8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,    79,    79,    83,    89,    93,    97,   101,   105,   109,
-     115,   121,   129,   136,   143,   150,   156,   162,   170,   178,
-     185,   192,   196,   203,   210,   219,   223,   230,   234,   241,
-     245,   252,   253,   259,   263,   269,   273,   279,   283,   289,
-     293,   297,   301,   307,   311,   315,   319,   323,   327,   333,
-     339,   347,   352,   358,   362,   368,   372,   378,   382,   386,
-     390,   394,   398,   402,   408,   413,   419,   425,   431,   437,
-     445,   451,   457,   465,   471,   477,   483,   490,   495,   501,
-     506,   511,   517,   523
+       0,    85,    85,    89,    95,    99,   103,   107,   111,   115,
+     121,   127,   135,   142,   149,   156,   162,   168,   176,   184,
+     191,   198,   205,   212,   219,   228,   232,   239,   243,   250,
+     254,   261,   266,   274,   279,   286,   290,   296,   301,   308,
+     312,   316,   320,   326,   330,   334,   338,   342,   346,   352,
+     358,   366,   371,   377,   381,   387,   391,   397,   401,   405,
+     409,   413,   417,   421,   427,   432,   438,   444,   450,   456,
+     464,   470,   476,   484,   490,   496,   502,   509,   514,   520,
+     525,   530,   536,   542
 };
 #endif
 
@@ -1511,154 +1514,154 @@ yyreduce:
   switch (yyn)
     {
   case 2:
-#line 80 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 86 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
         {
 
         }
-#line 1519 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 1522 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 3:
-#line 84 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 90 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
         {
 
         }
-#line 1527 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 1530 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 4:
-#line 90 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 96 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
       {
 
       }
-#line 1535 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 1538 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 5:
-#line 94 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 100 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
       {
 
       }
-#line 1543 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 1546 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 6:
-#line 98 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 104 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
       {
 
       }
-#line 1551 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 1554 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 7:
-#line 102 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 108 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
       {
 
       }
-#line 1559 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 1562 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 8:
-#line 106 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 112 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
       {
 
       }
-#line 1567 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 1570 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 9:
-#line 110 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 116 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
       {
           YYACCEPT;
       }
-#line 1575 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 1578 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 10:
-#line 116 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 122 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
         {
             (yyval.tree) = new parser::ShowDatabase();
             parser::Tree::setInstance((yyval.tree));
             parser::Tree::run();
         }
-#line 1585 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 1588 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 11:
-#line 122 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 128 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
         {
             (yyval.tree) = new parser::ShowDatabase((yyvsp[0].string));
             parser::Tree::setInstance((yyval.tree));
             parser::Tree::run();
         }
-#line 1595 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 1598 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 12:
-#line 130 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 136 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
         {
             (yyval.tree) = new parser::CreateDatabase((yyvsp[0].string));
             parser::Tree::setInstance((yyval.tree));
             delete (yyvsp[0].string);
             parser::Tree::run();
         }
-#line 1606 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 1609 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 13:
-#line 137 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 143 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
         {
             (yyval.tree) = new parser::DropDatabase((yyvsp[0].string));
             parser::Tree::setInstance((yyval.tree));
             delete (yyvsp[0].string);
             parser::Tree::run();
         }
-#line 1617 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 1620 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 14:
-#line 144 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 150 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
         {
             (yyval.tree) = new parser::UseDatabase((yyvsp[0].string));
             parser::Tree::setInstance((yyval.tree));
             delete (yyvsp[0].string);
             parser::Tree::run();
         }
-#line 1628 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 1631 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 15:
-#line 151 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 157 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
         {
             (yyval.tree) = new parser::CloseDatabase();
             parser::Tree::setInstance((yyval.tree));
             parser::Tree::run();
         }
-#line 1638 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 1641 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 16:
-#line 157 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 163 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
         {
             (yyval.tree) = new parser::ShowTable((yyvsp[0].string));
             parser::Tree::setInstance((yyval.tree));
             parser::Tree::run();
         }
-#line 1648 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 1651 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 17:
-#line 163 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 169 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
         {
             (yyval.tree) = new parser::ShowTable();
             parser::Tree::setInstance((yyval.tree));
             parser::Tree::run();
         }
-#line 1658 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 1661 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 18:
-#line 171 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 177 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
         {
             std::cout << (yyvsp[-5].string) << std::endl;
             (yyval.tree) = new parser::CreateTable((yyvsp[-5].string), (yyvsp[-3].fieldList), (yyvsp[-1].consList));
@@ -1666,569 +1669,587 @@ yyreduce:
             parser::Tree::run();
             delete (yyvsp[-5].string);
         }
-#line 1670 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 1673 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 19:
-#line 179 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 185 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
         {
             (yyval.tree) = new parser::CreateTable((yyvsp[-3].string), (yyvsp[-1].fieldList));
             parser::Tree::setInstance((yyval.tree));
             parser::Tree::run();
             delete (yyvsp[-3].string);
         }
-#line 1681 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 1684 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 20:
-#line 186 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 192 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
         {
             (yyval.tree) = new parser::DropTable((yyvsp[0].string));
             parser::Tree::setInstance((yyval.tree));
             parser::Tree::run();
             delete (yyvsp[0].string);
         }
-#line 1692 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 1695 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 21:
-#line 193 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 199 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
         {
-
+          std::cout << "yacc select" << std::endl;
+          (yyval.tree) = new parser::Select((yyvsp[-4].my_selector), (yyvsp[-2].vector_of_char), (yyvsp[0].whereclause));
+          parser::Tree::setInstance((yyval.tree));
+          parser::Tree::run();
         }
-#line 1700 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 1706 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 22:
-#line 197 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 206 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
         {
-          std::cout << "insert" << std::endl;
+          std::cout << "yacc insert" << std::endl;
           (yyval.tree) = new parser::Insert((yyvsp[-2].string), (yyvsp[0].valueliststree));
           parser::Tree::setInstance((yyval.tree));
           parser::Tree::run();
         }
-#line 1711 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 1717 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 23:
-#line 204 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 213 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
         {
           std::cout << "yacc delete" << std::endl;
           (yyval.tree) = new parser::Delete((yyvsp[-2].string), (yyvsp[0].whereclause));
           parser::Tree::setInstance((yyval.tree));
           parser::Tree::run();
         }
-#line 1722 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 1728 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 24:
-#line 211 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 220 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
         {
           std::cout << "yacc update" << std::endl;
           (yyval.tree) = new parser::Update((yyvsp[-2].string), (yyvsp[0].setclause));
           parser::Tree::setInstance((yyval.tree));
           parser::Tree::run();
         }
-#line 1733 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 1739 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 25:
-#line 220 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 229 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
                 {
                   (yyval.setclause) = new parser::SetClause((yyvsp[-2].string), (yyvsp[0].my_value));
                 }
-#line 1741 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 1747 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 26:
-#line 224 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 233 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
                 {
                   (yyval.setclause) = (yyvsp[-4].setclause);
                   (yyval.setclause)->Add((yyvsp[-2].string), (yyvsp[0].my_value));
                 }
-#line 1750 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 1756 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 27:
-#line 231 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 240 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
                 {
                   (yyval.valueliststree) = new parser::ValueLists((yyvsp[-1].valuelisttree));
                 }
-#line 1758 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 1764 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 28:
-#line 235 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 244 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
                 {
                   (yyval.valueliststree) = (yyvsp[-4].valueliststree);
                   (yyval.valueliststree)->AddValueList((yyvsp[-1].valuelisttree));
                 }
-#line 1767 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 1773 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 29:
-#line 242 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 251 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
                 {
                   (yyval.valuelisttree) = new parser::ValueList((yyvsp[0].my_value));
                 }
-#line 1775 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 1781 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 30:
-#line 246 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 255 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
                 {
                   (yyval.valuelisttree) = (yyvsp[-2].valuelisttree);
                   (yyval.valuelisttree)->AddValue((yyvsp[0].my_value));
                 }
-#line 1784 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 1790 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+    break;
+
+  case 31:
+#line 262 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+                {
+                  (yyval.my_selector) = new parser::Selector();
+                  (yyval.my_selector)->is_xing = true;
+                }
+#line 1799 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 32:
-#line 254 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 267 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
                 {
-
+                  (yyval.my_selector) = new parser::Selector();
+                  (yyval.my_selector)->is_xing = false;
+                  (yyval.my_selector)->cols = (yyvsp[0].vector_of_col);
                 }
-#line 1792 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 1809 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 33:
-#line 260 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 275 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
         {
-
+          (yyval.vector_of_col) = new std::vector<parser::Col*>();
+          (yyval.vector_of_col)->push_back((yyvsp[0].my_col));
         }
-#line 1800 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 1818 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 34:
-#line 264 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 280 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
         {
-
+          (yyval.vector_of_col) = (yyvsp[-2].vector_of_col);
+          (yyval.vector_of_col)->push_back((yyvsp[0].my_col));
         }
-#line 1808 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 1827 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 35:
-#line 270 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 287 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
         {
           (yyval.my_col) = new parser::Col(NULL, (yyvsp[0].string));
         }
-#line 1816 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 1835 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 36:
-#line 274 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 291 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
         {
           (yyval.my_col) = new parser::Col((yyvsp[-2].string), (yyvsp[0].string));
         }
-#line 1824 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 1843 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 37:
-#line 280 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 297 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
                 {
-
+                  (yyval.vector_of_char) = new std::vector<char*>();
+                  (yyval.vector_of_char)->push_back((yyvsp[0].string));
                 }
-#line 1832 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 1852 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 38:
-#line 284 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 302 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
                 {
-
+                  (yyval.vector_of_char) = (yyvsp[-2].vector_of_char);
+                  (yyval.vector_of_char)->push_back((yyvsp[0].string));
                 }
-#line 1840 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 1861 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 39:
-#line 290 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 309 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
                 {
                   (yyval.whereclause) = new parser::WhereClause((yyvsp[-2].my_col), (yyvsp[-1].compop), (yyvsp[0].my_expr));
                 }
-#line 1848 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 1869 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 40:
-#line 294 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 313 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
                 {
                   // TBD
                 }
-#line 1856 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 1877 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 41:
-#line 298 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 317 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
                 {
                   // TBD
                 }
-#line 1864 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 1885 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 42:
-#line 302 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 321 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
                 {
                   (yyval.whereclause) = new parser::WhereClause((yyvsp[-2].whereclause), (yyvsp[0].whereclause));
                 }
-#line 1872 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 1893 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 43:
-#line 308 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 327 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
         {
           (yyval.compop) = CompOp::EQ_OP;
         }
-#line 1880 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 1901 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 44:
-#line 312 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 331 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
         {
           (yyval.compop) = CompOp::GE_OP;
         }
-#line 1888 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 1909 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 45:
-#line 316 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 335 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
         {
           (yyval.compop) = CompOp::LE_OP;
         }
-#line 1896 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 1917 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 46:
-#line 320 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 339 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
         {
           (yyval.compop) = CompOp::NE_OP;
         }
-#line 1904 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 1925 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 47:
-#line 324 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 343 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
         {
           (yyval.compop) = CompOp::GT_OP;
         }
-#line 1912 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 1933 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 48:
-#line 328 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 347 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
         {
           (yyval.compop) = CompOp::LT_OP;
         }
-#line 1920 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 1941 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 49:
-#line 334 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 353 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
         {
           (yyval.my_expr) = new parser::Expr();
           (yyval.my_expr)->col = (yyvsp[0].my_col);
           (yyval.my_expr)->is_value = false;
         }
-#line 1930 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 1951 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 50:
-#line 340 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 359 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
         {
           (yyval.my_expr) = new parser::Expr();
           (yyval.my_expr)->value = (yyvsp[0].my_value);
           (yyval.my_expr)->is_value = true;
         }
-#line 1940 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 1961 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 51:
-#line 348 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 367 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
                 {
                    (yyval.consList) = new parser::ConstraintList();
                    (yyval.consList)->add((yyvsp[0].cons));
                 }
-#line 1949 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 1970 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 52:
-#line 353 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 372 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
                 {
                    (yyval.consList)->add((yyvsp[0].cons));
                 }
-#line 1957 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 1978 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 53:
-#line 359 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 378 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
             {
               (yyval.cons) = new parser::Constraint(true, (yyvsp[-1].columnList), "PrimaryKey", "");
             }
-#line 1965 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 1986 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 54:
-#line 363 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 382 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
             {
               (yyval.cons) = new parser::Constraint(false, (yyvsp[-6].columnList), (yyvsp[-8].string), (yyvsp[-3].string), (yyvsp[-1].columnList));
             }
-#line 1973 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 1994 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 55:
-#line 369 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 388 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
         {
 
         }
-#line 1981 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 2002 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 56:
-#line 373 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 392 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
         {
 
         }
-#line 1989 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 2010 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 57:
-#line 379 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 398 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
         {
 
         }
-#line 1997 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 2018 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 58:
-#line 383 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 402 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
         {
 
         }
-#line 2005 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 2026 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 59:
-#line 387 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 406 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
         {
 
         }
-#line 2013 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 2034 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 60:
-#line 391 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 410 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
         {
 
         }
-#line 2021 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 2042 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 61:
-#line 395 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 414 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
         {
 
         }
-#line 2029 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 2050 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 62:
-#line 399 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 418 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
         {
 
         }
-#line 2037 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 2058 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 63:
-#line 403 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 422 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
         {
 
         }
-#line 2045 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 2066 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 64:
-#line 409 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 428 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
           {    
               (yyval.fieldList) = new parser::FieldList();
               (yyval.fieldList)->add((yyvsp[0].field));
           }
-#line 2054 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 2075 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 65:
-#line 414 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 433 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
           {
               (yyval.fieldList)->add((yyvsp[0].field));
           }
-#line 2062 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 2083 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 66:
-#line 420 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 439 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
       {
           (yyval.field) = new parser::Field((yyvsp[-1].string), (yyvsp[0].type)->attrType, (yyvsp[0].type)->attrLength);
           delete (yyvsp[-1].string);
           delete (yyvsp[0].type);
       }
-#line 2072 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 2093 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 67:
-#line 426 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 445 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
       {
           (yyval.field) = new parser::Field((yyvsp[-2].string), (yyvsp[-1].type)->attrType, (yyvsp[-1].type)->attrLength, true);
           delete (yyvsp[-2].string);
           delete (yyvsp[-1].type);
       }
-#line 2082 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 2103 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 68:
-#line 432 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 451 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
       {
           (yyval.field) = new parser::Field((yyvsp[-3].string), (yyvsp[-2].type)->attrType, (yyvsp[-2].type)->attrLength, false, (yyvsp[0].my_value));
           delete (yyvsp[-3].string);
           delete (yyvsp[-2].type);
       }
-#line 2092 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 2113 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 69:
-#line 438 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 457 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
       {
           (yyval.field) = new parser::Field((yyvsp[-4].string), (yyvsp[-3].type)->attrType, (yyvsp[-3].type)->attrLength, true, (yyvsp[0].my_value));
           delete (yyvsp[-4].string);
           delete (yyvsp[-3].type);
       }
-#line 2102 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 2123 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 70:
-#line 446 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 465 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
       {
           (yyval.type) = new parser::Type();
           (yyval.type)->attrType = AttrType::INT;
           (yyval.type)->attrLength = 4;
       }
-#line 2112 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 2133 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 71:
-#line 452 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 471 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
       {         
           (yyval.type) = new parser::Type();
           (yyval.type)->attrType = AttrType::STRING;
           (yyval.type)->attrLength = (yyvsp[-1].ivalue);
       }
-#line 2122 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 2143 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 72:
-#line 458 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 477 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
       {
           (yyval.type) = new parser::Type();
           (yyval.type)->attrType = AttrType::FLOAT;
           (yyval.type)->attrLength = 4;
       }
-#line 2132 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 2153 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 73:
-#line 466 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 485 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
       {
         (yyval.my_value) = new querylanguage::Value();
         (yyval.my_value)->type = AttrType::INT;
         (yyval.my_value)->data = new int((yyvsp[0].ivalue));
       }
-#line 2142 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 2163 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 74:
-#line 472 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 491 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
       {
         (yyval.my_value) = new querylanguage::Value();
         (yyval.my_value)->type = AttrType::STRING;
         (yyval.my_value)->data = (void*)(yyvsp[0].string);
       }
-#line 2152 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 2173 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 75:
-#line 478 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 497 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
       {
         (yyval.my_value) = new querylanguage::Value();
         (yyval.my_value)->type = AttrType::FLOAT;
         (yyval.my_value)->data = new float((yyvsp[0].fvalue));
       }
-#line 2162 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 2183 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 76:
-#line 484 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 503 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
       {
         (yyval.my_value) = new querylanguage::Value();
         (yyval.my_value)->data = NULL;
       }
-#line 2171 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 2192 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 77:
-#line 491 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 510 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
             {
                 (yyval.columnList) = new parser::ColumnList();
                 (yyval.columnList)->add((yyvsp[0].string));
             }
-#line 2180 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 2201 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 78:
-#line 496 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 515 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
             {
                 (yyval.columnList)->add((yyvsp[0].string));
             }
-#line 2188 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 2209 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 79:
-#line 502 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 521 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
         {
             (yyval.string) = (yyvsp[0].string);
         }
-#line 2196 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 2217 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 80:
-#line 507 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 526 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
         {
             (yyval.string) = (yyvsp[0].string);
         }
-#line 2204 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 2225 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 81:
-#line 512 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 531 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
             {
                 (yyval.string) = (yyvsp[0].string);
             }
-#line 2212 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 2233 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 82:
-#line 518 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 537 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
         {
             (yyval.string) = (yyvsp[0].string);
         }
-#line 2220 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 2241 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
   case 83:
-#line 524 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 543 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
         {
             (yyval.string) = (yyvsp[0].string);
         }
-#line 2228 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 2249 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
     break;
 
 
-#line 2232 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
+#line 2253 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.cpp"
 
       default: break;
     }
@@ -2460,7 +2481,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 529 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
+#line 548 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.y"
 
 void yyerror(const char *msg) {
     printf("YACC error: %s\n", msg);

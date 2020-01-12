@@ -339,6 +339,26 @@ class Update: public Tree {
   void visit();
 };
 
+class Selector {
+ public:
+  bool is_xing;
+  std::vector<Col*>* cols;
+};
+
+class Select : public Tree {
+ public:
+  Selector* selector;
+  std::vector<char*>* tablelist;
+  WhereClause* whereclause;
+  Select(Selector* selector, std::vector<char*>* tablelist, WhereClause* whereclause) {
+    this->selector = selector;
+    this->tablelist = tablelist;
+    this->whereclause = whereclause;
+  }
+
+  void visit();
+};
+
 }
 
 

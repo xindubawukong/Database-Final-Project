@@ -122,8 +122,11 @@ union YYSTYPE
     parser::Constraint* cons;
     parser::ConstraintList* consList;
     parser::SetClause* setclause;
+    std::vector<parser::Col*>* vector_of_col;
+    parser::Selector* my_selector;
+    std::vector<char*>* vector_of_char;
 
-#line 127 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.hpp"
+#line 130 "/Users/xdbwk/Desktop/thu41/database/Database-Final-Project/parser/parser.tab.hpp"
 
 };
 typedef union YYSTYPE YYSTYPE;

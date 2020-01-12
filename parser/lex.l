@@ -79,6 +79,7 @@ FROM            { return FROM; }
 WHERE           { return WHERE; }
 INSERT          { /*printf("lex insert\n");*/ return INSERT; }
 INTO            { return INTO; }
+SET             { return SET; }
 VALUES          { return VALUES; }
 DELETE          { return DELETE; }
 UPDATE          { return UPDATE; }
