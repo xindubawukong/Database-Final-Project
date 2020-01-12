@@ -332,6 +332,7 @@ int QL_Manager::Insert(const char *relName, int nValues, const Value values[]) {
   std::memset(data, 0, record_size);
   for (int i = 0, offset = 0; i < nValues; i++) {
     if (values[i].data != NULL) {
+      int len = std::min(table_info.attrInfos[i].attrLength, (int)std::strlen((char*)values[i].data));
       std::memcpy(data + offset, values[i].data, table_info.attrInfos[i].attrLength);
     }
     else {
