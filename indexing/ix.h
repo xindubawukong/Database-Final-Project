@@ -3,11 +3,11 @@
 
 #include <functional>
 
-#include "filesystem/bufmanager/BufPageManager.h"
-#include "filesystem/fileio/FileManager.h"
-#include "recordmanager/rm_rid.h"
-#include "utils/bitmap.h"
-#include "global.h"
+#include "../filesystem/bufmanager/BufPageManager.h"
+#include "../filesystem/fileio/FileManager.h"
+#include "../recordmanager/rm_rid.h"
+#include "../utils/bitmap.h"
+#include "../global.h"
 #include "btree_node.h"
 
 namespace indexing {

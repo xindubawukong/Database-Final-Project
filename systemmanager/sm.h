@@ -1,11 +1,11 @@
 #ifndef SYSTEMMANAGER_SM_H
 #define SYSTEMMANAGER_SM_H
 
-#include "filesystem/bufmanager/BufPageManager.h"
-#include "filesystem/fileio/FileManager.h"
-#include "indexing/ix.h"
-#include "recordmanager/rm.h"
-#include "global.h"
+#include "../filesystem/bufmanager/BufPageManager.h"
+#include "../filesystem/fileio/FileManager.h"
+#include "../indexing/ix.h"
+#include "../recordmanager/rm.h"
+#include "../global.h"
 
 #include <cstdio>
 #include <stdlib.h>
@@ -110,7 +110,6 @@ namespace systemmanager {
       filesystem::BufPageManager* _bpm;
       recordmanager::RM_Manager* _rmm;
       indexing::IX_Manager* _ixm;
-
   };
 }
 #endif

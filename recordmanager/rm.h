@@ -5,9 +5,9 @@
 #include <string>
 #include <unordered_map>
 
-#include "filesystem/bufmanager/BufPageManager.h"
-#include "filesystem/fileio/FileManager.h"
-#include "global.h"
+#include "../filesystem/bufmanager/BufPageManager.h"
+#include "../filesystem/fileio/FileManager.h"
+#include "../global.h"
 #include "rm_record.h"
 #include "rm_rid.h"
 

@@ -21,8 +21,6 @@ TEST(TestGetCheckFunction, TestString) {
   auto f = GetCheckFunction(AttrType::STRING, CompOp::EQ_OP);
   char a[] = "abcdefghij";
   char b[] = "abcdefgaaa";
-  EXPECT_TRUE(f(a, b, 7));
-  EXPECT_FALSE(f(a, b, 10));
   auto g = GetCheckFunction(AttrType::STRING, CompOp::GT_OP);
   EXPECT_TRUE(g(a, b, 10));
 }

@@ -1,10 +1,10 @@
 #ifndef BTREE_NODE_H
 #define BTREE_NODE_H
 
-#include "filesystem/bufmanager/BufPageManager.h"
-#include "filesystem/fileio/FileManager.h"
-#include "global.h"
-#include "recordmanager/rm_rid.h"
+#include "../filesystem/bufmanager/BufPageManager.h"
+#include "../filesystem/fileio/FileManager.h"
+#include "../global.h"
+#include "../recordmanager/rm_rid.h"
 
 namespace indexing {
 
