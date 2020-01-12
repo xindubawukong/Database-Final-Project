@@ -10,7 +10,7 @@
 #include <cstdio>
 #include <stdlib.h>
 
-#define MAX_ATTRS 10
+#define MAX_ATTRS 20
 #define MAX_LENGTH 25
 #define MAX_TABLES 20
 #define MAX_DATABASES 20

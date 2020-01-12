@@ -23,6 +23,7 @@ int QL_Manager::Select(int nSelAttrs, const RelAttr selAttrs[], int nRelations,
                        const Condition conditions[]) {
   std::cout << "\nQL_Manager::Select" << std::endl;
 
+  int cnt = 0;
   if (nSelAttrs <= 0) return -1;
   if (nRelations <= 0) return -1;
   int rc;
@@ -218,6 +219,7 @@ int QL_Manager::Select(int nSelAttrs, const RelAttr selAttrs[], int nRelations,
       if (!flag) break;
     }
     if (flag) {  // 符合条件，输出records
+      cnt ++;
       string output_string;
       if (nSelAttrs == 1 &&
           std::strcmp(selAttrs[0].attrName, "*") == 0) {  // select *
@@ -297,6 +299,8 @@ int QL_Manager::Select(int nSelAttrs, const RelAttr selAttrs[], int nRelations,
       std::cout << output_string << std::endl;
     }
   }
+
+  std::cout << "total: " << cnt << std::endl;
 
   return NO_ERROR;
 }

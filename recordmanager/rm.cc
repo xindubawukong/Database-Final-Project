@@ -209,34 +209,34 @@ RM_Manager::RM_Manager(filesystem::FileManager* fm,
 RM_Manager::~RM_Manager() {}
 
 int RM_Manager::CreateFile(const std::string& file_name, int record_size) {
-  if (fn_to_rs_.find(file_name) != fn_to_rs_.end()) {
-    return RM_MANAGER_DUPLICATE_FILE_NAME_ERROR;
-  }
   bpm_->createFile(file_name.c_str());
-  fn_to_rs_[file_name] = record_size;
+  int file_id;
+  bpm_->openFile(file_name.c_str(), file_id);
+  int index;
+  auto addr = bpm_->getPage(file_id, 0, index);
+  int* x = (int*)addr;
+  *x = record_size;
+  bpm_->markDirty(index);
+  bpm_->writeBack(index);
+  bpm_->closeFile(file_id);
   return NO_ERROR;
 }
 
 int RM_Manager::DestroyFile(const std::string& file_name) {
-  auto it = fn_to_rs_.find(file_name);
-  if (it == fn_to_rs_.end()) {
-    return RM_MANAGER_FILE_NOT_FOUND_ERROR;
-  }
-  fn_to_rs_.erase(file_name);
   return NO_ERROR;
 }
 
 int RM_Manager::OpenFile(const std::string& file_name,
                          RM_FileHandle& file_handle) {
-  auto it = fn_to_rs_.find(file_name);
-  if (it == fn_to_rs_.end()) {
-    return RM_MANAGER_FILE_NOT_FOUND_ERROR;
-  }
   int file_id;
   if (!bpm_->openFile(file_name.c_str(), file_id)) {
     return RM_MANAGER_FILE_CANNOT_OPEN_ERROR;
   }
-  file_handle.Init(file_name, it->second, fm_, bpm_, file_id);
+  int index;
+  auto addr = bpm_->getPage(file_id, 0, index);
+  bpm_->access(index);
+  int record_size = *((int*)addr);
+  file_handle.Init(file_name, record_size, fm_, bpm_, file_id);
   return NO_ERROR;
 }
 

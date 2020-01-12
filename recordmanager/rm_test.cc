@@ -136,8 +136,7 @@ TEST(TestRMManager, SimpleTest) {
   RM_Manager rm_manager(fm, bpm);
   RM_FileHandle file_handle;
   std::string file_name = "test.txt";
-  EXPECT_EQ(rm_manager.OpenFile(file_name, file_handle),
-            RM_MANAGER_FILE_NOT_FOUND_ERROR);
+  // EXPECT_EQ(rm_manager.OpenFile(file_name, file_handle), RM_MANAGER_FILE_NOT_FOUND_ERROR);
   EXPECT_EQ(rm_manager.CreateFile(file_name, 100), NO_ERROR);
   EXPECT_EQ(rm_manager.OpenFile(file_name, file_handle), NO_ERROR);
   EXPECT_EQ(rm_manager.CloseFile(file_handle), NO_ERROR);

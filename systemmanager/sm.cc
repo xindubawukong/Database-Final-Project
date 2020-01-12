@@ -412,7 +412,9 @@ namespace systemmanager {
     int *offset = new int[info->attrCount];
     offset[0] = 0;
     for(int i = 1; i < info->attrCount; ++i) {
-      offset[i] += info->attrInfos[i].attrLength;
+      // std::cout << info->attrInfos[i].attrLength << std::endl;
+      offset[i] = offset[i - 1] + info->attrInfos[i - 1].attrLength;
+      // std::cout << offset[i] << std::endl;
     }
     Print(*info);
     _bpm->pin(index);
@@ -424,6 +426,8 @@ namespace systemmanager {
     // _bpm->unpin(index);
     // _bpm->closeFile(fileID);
     std::string dataFile = (std::string)relName + "_data";
+
+    // std::cout << dataFile << std::endl;
     
     recordmanager::RM_FileHandle fileHandle;
     rc = _rmm->OpenFile(dataFile, fileHandle); 
@@ -434,9 +438,12 @@ namespace systemmanager {
     fileScan.OpenScan(&fileHandle, info->attrInfos[0].attrType, info->attrInfos[0].attrLength, 0, NO_OP, nullptr);
 
     recordmanager::RM_Record record;
+    // std::cout << "here " << std::endl;
     while(fileScan.GetNextRecord(record) != RM_EOF) {
+      // std::cout << "here" << std::endl;
       char *data;
       rc = record.GetData(data);
+      // std::cout << *((int*)data )<< std::endl;
 
       if(rc != 0) {
         return -1;
@@ -444,6 +451,7 @@ namespace systemmanager {
 
 
       for(int i = 0; i < info->attrCount; ++i) {
+        // std::cout << "i = " << i <<" " << info->attrInfos[i].attrType << " " << offset[i]<< std::endl;
         
         switch (info->attrInfos[i].attrType)
         {
@@ -454,12 +462,12 @@ namespace systemmanager {
             std::cout << *((float*)(data + offset[i]));
             break;
           case STRING:
-            std::cout << data + offset[i];
+            std::cout << (char*)(data + offset[i]);
             break;
           default:
             break;
         }
-        std::cout << "  ";
+        std::cout << ", ";
       }
 
       std::cout << std::endl;

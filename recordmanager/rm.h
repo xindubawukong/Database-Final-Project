@@ -89,7 +89,6 @@ class RM_Manager {
  private:
   filesystem::FileManager* fm_;
   filesystem::BufPageManager* bpm_;
-  std::unordered_map<std::string, int> fn_to_rs_;  // file_name -> record_size
 };
 
 //
