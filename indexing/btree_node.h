@@ -66,6 +66,7 @@ class BTreeNode {
     recordmanager::RID pageRID;
     filesystem::BufPageManager *_bpm;
     int fileID;
+    int index;
 };
 
 }

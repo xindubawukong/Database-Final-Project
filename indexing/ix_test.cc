@@ -69,6 +69,7 @@ TEST(TestHandle, Handle) {
   for(int i = 10000; i > 681; --i) {
     RID r = RID(i, i);
     handle.InsertEntry(&i, r);
+    std::cout << i << std::endl;
   }
 
   EXPECT_EQ(handle.GetHeight(), 2);

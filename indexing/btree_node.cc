@@ -23,6 +23,8 @@ BTreeNode::BTreeNode(AttrType attrType, int attrLength,
   _bpm = bpm;
   this->fileID = fileID;
   pData = (char*) bpm->getPage(fileID, pageID, index);
+  index = index;
+  bpm->pin(index);
   
 
   keys = pData;
@@ -35,7 +37,7 @@ BTreeNode::BTreeNode(AttrType attrType, int attrLength,
     SetRight(-1);
     SetNumKeys(0);
     bpm->markDirty(index);
-    bpm->writeBack(index);
+    // bpm->writeBack(index);
   } else {
     GetLeft();
     GetRight();
@@ -295,7 +297,7 @@ int BTreeNode::Split(BTreeNode* other) {
   // }
 
   RangeRemove(startMovedPos, numKeys - 1);
-  std::cout << "afhkdhf: " << other->GetNumKeys() - 1 << std::endl;
+  std::cout << "afhkdhf: " << other->GetNumKeys() << std::endl;
   other->SetRight(this->GetRight());
   int otherPageNum;
   other->GetPageRID().GetPageNum(otherPageNum);
@@ -304,12 +306,16 @@ int BTreeNode::Split(BTreeNode* other) {
   this->GetPageRID().GetPageNum(thisPageNum);
   other->SetLeft(thisPageNum);
   int index;
-  _bpm->getPage(fileID, thisPageNum, index);
-  _bpm->markDirty(index);
+  std::cout << "afhkdhf: " << other->GetNumKeys() << std::endl;
+  std::cout << "largest:" << *(int*)other->LargestKey() << std::endl;
+
+  //_bpm->getPage(fileID, thisPageNum, index);
+  //_bpm->markDirty(index);
   // _bpm->writeBack(index);
-  _bpm->getPage(fileID, otherPageNum, index);
-  _bpm->markDirty(index);
+  //_bpm->getPage(fileID, otherPageNum, index);
+  //_bpm->markDirty(index);
   // _bpm->writeBack(index);
+  std::cout << "afhkdhf: " << other->GetNumKeys() << std::endl;
 
   
   assert(IsValid() == 0);

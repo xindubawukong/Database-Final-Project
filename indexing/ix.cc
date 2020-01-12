@@ -60,6 +60,7 @@ IX_IndexHandle::~IX_IndexHandle() {
 }
 
 int IX_IndexHandle::InsertEntry(void* pData, recordmanager::RID &r) {
+  std::cout << "enter insert" << std::endl;
   if(pData == nullptr) {
     return IX_KEY_NULL_ERROR;
   }
@@ -75,7 +76,7 @@ int IX_IndexHandle::InsertEntry(void* pData, recordmanager::RID &r) {
     newLargest = true;
     prevKey = treeLargest;
   }
-
+  std::cout << "why: " << std::endl;
   int ret = node->Insert(pData, r);
   std::cout << "now: " << *(int*)prevKey << std::endl;
 
@@ -146,7 +147,8 @@ int IX_IndexHandle::InsertEntry(void* pData, recordmanager::RID &r) {
 
 if(level < 0 ) {
     // Release(header.rootPageNum);
-    WriteBack(header.rootPageNum);
+    std::cout << "enter" << std::endl;
+    // WriteBack(header.rootPageNum);
 
     int pageNum;
     int index;
@@ -155,11 +157,11 @@ if(level < 0 ) {
     // std::cout << pageNum << "," << header.rootPageNum << std::endl;
   
     root = new BTreeNode(header.attrType, header.attrLength, bpm, fileID, pageNum);
-    
+    std::cout << newNode->GetNumKeys() << std::endl;
+    std::cout << "largest:"<<*(int*)node->LargestKey() << ", " << *(int*)newNode->LargestKey() << std::endl;
     root->Insert(node->LargestKey(), node->GetPageRID());
     root->Insert(newNode->LargestKey(), newNode->GetPageRID());
-    std::cout << newNode->GetNumKeys() << std::endl;
-    std::cout << *(int*)node->LargestKey() << ", " << *(int*)newNode->LargestKey() << std::endl;
+    
     
 
     header.rootPageNum = root->GetPageNum();
@@ -170,9 +172,9 @@ if(level < 0 ) {
       newNode = nullptr;
     }
     SetHeight(header.height + 1);
-    std::cout << "hi:" << GetHeight() << std::endl;
     
   }
+  std::cout << "leave insert" << std::endl;
   return NO_ERROR;
 }
 
@@ -497,7 +499,6 @@ BTreeNode* IX_IndexHandle::FindLeaf(const void* pData) {
     recordmanager::RID r;
     path[i - 1]->FindAddrByKey(pData, r);
     int pos = path[i - 1]->FindPositionByKey(pData);
-    std::cout << pos << std::endl;
 
     if(pos == path[i - 1]->GetNumKeys()) {
       pos--;
