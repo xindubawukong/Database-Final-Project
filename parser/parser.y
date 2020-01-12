@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include "../global.h"
 #include "ast.hh"
+#include <cstring>
 #include "parser.yy.cpp"
 
 int yylex();
@@ -24,11 +25,17 @@ void yyerror(const char *);
     float fvalue;
     char *string;
     parser::Tree* tree;
+    parser::ColumnList* columnList;
+    parser::Type* type;
+    parser::Field* field;
+    parser::FieldList* fieldList;
+    parser::Constraint* cons;
+    parser::ConstraintList* consList;
 }
 
 /* keyword */
 %token QUIT
-%token CREATE DROP USE SHOW TABLES DESC ADD CHANGE ALTER 
+%token CREATE DROP USE SHOW TABLES DESC ADD CHANGE ALTER CLOSE
 %token DATABASES DATABASE TABLE INDEX ON CONSTRAINT
 
 /* COLUMN DESCPRITION */
@@ -41,15 +48,22 @@ void yyerror(const char *);
 %token <string> VALUE_STRING IDENTIFIER VALUE_NULL
 
 /* type */
-%type <tree> dbStmt
+%type <tree> dbStmt sysStmt tbStmt idxStmt alterStmt stmt
 %type <string> tbName dbName idxName fkName columnName
+%type <columnList> columnList
+%type <string> value
+%type <type> type
+%type <consList> keyConstraints
+%type <cons> keyConstrint
+%type <field> field
+%type <fieldList> fieldList
 %%
 
 program: %empty 
         {
 
         }
-        | program stmt 
+        | stmt program
         {
 
         }
@@ -83,13 +97,20 @@ stmt: sysStmt ';'
 
 sysStmt: SHOW DATABASES 
         {
-
+            $$ = new parser::ShowDatabase();
+            parser::Tree::setInstance($$);
+            parser::Tree::run();
+        }
+        | SHOW DATABASE dbName 
+        {
+            $$ = new parser::ShowDatabase($3);
+            parser::Tree::setInstance($$);
+            parser::Tree::run();
         }
         ;
 
 dbStmt: CREATE DATABASE dbName
         {
-            std::cout << "Create" << std::endl;
             $$ = new parser::CreateDatabase($3);
             parser::Tree::setInstance($$);
             delete $3;
@@ -109,43 +130,68 @@ dbStmt: CREATE DATABASE dbName
             delete $2;
             parser::Tree::run();
         }
+        | CLOSE 
+        {
+            $$ = new parser::CloseDatabase();
+            parser::Tree::setInstance($$);
+            parser::Tree::run();
+        }
+        | SHOW TABLE tbName
+        {
+            $$ = new parser::ShowTable($3);
+            parser::Tree::setInstance($$);
+            parser::Tree::run();
+        }
         | SHOW TABLES
         {
-
+            $$ = new parser::ShowTable();
+            parser::Tree::setInstance($$);
+            parser::Tree::run();
         }
         ;
 
-tbStmt: CREATE TABLE tbName '(' fieldList keyConstraints ')'
+tbStmt: CREATE TABLE tbName '(' fieldList ',' keyConstraints ')'
         {
-
+            std::cout << $3 << std::endl;
+            $$ = new parser::CreateTable($3, $5, $7);
+            parser::Tree::setInstance($$);
+            parser::Tree::run();
+            delete $3;
+        }
+        | CREATE TABLE tbName '(' fieldList ')'
+        {
+            $$ = new parser::CreateTable($3, $5);
+            parser::Tree::setInstance($$);
+            parser::Tree::run();
+            delete $3;
         }
         | DROP TABLE tbName
         {
-
-        }
-        | DESC tbName 
-        {
-
+            $$ = new parser::DropTable($3);
+            parser::Tree::setInstance($$);
+            parser::Tree::run();
+            delete $3;
         }
         ;
 
-keyConstraints: %empty
+keyConstraints: keyConstrint
                 {
-
+                   $$ = new parser::ConstraintList();
+                   $$->add($1);
                 }
-                | ',' keyConstrint keyConstraints
+                | keyConstraints ',' keyConstrint
                 {
-
+                   $$->add($3);
                 }
                 ;
 
 keyConstrint: PRIMARY '(' columnList ')'
             {
-
+              $$ = new parser::Constraint(true, $3, "PrimaryKey", "");
             }
-            | FOREIGN '(' columnList ')' REFERENCES tbName '(' columnList ')'
+            | FOREIGN fkName '(' columnList ')' REFERENCES tbName '(' columnList ')'
             {
-
+              $$ = new parser::Constraint(false, $4, $2, $7, $9);
             }
             ;
 
@@ -190,72 +236,90 @@ alterStmt: ALTER TABLE tbName ADD PRIMARY '(' columnList ')'
         ;
 
 fieldList: field
-          {
-
+          {    
+              $$ = new parser::FieldList();
+              $$->add($1);
           }
           | fieldList ',' field
           {
-
+              $$->add($3);
           }
           ;
 
 field: columnName type
       {
-
+          $$ = new parser::Field($1, $2->attrType, $2->attrLength);
+          delete $1;
+          delete $2;
       }
       | columnName type NOTNULL
       {
-
+          $$ = new parser::Field($1, $2->attrType, $2->attrLength, true);
+          delete $1;
+          delete $2;
       }
       | columnName type DEFAULT value
       {
-
+          $$ = new parser::Field($1, $2->attrType, $2->attrLength, false, $4);
+          delete $1;
+          delete $2;
       }
       | columnName type NOTNULL DEFAULT value
       {
-
+          $$ = new parser::Field($1, $2->attrType, $2->attrLength, true, $5);
+          delete $1;
+          delete $2;
       }
       ;
 
-type: T_INT '(' VALUE_INT ')'
+type: T_INT 
       {
-
+          $$ = new parser::Type();
+          $$->attrType = AttrType::INT;
+          $$->attrLength = 4;
       }
       | VARCHAR '(' VALUE_INT ')'
-      {
-
+      {         
+          $$ = new parser::Type();
+          $$->attrType = AttrType::STRING;
+          $$->attrLength = $3;
       }
       | T_FLOAT
       {
-
+          $$ = new parser::Type();
+          $$->attrType = AttrType::FLOAT;
+          $$->attrLength = 4;
       }
       ;
 
 value: VALUE_INT
       {
-
+          $$ = new char[4];
+          memcpy($$, &$1, 4);
       }
       | VALUE_STRING
       {
-
+          memcpy($$, $1, std::strlen($1));
       }
       | VALUE_FLOAT
       {
-
+          $$ = new char[4];
+          memcpy($$, &$1, 4);
       }
       | VALUE_NULL
       {
-
+          $$ = nullptr;
       }
       ;
 
 columnList: columnName
             {
-
+                $$ = new parser::ColumnList();
+                $$->add($1);
             }
             | columnList ',' columnName
             {
-
+                $$->add($3);
             }
             ;
 

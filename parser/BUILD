@@ -16,7 +16,7 @@ cc_library(
 cc_library(
   name = "parser",
   srcs = [ "parser.tab.cpp"],
-  hdrs = ["parser.tab.hpp", "stack.hh", "parser.yy.cpp"],
+  hdrs = ["parser.tab.hpp", "parser.yy.cpp"],
   deps = [
     "//:global",
     "//parser:ast",

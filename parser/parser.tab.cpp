@@ -75,6 +75,7 @@
 #include <stdlib.h>
 #include "../global.h"
 #include "ast.hh"
+#include <cstring>
 #include "parser.yy.cpp"
 
 int yylex();
@@ -82,7 +83,7 @@ void yyerror(const char *);
 
 // class Tree;
 
-#line 86 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:339  */
+#line 87 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -127,25 +128,26 @@ extern int yydebug;
     ADD = 265,
     CHANGE = 266,
     ALTER = 267,
-    DATABASES = 268,
-    DATABASE = 269,
-    TABLE = 270,
-    INDEX = 271,
-    ON = 272,
-    CONSTRAINT = 273,
-    T_INT = 274,
-    T_FLOAT = 275,
-    VARCHAR = 276,
-    PRIMARY = 277,
-    FOREIGN = 278,
-    REFERENCES = 279,
-    NOTNULL = 280,
-    DEFAULT = 281,
-    VALUE_INT = 282,
-    VALUE_FLOAT = 283,
-    VALUE_STRING = 284,
-    IDENTIFIER = 285,
-    VALUE_NULL = 286
+    CLOSE = 268,
+    DATABASES = 269,
+    DATABASE = 270,
+    TABLE = 271,
+    INDEX = 272,
+    ON = 273,
+    CONSTRAINT = 274,
+    T_INT = 275,
+    T_FLOAT = 276,
+    VARCHAR = 277,
+    PRIMARY = 278,
+    FOREIGN = 279,
+    REFERENCES = 280,
+    NOTNULL = 281,
+    DEFAULT = 282,
+    VALUE_INT = 283,
+    VALUE_FLOAT = 284,
+    VALUE_STRING = 285,
+    IDENTIFIER = 286,
+    VALUE_NULL = 287
   };
 #endif
 
@@ -154,15 +156,21 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 21 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:355  */
+#line 22 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:355  */
 
     int ivalue;
     AttrType attrType;
     float fvalue;
     char *string;
     parser::Tree* tree;
+    parser::ColumnList* columnList;
+    parser::Type* type;
+    parser::Field* field;
+    parser::FieldList* fieldList;
+    parser::Constraint* cons;
+    parser::ConstraintList* consList;
 
-#line 166 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:355  */
+#line 174 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:355  */
 };
 
 typedef union YYSTYPE YYSTYPE;
@@ -179,7 +187,7 @@ int yyparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 183 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:358  */
+#line 191 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -419,23 +427,23 @@ union yyalloc
 #endif /* !YYCOPY_NEEDED */
 
 /* YYFINAL -- State number of the termination state.  */
-#define YYFINAL  2
+#define YYFINAL  28
 /* YYLAST -- Last index in YYTABLE.  */
 #define YYLAST   117
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  36
+#define YYNTOKENS  37
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  20
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  50
+#define YYNRULES  53
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  121
+#define YYNSTATES  124
 
 /* YYTRANSLATE[YYX] -- Symbol number corresponding to YYX as returned
    by yylex, with out-of-bounds checking.  */
 #define YYUNDEFTOK  2
-#define YYMAXUTOK   286
+#define YYMAXUTOK   287
 
 #define YYTRANSLATE(YYX)                                                \
   ((unsigned int) (YYX) <= YYMAXUTOK ? yytranslate[YYX] : YYUNDEFTOK)
@@ -448,8 +456,8 @@ static const yytype_uint8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-      33,    34,     2,     2,    35,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,    32,
+      34,    36,     2,     2,    35,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,    33,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -472,19 +480,19 @@ static const yytype_uint8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
       15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
-      25,    26,    27,    28,    29,    30,    31
+      25,    26,    27,    28,    29,    30,    31,    32
 };
 
 #if YYDEBUG
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,    48,    48,    52,    58,    62,    66,    70,    74,    78,
-      84,    90,    98,   105,   112,   118,   122,   126,   132,   136,
-     142,   146,   152,   156,   162,   166,   170,   174,   178,   182,
-     186,   192,   196,   202,   206,   210,   214,   220,   224,   228,
-     234,   238,   242,   246,   252,   256,   262,   267,   272,   278,
-     284
+       0,    62,    62,    66,    72,    76,    80,    84,    88,    92,
+      98,   104,   112,   119,   126,   133,   139,   145,   153,   161,
+     168,   177,   182,   188,   192,   198,   202,   208,   212,   216,
+     220,   224,   228,   232,   238,   243,   249,   255,   261,   267,
+     275,   281,   287,   295,   300,   304,   309,   315,   320,   326,
+     331,   336,   342,   348
 };
 #endif
 
@@ -494,14 +502,14 @@ static const yytype_uint16 yyrline[] =
 static const char *const yytname[] =
 {
   "$end", "error", "$undefined", "QUIT", "CREATE", "DROP", "USE", "SHOW",
-  "TABLES", "DESC", "ADD", "CHANGE", "ALTER", "DATABASES", "DATABASE",
-  "TABLE", "INDEX", "ON", "CONSTRAINT", "T_INT", "T_FLOAT", "VARCHAR",
-  "PRIMARY", "FOREIGN", "REFERENCES", "NOTNULL", "DEFAULT", "VALUE_INT",
-  "VALUE_FLOAT", "VALUE_STRING", "IDENTIFIER", "VALUE_NULL", "';'", "'('",
-  "')'", "','", "$accept", "program", "stmt", "sysStmt", "dbStmt",
-  "tbStmt", "keyConstraints", "keyConstrint", "idxStmt", "alterStmt",
-  "fieldList", "field", "type", "value", "columnList", "dbName", "tbName",
-  "columnName", "fkName", "idxName", YY_NULLPTR
+  "TABLES", "DESC", "ADD", "CHANGE", "ALTER", "CLOSE", "DATABASES",
+  "DATABASE", "TABLE", "INDEX", "ON", "CONSTRAINT", "T_INT", "T_FLOAT",
+  "VARCHAR", "PRIMARY", "FOREIGN", "REFERENCES", "NOTNULL", "DEFAULT",
+  "VALUE_INT", "VALUE_FLOAT", "VALUE_STRING", "IDENTIFIER", "VALUE_NULL",
+  "';'", "'('", "','", "')'", "$accept", "program", "stmt", "sysStmt",
+  "dbStmt", "tbStmt", "keyConstraints", "keyConstrint", "idxStmt",
+  "alterStmt", "fieldList", "field", "type", "value", "columnList",
+  "dbName", "tbName", "columnName", "fkName", "idxName", YY_NULLPTR
 };
 #endif
 
@@ -513,14 +521,14 @@ static const yytype_uint16 yytoknum[] =
        0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
      265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
      275,   276,   277,   278,   279,   280,   281,   282,   283,   284,
-     285,   286,    59,    40,    41,    44
+     285,   286,   287,    59,    40,    44,    41
 };
 # endif
 
-#define YYPACT_NINF -63
+#define YYPACT_NINF -68
 
 #define yypact_value_is_default(Yystate) \
-  (!!((Yystate) == (-63)))
+  (!!((Yystate) == (-68)))
 
 #define YYTABLE_NINF -1
 
@@ -531,19 +539,19 @@ static const yytype_uint16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-     -63,    27,   -63,   -63,    31,    35,   -29,    30,   -21,    20,
-     -63,    10,    12,    37,    52,    53,   -29,   -21,    22,   -29,
-     -21,    22,   -63,   -63,   -63,   -63,   -63,   -63,   -21,   -63,
-     -63,   -63,   -63,   -63,   -63,    54,   -63,    69,   -63,   -63,
-     -63,     5,    58,   -21,    -9,   -10,    58,   -63,    55,   -63,
-      41,    56,   -63,    61,   -63,    61,    59,    58,    58,    18,
-      29,    60,   -63,    63,     3,    58,   -63,   -63,    74,    58,
-     -63,   -63,    65,    66,    67,   -63,   -63,    73,    76,    75,
-      28,    33,   -63,    71,    36,    58,    58,    50,   -63,    72,
-      77,    28,   -63,   -63,   -63,   -63,   -63,   -63,    58,    58,
-     -63,    40,    42,   -63,   -63,   -63,   -63,    44,   -63,    81,
-      83,   -21,   -21,    79,    80,    58,    58,    46,    48,   -63,
-     -63
+      20,   -68,    46,    49,   -20,    27,    -3,   -68,    15,    20,
+      -4,     3,    22,    26,    40,   -20,    17,    53,   -20,    17,
+      53,   -68,   -68,   -68,   -68,   -20,    17,    17,   -68,   -68,
+     -68,   -68,   -68,   -68,   -68,   -68,   -68,    19,   -68,    79,
+     -68,   -68,   -68,   -68,   -68,    39,    67,    17,     7,    -9,
+      67,   -68,    10,   -68,    47,    65,   -68,    69,   -68,    69,
+      68,    67,    67,    16,   -68,   -68,   -68,    70,    48,    67,
+     -68,   -68,    77,    67,   -68,   -68,    71,    69,    41,   -68,
+     -68,    75,    80,    28,    43,   -68,    72,    45,    67,    74,
+      59,   -68,    73,    28,   -68,   -68,   -68,   -68,   -68,    67,
+     -68,    67,   -68,    50,    67,   -68,   -68,   -68,   -68,    52,
+     -68,    54,    85,    86,    17,    17,    78,    81,    67,    67,
+      56,    58,   -68,   -68
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -551,33 +559,33 @@ static const yytype_int8 yypact[] =
      means the default is an error.  */
 static const yytype_uint8 yydefact[] =
 {
-       2,     0,     1,     9,     0,     0,     0,     0,     0,     0,
-       3,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,    46,    13,    14,    10,    47,    17,     0,     4,
-       5,     6,     7,     8,    11,     0,    50,     0,    12,    16,
-      23,     0,     0,     0,     0,     0,     0,    48,    18,    31,
-       0,     0,    25,     0,    29,     0,     0,     0,     0,     0,
-       0,     0,    39,     0,    33,     0,    49,    27,     0,     0,
-      28,    30,     0,     0,    18,    32,    15,     0,     0,    34,
-       0,     0,    44,     0,     0,     0,     0,     0,    19,     0,
-       0,     0,    40,    42,    41,    43,    35,    22,     0,     0,
-      24,     0,     0,    37,    38,    36,    45,     0,    20,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,    21,
-      26
+       2,     9,     0,     0,     0,     0,     0,    15,     0,     2,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,    49,    14,    17,    10,     0,     0,     0,     1,     3,
+       4,     5,     6,     7,     8,    12,    50,     0,    53,     0,
+      13,    20,    26,    11,    16,     0,     0,     0,     0,     0,
+       0,    51,     0,    34,     0,     0,    28,     0,    32,     0,
+       0,     0,     0,     0,    19,    40,    42,     0,    36,     0,
+      52,    30,     0,     0,    31,    33,     0,     0,     0,    21,
+      35,     0,    37,     0,     0,    47,     0,     0,     0,     0,
+       0,    18,     0,     0,    43,    45,    44,    46,    38,     0,
+      25,     0,    27,     0,     0,    22,    41,    39,    48,     0,
+      23,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,    29,    24
 };
 
   /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -63,   -63,   -63,   -63,   -63,   -63,    34,   -63,   -63,   -63,
-     -63,     7,   -63,    19,   -62,     6,   -17,   -40,    62,    88
+     -68,   104,   -68,   -68,   -68,   -68,   -68,    24,   -68,   -68,
+     -68,     9,   -68,    23,   -67,    -6,   -19,   -45,   -57,    97
 };
 
   /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,     1,    10,    11,    12,    13,    60,    74,    14,    15,
-      48,    49,    64,    96,    81,    23,    27,    82,    67,    37
+      -1,     8,     9,    10,    11,    12,    78,    79,    13,    14,
+      52,    53,    68,    98,    84,    22,    37,    85,    71,    39
 };
 
   /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -585,75 +593,75 @@ static const yytype_int8 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_uint8 yytable[] =
 {
-      35,    22,    50,    39,    54,    57,    58,    84,    55,    26,
-      44,    41,    56,    52,    53,    45,    46,    50,    50,    50,
-      47,    47,    34,   101,   102,    38,    51,     2,    79,    80,
-       3,     4,     5,     6,     7,    28,     8,   107,    24,     9,
-      72,    73,    29,    25,    30,    16,    17,    18,    47,    19,
-      20,    21,    36,   117,   118,    92,    93,    94,   106,    95,
-      61,    62,    63,    76,    70,    71,    75,    97,    98,    31,
-     100,    98,    72,    73,   108,    98,   109,    98,   110,    98,
-     119,    98,   120,    98,    32,    33,    43,    42,    47,    65,
-      59,    66,    69,    77,   113,   114,    78,    83,    85,    86,
-      89,    91,    87,    90,    99,   111,   103,   112,    88,    40,
-     105,   104,   115,   116,     0,     0,     0,    68
+      41,    54,    72,    58,    61,    62,    87,    44,    45,    35,
+      59,    21,    40,    27,    60,    28,    54,    54,    54,    43,
+      89,   103,    51,     1,     2,     3,     4,     5,    55,    30,
+      56,    57,     6,     7,   109,    23,    31,   111,    51,    76,
+      77,    24,    25,    26,    48,    63,    64,    51,    36,    49,
+      50,   120,   121,    46,   108,    32,    94,    95,    96,    33,
+      97,    15,    16,    17,    18,    19,    20,    65,    66,    67,
+      74,    75,    80,    34,    82,    83,    90,    91,    99,   100,
+      99,   102,    76,    77,    38,    99,   110,    99,   112,    99,
+     113,    99,   122,    99,   123,   116,   117,    47,    51,    69,
+      70,    86,    73,    92,    81,    88,   101,    93,   104,   106,
+     114,   115,   118,    29,   105,   119,   107,    42
 };
 
-static const yytype_int8 yycheck[] =
+static const yytype_uint8 yycheck[] =
 {
-      17,    30,    42,    20,    44,    45,    46,    69,    18,    30,
-       5,    28,    22,    22,    23,    10,    11,    57,    58,    59,
-      30,    30,    16,    85,    86,    19,    43,     0,    25,    26,
-       3,     4,     5,     6,     7,    15,     9,    99,     8,    12,
-      22,    23,    32,    13,    32,    14,    15,    16,    30,    14,
-      15,    16,    30,   115,   116,    27,    28,    29,    98,    31,
-      19,    20,    21,    34,    57,    58,    59,    34,    35,    32,
-      34,    35,    22,    23,    34,    35,    34,    35,    34,    35,
-      34,    35,    34,    35,    32,    32,    17,    33,    30,    33,
-      35,    30,    33,    33,   111,   112,    33,    23,    33,    33,
-      27,    26,    35,    27,    33,    24,    34,    24,    74,    21,
-      91,    34,    33,    33,    -1,    -1,    -1,    55
+      19,    46,    59,    48,    49,    50,    73,    26,    27,    15,
+      19,    31,    18,    16,    23,     0,    61,    62,    63,    25,
+      77,    88,    31,     3,     4,     5,     6,     7,    47,    33,
+      23,    24,    12,    13,   101,     8,    33,   104,    31,    23,
+      24,    14,    15,    16,     5,    35,    36,    31,    31,    10,
+      11,   118,   119,    34,    99,    33,    28,    29,    30,    33,
+      32,    15,    16,    17,    15,    16,    17,    20,    21,    22,
+      61,    62,    63,    33,    26,    27,    35,    36,    35,    36,
+      35,    36,    23,    24,    31,    35,    36,    35,    36,    35,
+      36,    35,    36,    35,    36,   114,   115,    18,    31,    34,
+      31,    24,    34,    28,    34,    34,    34,    27,    34,    36,
+      25,    25,    34,     9,    90,    34,    93,    20
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
      symbol of state STATE-NUM.  */
 static const yytype_uint8 yystos[] =
 {
-       0,    37,     0,     3,     4,     5,     6,     7,     9,    12,
-      38,    39,    40,    41,    44,    45,    14,    15,    16,    14,
-      15,    16,    30,    51,     8,    13,    30,    52,    15,    32,
-      32,    32,    32,    32,    51,    52,    30,    55,    51,    52,
-      55,    52,    33,    17,     5,    10,    11,    30,    46,    47,
-      53,    52,    22,    23,    53,    18,    22,    53,    53,    35,
-      42,    19,    20,    21,    48,    33,    30,    54,    54,    33,
-      47,    47,    22,    23,    43,    47,    34,    33,    33,    25,
-      26,    50,    53,    23,    50,    33,    33,    35,    42,    27,
-      27,    26,    27,    28,    29,    31,    49,    34,    35,    33,
-      34,    50,    50,    34,    34,    49,    53,    50,    34,    34,
-      34,    24,    24,    52,    52,    33,    33,    50,    50,    34,
-      34
+       0,     3,     4,     5,     6,     7,    12,    13,    38,    39,
+      40,    41,    42,    45,    46,    15,    16,    17,    15,    16,
+      17,    31,    52,     8,    14,    15,    16,    16,     0,    38,
+      33,    33,    33,    33,    33,    52,    31,    53,    31,    56,
+      52,    53,    56,    52,    53,    53,    34,    18,     5,    10,
+      11,    31,    47,    48,    54,    53,    23,    24,    54,    19,
+      23,    54,    54,    35,    36,    20,    21,    22,    49,    34,
+      31,    55,    55,    34,    48,    48,    23,    24,    43,    44,
+      48,    34,    26,    27,    51,    54,    24,    51,    34,    55,
+      35,    36,    28,    27,    28,    29,    30,    32,    50,    35,
+      36,    34,    36,    51,    34,    44,    36,    50,    54,    51,
+      36,    51,    36,    36,    25,    25,    53,    53,    34,    34,
+      51,    51,    36,    36
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
-       0,    36,    37,    37,    38,    38,    38,    38,    38,    38,
-      39,    40,    40,    40,    40,    41,    41,    41,    42,    42,
-      43,    43,    44,    44,    45,    45,    45,    45,    45,    45,
-      45,    46,    46,    47,    47,    47,    47,    48,    48,    48,
-      49,    49,    49,    49,    50,    50,    51,    52,    53,    54,
-      55
+       0,    37,    38,    38,    39,    39,    39,    39,    39,    39,
+      40,    40,    41,    41,    41,    41,    41,    41,    42,    42,
+      42,    43,    43,    44,    44,    45,    45,    46,    46,    46,
+      46,    46,    46,    46,    47,    47,    48,    48,    48,    48,
+      49,    49,    49,    50,    50,    50,    50,    51,    51,    52,
+      53,    54,    55,    56
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
 static const yytype_uint8 yyr2[] =
 {
        0,     2,     0,     2,     2,     2,     2,     2,     2,     1,
-       2,     3,     3,     2,     2,     7,     3,     2,     0,     3,
-       4,     9,     8,     3,     8,     5,    15,     6,     6,     5,
-       6,     1,     3,     2,     3,     4,     5,     4,     4,     1,
-       1,     1,     1,     1,     1,     3,     1,     1,     1,     1,
-       1
+       2,     3,     3,     3,     2,     1,     3,     2,     8,     6,
+       3,     1,     3,     4,    10,     8,     3,     8,     5,    15,
+       6,     6,     5,     6,     1,     3,     2,     3,     4,     5,
+       1,     4,     1,     1,     1,     1,     1,     1,     3,     1,
+       1,     1,     1,     1
 };
 
 
@@ -1330,409 +1338,471 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 49 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
-    {
-
-        }
-#line 1338 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
-    break;
-
-  case 3:
-#line 53 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+#line 63 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
 
         }
 #line 1346 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 4:
-#line 59 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+  case 3:
+#line 67 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
 
-      }
+        }
 #line 1354 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 5:
-#line 63 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+  case 4:
+#line 73 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
 
       }
 #line 1362 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 6:
-#line 67 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+  case 5:
+#line 77 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
 
       }
 #line 1370 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 7:
-#line 71 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+  case 6:
+#line 81 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
 
       }
 #line 1378 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 8:
-#line 75 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+  case 7:
+#line 85 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
 
       }
 #line 1386 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 9:
-#line 79 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+  case 8:
+#line 89 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
-          YYACCEPT;
+
       }
 #line 1394 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 10:
-#line 85 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+  case 9:
+#line 93 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
-
-        }
+          YYACCEPT;
+      }
 #line 1402 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 11:
-#line 91 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+  case 10:
+#line 99 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
-            std::cout << "Create" << std::endl;
+            (yyval.tree) = new parser::ShowDatabase();
+            parser::Tree::setInstance((yyval.tree));
+            parser::Tree::run();
+        }
+#line 1412 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+    break;
+
+  case 11:
+#line 105 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+    {
+            (yyval.tree) = new parser::ShowDatabase((yyvsp[0].string));
+            parser::Tree::setInstance((yyval.tree));
+            parser::Tree::run();
+        }
+#line 1422 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+    break;
+
+  case 12:
+#line 113 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+    {
             (yyval.tree) = new parser::CreateDatabase((yyvsp[0].string));
             parser::Tree::setInstance((yyval.tree));
             delete (yyvsp[0].string);
             parser::Tree::run();
         }
-#line 1414 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+#line 1433 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 12:
-#line 99 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+  case 13:
+#line 120 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
             (yyval.tree) = new parser::DropDatabase((yyvsp[0].string));
             parser::Tree::setInstance((yyval.tree));
             delete (yyvsp[0].string);
             parser::Tree::run();
         }
-#line 1425 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+#line 1444 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 13:
-#line 106 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+  case 14:
+#line 127 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
             (yyval.tree) = new parser::UseDatabase((yyvsp[0].string));
             parser::Tree::setInstance((yyval.tree));
             delete (yyvsp[0].string);
             parser::Tree::run();
         }
-#line 1436 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
-    break;
-
-  case 14:
-#line 113 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
-    {
-
-        }
-#line 1444 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+#line 1455 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 15:
-#line 119 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+#line 134 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
-
+            (yyval.tree) = new parser::CloseDatabase();
+            parser::Tree::setInstance((yyval.tree));
+            parser::Tree::run();
         }
-#line 1452 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+#line 1465 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 16:
-#line 123 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+#line 140 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
-
+            (yyval.tree) = new parser::ShowTable((yyvsp[0].string));
+            parser::Tree::setInstance((yyval.tree));
+            parser::Tree::run();
         }
-#line 1460 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+#line 1475 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 17:
-#line 127 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+#line 146 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
-
+            (yyval.tree) = new parser::ShowTable();
+            parser::Tree::setInstance((yyval.tree));
+            parser::Tree::run();
         }
-#line 1468 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+#line 1485 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 18:
-#line 133 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+#line 154 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
-
-                }
-#line 1476 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+            std::cout << (yyvsp[-5].string) << std::endl;
+            (yyval.tree) = new parser::CreateTable((yyvsp[-5].string), (yyvsp[-3].fieldList), (yyvsp[-1].consList));
+            parser::Tree::setInstance((yyval.tree));
+            parser::Tree::run();
+            delete (yyvsp[-5].string);
+        }
+#line 1497 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 19:
-#line 137 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+#line 162 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
-
-                }
-#line 1484 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
-    break;
-
-  case 20:
-#line 143 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
-    {
-
-            }
-#line 1492 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
-    break;
-
-  case 21:
-#line 147 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
-    {
-
-            }
-#line 1500 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
-    break;
-
-  case 22:
-#line 153 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
-    {
-
+            (yyval.tree) = new parser::CreateTable((yyvsp[-3].string), (yyvsp[-1].fieldList));
+            parser::Tree::setInstance((yyval.tree));
+            parser::Tree::run();
+            delete (yyvsp[-3].string);
         }
 #line 1508 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 23:
-#line 157 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+  case 20:
+#line 169 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
-
+            (yyval.tree) = new parser::DropTable((yyvsp[0].string));
+            parser::Tree::setInstance((yyval.tree));
+            parser::Tree::run();
+            delete (yyvsp[0].string);
         }
-#line 1516 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+#line 1519 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+    break;
+
+  case 21:
+#line 178 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+    {
+                   (yyval.consList) = new parser::ConstraintList();
+                   (yyval.consList)->add((yyvsp[0].cons));
+                }
+#line 1528 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+    break;
+
+  case 22:
+#line 183 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+    {
+                   (yyval.consList)->add((yyvsp[0].cons));
+                }
+#line 1536 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+    break;
+
+  case 23:
+#line 189 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+    {
+              (yyval.cons) = new parser::Constraint(true, (yyvsp[-1].columnList), "PrimaryKey", "");
+            }
+#line 1544 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 24:
-#line 163 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+#line 193 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
-
-        }
-#line 1524 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+              (yyval.cons) = new parser::Constraint(false, (yyvsp[-6].columnList), (yyvsp[-8].string), (yyvsp[-3].string), (yyvsp[-1].columnList));
+            }
+#line 1552 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 25:
-#line 167 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+#line 199 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
 
         }
-#line 1532 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+#line 1560 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 26:
-#line 171 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
-    {
-
-        }
-#line 1540 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
-    break;
-
-  case 27:
-#line 175 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
-    {
-
-        }
-#line 1548 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
-    break;
-
-  case 28:
-#line 179 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
-    {
-
-        }
-#line 1556 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
-    break;
-
-  case 29:
-#line 183 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
-    {
-
-        }
-#line 1564 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
-    break;
-
-  case 30:
-#line 187 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
-    {
-
-        }
-#line 1572 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
-    break;
-
-  case 31:
-#line 193 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
-    {
-
-          }
-#line 1580 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
-    break;
-
-  case 32:
-#line 197 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
-    {
-
-          }
-#line 1588 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
-    break;
-
-  case 33:
 #line 203 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
 
-      }
-#line 1596 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+        }
+#line 1568 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 34:
-#line 207 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+  case 27:
+#line 209 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
 
-      }
-#line 1604 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+        }
+#line 1576 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 35:
-#line 211 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+  case 28:
+#line 213 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
 
-      }
-#line 1612 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+        }
+#line 1584 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 36:
-#line 215 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+  case 29:
+#line 217 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
 
-      }
-#line 1620 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+        }
+#line 1592 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 37:
+  case 30:
 #line 221 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
 
-      }
-#line 1628 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+        }
+#line 1600 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 38:
+  case 31:
 #line 225 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
 
-      }
-#line 1636 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+        }
+#line 1608 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 39:
+  case 32:
 #line 229 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
 
+        }
+#line 1616 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+    break;
+
+  case 33:
+#line 233 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+    {
+
+        }
+#line 1624 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+    break;
+
+  case 34:
+#line 239 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+    {    
+              (yyval.fieldList) = new parser::FieldList();
+              (yyval.fieldList)->add((yyvsp[0].field));
+          }
+#line 1633 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+    break;
+
+  case 35:
+#line 244 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+    {
+              (yyval.fieldList)->add((yyvsp[0].field));
+          }
+#line 1641 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+    break;
+
+  case 36:
+#line 250 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+    {
+          (yyval.field) = new parser::Field((yyvsp[-1].string), (yyvsp[0].type)->attrType, (yyvsp[0].type)->attrLength);
+          delete (yyvsp[-1].string);
+          delete (yyvsp[0].type);
       }
-#line 1644 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+#line 1651 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+    break;
+
+  case 37:
+#line 256 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+    {
+          (yyval.field) = new parser::Field((yyvsp[-2].string), (yyvsp[-1].type)->attrType, (yyvsp[-1].type)->attrLength, true);
+          delete (yyvsp[-2].string);
+          delete (yyvsp[-1].type);
+      }
+#line 1661 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+    break;
+
+  case 38:
+#line 262 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+    {
+          (yyval.field) = new parser::Field((yyvsp[-3].string), (yyvsp[-2].type)->attrType, (yyvsp[-2].type)->attrLength, false, (yyvsp[0].string));
+          delete (yyvsp[-3].string);
+          delete (yyvsp[-2].type);
+      }
+#line 1671 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+    break;
+
+  case 39:
+#line 268 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+    {
+          (yyval.field) = new parser::Field((yyvsp[-4].string), (yyvsp[-3].type)->attrType, (yyvsp[-3].type)->attrLength, true, (yyvsp[0].string));
+          delete (yyvsp[-4].string);
+          delete (yyvsp[-3].type);
+      }
+#line 1681 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 40:
-#line 235 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+#line 276 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
-
+          (yyval.type) = new parser::Type();
+          (yyval.type)->attrType = AttrType::INT;
+          (yyval.type)->attrLength = 4;
       }
-#line 1652 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+#line 1691 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 41:
-#line 239 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
-    {
-
+#line 282 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+    {         
+          (yyval.type) = new parser::Type();
+          (yyval.type)->attrType = AttrType::STRING;
+          (yyval.type)->attrLength = (yyvsp[-1].ivalue);
       }
-#line 1660 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+#line 1701 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 42:
-#line 243 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+#line 288 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
-
+          (yyval.type) = new parser::Type();
+          (yyval.type)->attrType = AttrType::FLOAT;
+          (yyval.type)->attrLength = 4;
       }
-#line 1668 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+#line 1711 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 43:
-#line 247 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+#line 296 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
-
+          (yyval.string) = new char[4];
+          memcpy((yyval.string), &(yyvsp[0].ivalue), 4);
       }
-#line 1676 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+#line 1720 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 44:
-#line 253 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+#line 301 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
-
-            }
-#line 1684 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+          memcpy((yyval.string), (yyvsp[0].string), std::strlen((yyvsp[0].string)));
+      }
+#line 1728 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 45:
-#line 257 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+#line 305 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
-
-            }
-#line 1692 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+          (yyval.string) = new char[4];
+          memcpy((yyval.string), &(yyvsp[0].fvalue), 4);
+      }
+#line 1737 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 46:
-#line 263 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+#line 310 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
-            (yyval.string) = (yyvsp[0].string);
-        }
-#line 1700 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+          (yyval.string) = nullptr;
+      }
+#line 1745 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 47:
-#line 268 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+#line 316 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
-            (yyval.string) = (yyvsp[0].string);
-        }
-#line 1708 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+                (yyval.columnList) = new parser::ColumnList();
+                (yyval.columnList)->add((yyvsp[0].string));
+            }
+#line 1754 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 48:
-#line 273 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+#line 321 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
-                (yyval.string) = (yyvsp[0].string);
+                (yyval.columnList)->add((yyvsp[0].string));
             }
-#line 1716 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+#line 1762 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 49:
-#line 279 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+#line 327 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
             (yyval.string) = (yyvsp[0].string);
         }
-#line 1724 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+#line 1770 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 50:
-#line 285 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+#line 332 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
     {
             (yyval.string) = (yyvsp[0].string);
         }
-#line 1732 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+#line 1778 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+    break;
+
+  case 51:
+#line 337 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+    {
+                (yyval.string) = (yyvsp[0].string);
+            }
+#line 1786 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+    break;
+
+  case 52:
+#line 343 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+    {
+            (yyval.string) = (yyvsp[0].string);
+        }
+#line 1794 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+    break;
+
+  case 53:
+#line 349 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1646  */
+    {
+            (yyval.string) = (yyvsp[0].string);
+        }
+#line 1802 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
     break;
 
 
-#line 1736 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
+#line 1806 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.cpp" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1960,7 +2030,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 290 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1906  */
+#line 354 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1906  */
 
 void yyerror(const char *msg) {
     printf("YACC error: %s\n", msg);

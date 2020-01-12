@@ -139,6 +139,8 @@ stdlib.h
 /mnt/d/learn/senior/database/Database-Final-Project/global.h
 ast.hh
 /mnt/d/learn/senior/database/Database-Final-Project/parser/ast.hh
+cstring
+-
 parser.yy.cpp
 /mnt/d/learn/senior/database/Database-Final-Project/parser/parser.yy.cpp
 stddef.h

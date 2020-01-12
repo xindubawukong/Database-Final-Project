@@ -55,25 +55,26 @@ extern int yydebug;
     ADD = 265,
     CHANGE = 266,
     ALTER = 267,
-    DATABASES = 268,
-    DATABASE = 269,
-    TABLE = 270,
-    INDEX = 271,
-    ON = 272,
-    CONSTRAINT = 273,
-    T_INT = 274,
-    T_FLOAT = 275,
-    VARCHAR = 276,
-    PRIMARY = 277,
-    FOREIGN = 278,
-    REFERENCES = 279,
-    NOTNULL = 280,
-    DEFAULT = 281,
-    VALUE_INT = 282,
-    VALUE_FLOAT = 283,
-    VALUE_STRING = 284,
-    IDENTIFIER = 285,
-    VALUE_NULL = 286
+    CLOSE = 268,
+    DATABASES = 269,
+    DATABASE = 270,
+    TABLE = 271,
+    INDEX = 272,
+    ON = 273,
+    CONSTRAINT = 274,
+    T_INT = 275,
+    T_FLOAT = 276,
+    VARCHAR = 277,
+    PRIMARY = 278,
+    FOREIGN = 279,
+    REFERENCES = 280,
+    NOTNULL = 281,
+    DEFAULT = 282,
+    VALUE_INT = 283,
+    VALUE_FLOAT = 284,
+    VALUE_STRING = 285,
+    IDENTIFIER = 286,
+    VALUE_NULL = 287
   };
 #endif
 
@@ -82,15 +83,21 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 21 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1909  */
+#line 22 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.y" /* yacc.c:1909  */
 
     int ivalue;
     AttrType attrType;
     float fvalue;
     char *string;
     parser::Tree* tree;
+    parser::ColumnList* columnList;
+    parser::Type* type;
+    parser::Field* field;
+    parser::FieldList* fieldList;
+    parser::Constraint* cons;
+    parser::ConstraintList* consList;
 
-#line 94 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.hpp" /* yacc.c:1909  */
+#line 101 "/mnt/d/learn/senior/database/Database-Final-Project/parser/parser.tab.hpp" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

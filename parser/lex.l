@@ -30,7 +30,7 @@ DIGIT           [0-9]
 VALUE_INT       {DIGIT}+
 FLOAT           {DIGIT}+\.{DIGIT}*
 IDENTIFIER      [a-z][_a-z0-9]*
-WHITESPACE      [ \t\n]
+WHITESPACE      [ \t\n\r]
 DATE_FORMAT     '[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}'
 VALUE_STRING    '(\\\\|\\n|\\r|\\\"|\\0|\\'|[^'\\])*'
 
@@ -56,22 +56,22 @@ QUIT            { /*printf("QUIT");*/ return QUIT; }
 CREATE          { /*printf("CREATE "); */ return CREATE; }
 DROP            { /*printf("DROP "); */ return DROP; }
 USE             { /*printf("USE "); */ return USE; }
+CLOSE           { return CLOSE; }
 SHOW            { /*printf("SHOW "); */ return SHOW; }
 DATABASES       { /*printf("DATABASES "); */ return DATABASES; }
 DATABASE        { /*printf("DATABASE "); */ return DATABASE; }
 TABLE           { /*printf("TABLE "); */ return TABLE; }
 TABLES          { /*printf("TABLES "); */ return TABLES; }
+DEFAULT         { return DEFAULT; }
 REFERENCES      { /*printf("REFERENCES "); */ return REFERENCES; }
 "NOT NULL"      { /*printf("NOT_NULL "); */ return NOTNULL; }
 "PRIMARY KEY"   { /*printf("PRIMARY_KEY "); */ return PRIMARY; }
 "FOREIGN KEY"   { /*printf("FOREIGN_KEY "); */ return FOREIGN; }
-CHANGE          { return CHANGE; }
-DESC            { return DESC; }
 CONSTRAINT      { return CONSTRAINT; }
 INDEX           { /*printf("INDEX "); */ return INDEX; }
 NULL            { /*printf("NULL "); */ return VALUE_NULL; }
-int             { /*printf("int "); */ return INT; }
-float           { /*printf("float "); */ return FLOAT; }
+int             { /*printf("int "); */ return T_INT; }
+float           { /*printf("float "); */ return T_FLOAT; }
 varchar         { /*printf("varchar "); */ return VARCHAR; }
 {FLOAT}         { /*printf("FLOAT "); */ sscanf(yytext, "%f", &yylval.fvalue); return VALUE_FLOAT; }
 {VALUE_INT}       { /*printf("INTEGER "); */ sscanf(yytext, "%d", &yylval.ivalue); return VALUE_INT; }
