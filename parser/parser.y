@@ -196,12 +196,14 @@ tbStmt: CREATE TABLE tbName '(' fieldList ',' keyConstraints ')'
           std::cout << "insert" << std::endl;
           $$ = new parser::Insert($3, $5);
           parser::Tree::setInstance($$);
-          delete $3;
           parser::Tree::run();
         }
         | DELETE FROM tbName WHERE whereClause
         {
+          std::cout << "yacc delete" << std::endl;
           $$ = new parser::Delete($3, $5);
+          parser::Tree::setInstance($$);
+          parser::Tree::run();
         }
         | UPDATE tbName SET setClause
         {

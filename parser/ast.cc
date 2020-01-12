@@ -198,11 +198,16 @@ void Insert::visit() {
 }
 
 void Delete::visit() {
+  std::cout << "Delete visit" << std::endl;
   int n = this->whereclause->conditions.size();
   querylanguage::Condition conditions[n];
   for (int i = 0; i < n; i++) {
     conditions[i] = *this->whereclause->conditions[i];
   }
+  std::cout << conditions[0].lhsAttr.attrName << std::endl;
+  std::cout << (char*)conditions[0].rhsValue.data << std::endl;
+  std::cout << conditions[0].op<< std::endl;
+  std::cout << conditions[0].bRhsIsAttr << std::endl;
   qlm->Delete(this->tbname.c_str(), n, conditions);
 }
 

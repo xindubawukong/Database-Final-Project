@@ -465,8 +465,8 @@ int QL_Manager::Delete(const char *relName, int nConditions,
         } else {
           std::memcpy(r_data, condition.rhsValue.data, length);
         }
-        flag &=
-            check_f(record_data + l_offset, condition.rhsValue.data, length);
+        std::cout << "fuck" << std::endl;
+        flag &= check_f(l_data, r_data, length);
         delete[] l_data;
         delete[] r_data;
       }

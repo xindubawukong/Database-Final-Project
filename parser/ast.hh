@@ -288,6 +288,9 @@ class WhereClause: public Tree {
       condition->rhsAttr.relName = expr->col->tbname;
       condition->rhsAttr.attrName = expr->col->colname;
     }
+    std::cout << condition->op << std::endl;
+    std::cout << condition->lhsAttr.attrName << std::endl;
+    std::cout << (char*)condition->rhsValue.data << std::endl;
     conditions.clear();
     conditions.push_back(condition);
   }

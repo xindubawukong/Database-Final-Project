@@ -52,6 +52,9 @@ VALUE_STRING    '(\\\\|\\n|\\r|\\\"|\\0|\\'|[^'\\])*'
 "-"             { /*printf("- "); */ return yytext[0]; }
 "/"             { /*printf("/ "); */ return yytext[0]; }
 "*"             { /*printf("* "); */ return yytext[0]; }
+">"             { /*printf("* "); */ return yytext[0]; }
+"<"             { /*printf("* "); */ return yytext[0]; }
+"="             { /*printf("* "); */ return yytext[0]; }
 QUIT            { /*printf("QUIT");*/ return QUIT; }
 CREATE          { /*printf("CREATE "); */ return CREATE; }
 DROP            { /*printf("DROP "); */ return DROP; }
@@ -72,6 +75,8 @@ REFERENCES      { /*printf("REFERENCES "); */ return REFERENCES; }
 "<>"            { return LEX_NE; }
 CONSTRAINT      { return CONSTRAINT; }
 SELECT          { return SELECT; }
+FROM            { return FROM; }
+WHERE           { return WHERE; }
 INSERT          { /*printf("lex insert\n");*/ return INSERT; }
 INTO            { return INTO; }
 VALUES          { return VALUES; }
