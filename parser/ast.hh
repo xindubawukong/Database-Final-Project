@@ -13,19 +13,6 @@
 
 namespace parser {
 
-
-enum AlterObject {
-  PRIMARY,
-  FOREIGN,
-  COLUMN
-};
-
-enum AlterType {
-  ADD,
-  DROP,
-  CHANGE
-};
-
 class Tree;
 
 // Sys
@@ -37,6 +24,8 @@ class CreateDatabase;
 class DropDatabase;
 
 class UseDatabase;
+
+class CloseDatabase;
 
 // Tables
 class CreateTable;
@@ -59,9 +48,20 @@ class Field;
 
 class FieldList;
 
-class KeyConstraint;
+class Constraint;
 
-class KeyConstraintList;
+class ConstraintList;
+
+class AlterPrimaryKey;
+
+class AlterForeignKey;
+
+class AlterColumn;
+
+struct Type {
+  AttrType attrType;
+  int attrLength;
+};
 
 class Tree {
   public:
@@ -87,6 +87,7 @@ class Tree {
 class ShowDatabase: public Tree {
   public:
     ShowDatabase(std::string dbName);
+    ShowDatabase();
 
     void visit() override;
 
@@ -118,9 +119,16 @@ class UseDatabase: public Tree {
     std::string dbName;
 };
 
+class CloseDatabase: public Tree {
+  public:
+  CloseDatabase();
+  void visit() override;
+};
+
 class ShowTable: public Tree {
   public:
     ShowTable(std::string tbName);
+    ShowTable();
     void visit() override;
 
     std::string tbName;
@@ -128,13 +136,13 @@ class ShowTable: public Tree {
 
 class CreateTable: public Tree {
   public:
-    CreateTable(std::string tbName, FieldList* fieldList, KeyConstraintList* constraints = nullptr);
+    CreateTable(std::string tbName, FieldList* fieldList, ConstraintList* constraints = nullptr);
     void visit() override;
     ~CreateTable() override;
 
     std::string tbName;
     FieldList* fieldList;
-    KeyConstraintList* constraintts = nullptr;
+    ConstraintList* constraints = nullptr;
 };
 
 class DropTable: public Tree {
@@ -143,20 +151,6 @@ class DropTable: public Tree {
     void visit() override;
 
     std::string tbName;
-};
-
-class AlterTable: public Tree {
-  public:
-    AlterTable(std::string tbName, AlterObject alterObject, AlterType alterType, ColumnList* c1 = nullptr, ColumnList* c2 = nullptr, std::string columnName = nullptr, Field* field = nullptr);
-    void visit() override;
-    ~AlterTable() override;
-
-    std::string tbName;
-    AlterObject alterObject;
-    AlterType alterType;
-    ColumnList* c1 = nullptr, *c2 = nullptr;
-    std::string columnName;
-    Field* field = nullptr;
 };
 
 class CreateIndex: public Tree {
@@ -179,8 +173,7 @@ class DropIndex: public Tree {
 
 class ColumnList: public Tree {
   public:
-    ColumnList() = default;
-    void visit() override;
+    void visit() {};
     void add(std::string attrName);
 
     std::vector<std::string> attrNameList;
@@ -189,43 +182,33 @@ class ColumnList: public Tree {
 class Field: public Tree {
   public:
     Field(std::string attrName, AttrType attrType, int attrLength, bool notNull = false, void* defaltValue = nullptr);
-    void visit() override;
-    ~Field() override;
-
-    std::string attrName;
-    AttrType attrType;
-    int attrLength;
-    bool notNull;
-    void* defaultValue;
+    void visit() {};
+    systemmanager::AttrInfo info;
 };
 
 class FieldList: public Tree {
   public:
-    FieldList() = default;
-    void visit() override;
+    FieldList() {};
+    void visit() {};
     void add(Field* field);
     std::vector<Field*> fieldList;
 };
 
-class KeyConstraint: public Tree {
+class Constraint: public Tree {
   public:
-    KeyConstraint(bool isPrimary, ColumnList* columnList, std::string tbName, ColumnList* foreignList = nullptr);
-    void visit() override;
-    ~KeyConstraint() override;
+    Constraint(bool isPrimary, ColumnList* columnList, std::string fkName, std::string tbName, ColumnList* foreignList = nullptr);
+    void visit() {};
 
-    std::string tbName;
-    ColumnList* columnList;
-    ColumnList* foreignList;
-    bool isPrimary;
+    systemmanager::Constraint cons;
 
 };
 
-class KeyConstraintList: public Tree {
+class ConstraintList: public Tree {
   public:
-    KeyConstraintList();
-    void visit() override;
-    void add(KeyConstraint* constraint);
-    std::vector<KeyConstraint*> constraintList;
+    ConstraintList() {};
+    void visit() {};
+    void add(Constraint* constraint);
+    std::vector<Constraint*> constraintList;
 };
 
 class ValueList {
