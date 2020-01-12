@@ -51,6 +51,7 @@ def main():
                 inst += line[i]
         inst += ');'
         insts.append(inst)
+        
 
     with open('../generated.txt', 'w') as f:
         for inst in insts:

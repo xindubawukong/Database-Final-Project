@@ -1,6 +1,7 @@
 bazel-*
 .vscode
 .DS_Store
+.idea
 /parser/cmake_install.cmake
 /parser/CMakeCache.txt
 /parser/CMakeFiles/
