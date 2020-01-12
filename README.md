@@ -32,6 +32,12 @@ bazel test bazel_example/main:hello-greet_test --test_output=streamed  # run goo
 python3 test_all.py
 ```
 
+## Run database
+
+```shell
+bazel run :sql
+```
+
 ## References
 
 https://web.stanford.edu/class/cs346/2015/
