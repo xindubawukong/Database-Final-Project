@@ -322,9 +322,6 @@ int QL_Manager::Insert(const char *relName, int nValues, const Value values[]) {
 
   // 检测属性个数及类型是否一致
   if (nValues != table_info.attrCount) return -1;
-  for (int i = 0; i < nValues; i++) {
-    if (values[i].type != table_info.attrInfos[i].attrType && values[i].data != NULL) return -1;
-  }
 
   // 得到要插入的data
   int record_size = 0;
