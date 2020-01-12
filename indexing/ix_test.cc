@@ -37,12 +37,14 @@ TEST(TestManager, Manager) {
   EXPECT_EQ(handle.GetNumPages(), 2);
 
   ret = manager.DestroyIndex(name.c_str(), 0);
+  
   EXPECT_EQ(ret, 0);
   std::stringstream s;
   s << name << "." << 0;
   std::ifstream file;
   file.open(s.str().c_str());
   EXPECT_EQ(file.good(), false);
+  std::cout << "index test" <<std::endl;
 } 
 
 TEST(TestHandle, Handle) {

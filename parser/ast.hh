@@ -12,6 +12,13 @@
 
 namespace parser {
 
+extern filesystem::FileManager *fm;
+extern filesystem::BufPageManager* bpm;
+extern recordmanager::RM_Manager* rmm;
+extern indexing::IX_Manager* ixm;
+extern systemmanager::SM_Manager* sm;
+
+
 class Tree;
 
 // Sys
@@ -174,6 +181,14 @@ class ColumnList: public Tree {
   public:
     void visit() {};
     void add(std::string attrName);
+    systemmanager::AttrList* toAttrList() {
+      systemmanager::AttrList *attrs = new systemmanager::AttrList;
+      for(int i = 0; i < (int)attrNameList.size(); ++i) {
+        systemmanager::CopyStr(attrs->names[i], attrNameList[i].c_str(), MAX_LENGTH);
+      }
+      attrs->attrCount = (int)attrNameList.size();
+      return attrs;
+    }
 
     std::vector<std::string> attrNameList;
 };
@@ -210,10 +225,77 @@ class ConstraintList: public Tree {
     std::vector<Constraint*> constraintList;
 };
 
-class AlterPrimaryKey: public 
+class AlterPrimaryKey: public Tree {
+  public:
+    AlterPrimaryKey(std::string tbName, bool add = false, ColumnList* attrList = nullptr) {
+      this->tbName = move(tbName);
+      this->add = add;
+      this->attrList = attrList;
+    }
 
+    void visit() {
+      int rc = 0;
+      if(!add) {
+        rc = sm->AlterPrimaryKey(tbName.c_str());
+      } else {
+        systemmanager::AttrList *attrs = new systemmanager::AttrList();
+        for(int i = 0; i < (int)attrList->attrNameList.size(); ++i) {
+          systemmanager::CopyStr(attrs->names[i], attrList->attrNameList[i].c_str(), MAX_LENGTH);
+        }
+        attrs->attrCount = (int)attrList->attrNameList.size();
+        rc = sm->AlterPrimaryKey(tbName.c_str(), true, attrs);
+        delete attrs;
+      }
+      if(rc != 0) {
+        std::cout << "Alter PrimaryKey for " << tbName << " failed." << std::endl;
+      }
+    }
+
+    ~AlterPrimaryKey() {
+      if(attrList != nullptr) {
+        delete attrList;
+      }
+    }
+
+    std::string tbName;
+    bool add;
+    ColumnList* attrList;
+};
+
+class AlterForeignKey: public Tree {
+  public:
+  AlterForeignKey(std::string relName, std::string fkName, std::string tbName = "", ColumnList* thisName = nullptr, ColumnList* otherName = nullptr) {
+    this->relName = move(relName);
+    this->fkName = move(fkName);
+    this->tbName = move(tbName);
+    this->thisList = thisName;
+    this->refList = otherName;
+  }
+
+  void visit() {
+    int rc = 0;
+    if(tbName == "") {
+      rc = sm->AlterForeignKey(relName.c_str(), fkName.c_str());
+    } else {
+      rc = sm->AlterForeignKey(relName.c_str(), fkName.c_str(), tbName.c_str(), thisList->toAttrList(), refList->toAttrList());
+    }
+    if(rc != 0) {
+      std::cout << "Alter Foreign Key failed." << std::endl; 
+    }
+     
+  }
+  ~AlterForeignKey() {
+    // if(thisList != nullptr) {
+    //   delete thisList;
+    // }
+    // if(refList != nullptr) {
+    //   delete refList;
+    // }
+  }
+  std::string relName, fkName, tbName;
+  ColumnList* thisList, *refList;
+};
 
 }
-
 
 #endif

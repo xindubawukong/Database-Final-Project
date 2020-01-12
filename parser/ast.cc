@@ -5,7 +5,7 @@ namespace parser {
   using std::string;
   using std::move;
 
-  Tree *Tree::tree = nullptr;
+  Tree* Tree::tree = nullptr;
 
   filesystem::FileManager* fm = new filesystem::FileManager();
   filesystem::BufPageManager* bpm = new filesystem::BufPageManager(fm);

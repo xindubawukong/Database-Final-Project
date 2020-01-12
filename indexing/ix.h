@@ -32,7 +32,7 @@ namespace indexing {
       IX_IndexHandle();
 
       ~IX_IndexHandle();
-
+      
       int InsertEntry(void *pData, recordmanager::RID& rid);
 
       int DeleteEnrty(void* pData, recordmanager::RID& rid);

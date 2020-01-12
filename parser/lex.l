@@ -68,6 +68,8 @@ REFERENCES      { /*printf("REFERENCES "); */ return REFERENCES; }
 "PRIMARY KEY"   { /*printf("PRIMARY_KEY "); */ return PRIMARY; }
 "FOREIGN KEY"   { /*printf("FOREIGN_KEY "); */ return FOREIGN; }
 CONSTRAINT      { return CONSTRAINT; }
+ADD             { return ADD; }
+ALTER           { return ALTER; }
 INDEX           { /*printf("INDEX "); */ return INDEX; }
 NULL            { /*printf("NULL "); */ return VALUE_NULL; }
 int             { /*printf("int "); */ return T_INT; }

@@ -537,13 +537,14 @@ namespace systemmanager {
       _bpm->unpin(index);
       indexPri = ++info->constraintCount;
       _bpm->markDirty(index);
-      
+      _bpm->writeBack(index);
 
       Constraint *newCons = (Constraint*) _bpm->getPage(fileID, indexPri, index);
       CopyStr(newCons->constraintName, "PrimaryKey", MAX_LENGTH);
       newCons->isPrimary = true;
       newCons->thisNameList = *attrList;
       _bpm->markDirty(index);
+      _bpm->writeBack(index);
       _bpm->closeFile(fileID);
 
     }  else {
@@ -558,6 +559,8 @@ namespace systemmanager {
       _bpm->markDirty(indexPri);
       info->constraintCount--;
       _bpm->markDirty(index);
+      _bpm->writeBack(indexPri);
+      _bpm->writeBack(index);
       _bpm->closeFile(fileID);
     }
 
@@ -566,7 +569,127 @@ namespace systemmanager {
   }
 
   int SM_Manager::AlterForeignKey(const char *relName, const char *fkName, const char *tbName, AttrList* thisList, AttrList* otherList) {
+    if(!TableExist(relName)) {
+      return -1;
+    }
+    int fileID, index;
+    std::string metaFile = std::string(relName) + "_meta";
+    _bpm->openFile(metaFile.c_str(), fileID);
+    
+    TableInfo *info = (TableInfo*) _bpm->getPage(fileID, 0, index);
+    _bpm->pin(index);
+    int cnt = info->constraintCount;
+    bool find = false;
+    Constraint *target = nullptr;
+    int indexCon = -1;
+    for(int i = 0; i < cnt; ++i) {
+      int index;
+      Constraint *cons = (Constraint*) _bpm->getPage(fileID, i + 1, index);
+      _bpm->access(index);
+      if(strcmp(fkName, cons->constraintName) ==0) {
+        find = true;
+        target = cons;
+        indexCon = index;
+        break;
+      }
+    }
+    _bpm->unpin(index);
+
+    if(tbName == nullptr) {
+      if(!find) {
+        return -1;
+      }
+      int index_last;
+      Constraint *last_con = (Constraint*) _bpm->getPage(fileID, cnt, index_last);
+      memcpy(target, last_con, sizeof(Constraint));
+      memset(last_con, 0, sizeof(Constraint));
+      info->constraintCount--;
+      // std::cout << " wp " << std::endl;
+      _bpm->unpin(index);
+      _bpm->markDirty(index);
+      _bpm->markDirty(index_last);
+      _bpm->markDirty(indexCon);
+      _bpm->writeBack(index);
+      _bpm->writeBack(index_last);
+      _bpm->writeBack(indexCon);
+      _bpm->closeFile(fileID);
+    } else {
+      if(find) {
+        return -1;
+      }
+
+      if(!TableExist(tbName)) {
+        return -1;
+      }
+      
+      bool ok = true;
+      for(int i = 0; i < thisList->attrCount; ++i) {
+        if(!AttrExist(relName, thisList->names[i])) {
+          ok = false;
+          break;
+        }
+      }
+ 
+      if(!ok) {
+        _bpm->unpin(index);
+        _bpm->closeFile(fileID);
+        return -1;
+      }
+
+      int fID, fIndex;
+      std::string newMetaFile = std::string(tbName) + "_meta";
+      _bpm->openFile(newMetaFile.c_str(), fID);
+      TableInfo *info = (TableInfo*) _bpm->getPage(fID, 0, fIndex);
+
+      int counts = info->constraintCount;
+      _bpm->pin(fIndex);
+      bool find = false;
+      for(int i = 0; i < counts; ++i) {
+        int index;
+        Constraint* cons = (Constraint*) _bpm->getPage(fID, i + 1, index);
+        _bpm->access(index);
+        if(cons->isPrimary) {
+          find = true;
+          if(!AttrListEqual(cons->thisNameList, *otherList)) {
+            find = false;
+          }
+          break;
+        }
+      }
+      _bpm->unpin(fIndex);
+      _bpm->closeFile(fID);
+      if(!find) {
+        return -1;
+      }
+      int newIndex;
+      Constraint *newConstrat = new Constraint;
+      newConstrat->isPrimary = false;
+
+      CopyStr(newConstrat->constraintName, fkName, MAX_LENGTH);
+
+      CopyStr(newConstrat->foreignTableName, tbName, MAX_LENGTH);
+      newConstrat->thisNameList = *thisList;
+      newConstrat->referencesNameList = *otherList;
+
+      Constraint* buffer = (Constraint*)_bpm->getPage(fileID, cnt + 1, newIndex);
+
+      memcpy(buffer, newConstrat, sizeof(Constraint));
+    
+      _bpm->unpin(index);
+      _bpm->openFile(metaFile.c_str(), fileID);
+      info = (TableInfo*) _bpm->getPage(fileID, 0, index);
+
+      info->constraintCount++;
+      _bpm->markDirty(newIndex);
+      _bpm->writeBack(newIndex);
+      _bpm->markDirty(index);
+      _bpm->writeBack(index);
+
+      _bpm->closeFile(fileID);
+
+    }
     return 0;
+    
   }
 
   int SM_Manager::DropTable(const char* relName) {
@@ -625,13 +748,17 @@ namespace systemmanager {
     if(rc == 0) {
       return -1;
     }
+    int offset = 0;
     TableInfo *info = (TableInfo*) _bpm->getPage(fileID, 0, index);
+    _bpm->pin(index);
+
     int attrIndex = -1;
     for(int i = 0; i < info->attrCount; ++i) {
       if(strcmp(info->attrInfos[i].attrName, attrName) == 0) {
         attrIndex = i;
         break;
       }
+      offset += info->attrInfos[i].attrLength;
     }
     if(attrIndex == -1) {
       return -1;
@@ -647,13 +774,49 @@ namespace systemmanager {
       return -1;
     }
     
-    info->indexedAttr[info->indexSize++] = attrIndex;
+    
     rc = _ixm->CreateIndex(relName, attrIndex, info->attrInfos[attrIndex].attrType, info->attrInfos[attrIndex].attrLength);
-
+    if(rc != 0) {
+      return rc;
+    }
+    indexing::IX_IndexHandle ixh;
+    rc = _ixm->OpendIndex(relName, attrIndex, ixh);
     if(rc != 0) {
       return rc;
     }
 
+    std::string dataFile = std::string(relName) + "_data";
+    recordmanager::RM_FileHandle rfh;
+    rc = _rmm->OpenFile(dataFile, rfh);
+    if(rc != 0) {
+      return rc;
+    }
+
+    recordmanager::RM_FileScan fs;
+    rc = fs.OpenScan(&rfh, info->attrInfos[attrIndex].attrType, info->attrInfos[attrIndex].attrLength, offset, NO_OP, nullptr);
+    if(rc != 0) {
+      return rc;
+    }
+    recordmanager::RM_Record record;
+    recordmanager::RID rid;
+    while(fs.GetNextRecord(record) != RM_EOF) {
+      rc = record.GetRid(rid);
+      if(rc != 0) {
+        return rc;
+      }
+      void* data;
+      rc = record.GetData((char* &)data);
+      if(rc != 0) {
+        return rc;
+      }
+      rc = ixh.InsertEntry(data, rid);
+      if(rc != 0) {
+        return rc;
+      }
+    }
+
+    info->indexedAttr[info->indexSize++] = attrIndex;
+    _bpm->unpin(index);
     _bpm->markDirty(index);
     _bpm->writeBack(index);
     _bpm->closeFile(fileID);

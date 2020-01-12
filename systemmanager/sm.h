@@ -98,7 +98,6 @@ namespace systemmanager {
       int Load(const char *relName, const char* fileName);
       int Help();
       int Help(const char *relName);
-      // int Print(const char *relName);
       int Set(const char *paramName, const char *value);
 
       bool TableExist(const char *tableName);

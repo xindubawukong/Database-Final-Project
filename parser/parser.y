@@ -207,19 +207,36 @@ idxStmt: CREATE INDEX idxName ON tbName '(' columnList ')'
 
 alterStmt: ALTER TABLE tbName ADD PRIMARY '(' columnList ')'
         {
-
+           $$ = new parser::AlterPrimaryKey($3, true, $7);
+           parser::Tree::setInstance($$);
+           parser::Tree::run();
+           delete $3;
         }
         | ALTER TABLE tbName DROP PRIMARY
         {
-
+           $$ = new parser::AlterPrimaryKey($3);
+           parser::Tree::setInstance($$);
+           parser::Tree::run();
+           delete $3;
         }
+        
         | ALTER TABLE tbName ADD CONSTRAINT fkName FOREIGN '(' columnList ')' REFERENCES tbName '(' columnList ')'
         {
+            $$ = new parser::AlterForeignKey($3, $6, $12, $9, $14);
+            parser::Tree::setInstance($$);
+            parser::Tree::run();
+            delete $3;
+            delete $6;
+            delete $9;
 
         }
         | ALTER TABLE tbName DROP FOREIGN fkName
         {
-
+            $$ = new parser::AlterForeignKey($3, $6);
+            parser::Tree::setInstance($$);
+            parser::Tree::run();
+            delete $3;
+            delete $6;
         }
         | ALTER TABLE tbName ADD columnName field
         {

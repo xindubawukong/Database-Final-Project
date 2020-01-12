@@ -24,7 +24,7 @@ IX_IndexHandle::IX_IndexHandle() {
 
 IX_IndexHandle::~IX_IndexHandle() {
   if(root != nullptr && bpm != nullptr) {
-    WriteBack(header.rootPageNum);
+    // WriteBack(header.rootPageNum);
     delete root;
     root = nullptr;
   }
@@ -38,7 +38,7 @@ IX_IndexHandle::~IX_IndexHandle() {
     for(int i = 0; i < header.height; ++i) {
       if(path[i] != nullptr) {
         if(bpm != nullptr) {
-          WriteBack(path[i]->GetPageNum());
+          // WriteBack(path[i]->GetPageNum());
           // delete path[i];
           // path[i] = nullptr;
         }
@@ -84,6 +84,7 @@ int IX_IndexHandle::InsertEntry(void* pData, recordmanager::RID &r) {
   if(newLargest) {
     for(int i = 0; i < header.height - 1; ++i) {
       int pos = path[i]->FindKey((const void* &)prevKey);
+      std::cout << "Pos:" << pos << std::endl;
       path[i]->SetKey(pos, pData);
     }
 
@@ -446,6 +447,8 @@ int IX_IndexHandle::SetFileHeader(const int &pageNum) const {
   int index;
   char* buf = (char*) bpm->getPage(fileID, pageNum, index);
   memcpy(buf, &header, sizeof(header));
+  bpm->markDirty(index);
+  bpm->writeBack(index);
   return NO_ERROR;
 }
 
@@ -456,8 +459,8 @@ int IX_IndexHandle::ForcePages() {
     bitmap.Get(i, used);
     if(used == 1) {
       bpm->getPage(fileID, i, index);
-      bpm->markDirty(i);
-      bpm->writeBack(i);
+      bpm->markDirty(index);
+      bpm->writeBack(index);
     }
   }
   return NO_ERROR;
@@ -1127,15 +1130,15 @@ int IX_Manager::CreateIndex(const char* fileName, int indexNo, AttrType attrType
      ||
      (attrType == STRING && 
       ((unsigned int)attrLength <= 0 || 
-       (unsigned int)attrLength > 100)))
+       (unsigned int)attrLength > 255)))
       return -3;
   
   std::stringstream name;
   name << fileName << "." << indexNo;
 
-  fm_->createFile(name.str().c_str());
+  bpm_->createFile(name.str().c_str());
   int fileID;
-  fm_->openFile(name.str().c_str(), fileID);
+  bpm_->openFile(name.str().c_str(), fileID);
   int index;
   char* data = (char*) bpm_->getPage(fileID, 0, index);
   IX_FileHeader header;
@@ -1148,9 +1151,9 @@ int IX_Manager::CreateIndex(const char* fileName, int indexNo, AttrType attrType
 
   memcpy(data, &header, sizeof(header));
 
-  bpm_->markDirty(0);
-  bpm_->writeBack(0);
-  fm_->closeFile(fileID);
+  bpm_->markDirty(index);
+  bpm_->writeBack(index);
+  bpm_->closeFile(fileID);
   return NO_ERROR;
 }
 
@@ -1162,7 +1165,7 @@ int IX_Manager::DestroyIndex(const char* fileName, int indexNo) {
   std::stringstream name;
   name << fileName << "." << indexNo;
   
-  bool ret = fm_->deleteFile(name.str().c_str());
+  bool ret = bpm_->deleteFile(name.str().c_str());
   if(!ret) {
     return -1;
   }
@@ -1179,14 +1182,14 @@ int IX_Manager::OpendIndex(const char* fileName, int indexNo, IX_IndexHandle& ix
   name << fileName << "." << indexNo;
 
   int fileID;
-  fm_->openFile(name.str().c_str(), fileID);
+  bpm_->openFile(name.str().c_str(), fileID);
   int index;
   char* data = (char*) bpm_->getPage(fileID, 0, index);
   IX_FileHeader header;
   memcpy(&header, data, sizeof(header));
 
   ixh.Open(bpm_, fileID, header.rootPageNum);
-  bpm_->release(0);
+  bpm_->release(index);
   return NO_ERROR;
 }
 
@@ -1195,17 +1198,17 @@ int IX_Manager::CloseIndex(IX_IndexHandle& ixh) {
     return -1;
   }
   if(ixh.bHeaderChanged) {
-    int index;
-    ixh.bpm->getPage(ixh.fileID, 0, index);
+    // int index;
+    // ixh.bpm->getPage(ixh.fileID, 0, index);
     ixh.SetFileHeader(0);
-    ixh.bpm->markDirty(index);
-    ixh.bpm->writeBack(index);
+    // ixh.bpm->markDirty(index);
+    // ixh.bpm->writeBack(index);
     ixh.ForcePages();
   }
 
-  fm_->closeFile(ixh.fileID);
-  ixh.~IX_IndexHandle();
-  ixh.bpm = nullptr;
+  bpm_->closeFile(ixh.fileID);
+  // ixh.Close();
+  // ixh.bpm = nullptr;
   ixh.bFileOpen = false;
   return NO_ERROR;
 }

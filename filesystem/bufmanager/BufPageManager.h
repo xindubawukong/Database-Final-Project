@@ -50,6 +50,7 @@ struct BufPageManager {
     b = addr[index];
     //std::cout << "b: " << b << std::endl;
     if (b == NULL) {
+      
       b = allocMem();
       addr[index] = b;
     } else {
@@ -129,7 +130,7 @@ struct BufPageManager {
     //   std::cout << oldName << ", " << newName << std::endl;
 
     BufType b = fetchPage(fileID, pageID, index);
-    //std::cout << (void*)b << std::endl;
+    // std::cout << (void*)b << std::endl;
     fileManager->readPage(fileID, pageID, b, 0);
 
     // std::cout << "old: " << idx_to_name[index] << std::endl;

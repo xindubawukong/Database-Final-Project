@@ -32,6 +32,8 @@ BTreeNode::BTreeNode(AttrType attrType, int attrLength,
     SetLeft(-1);
     SetRight(-1);
     SetNumKeys(0);
+    bpm->markDirty(index);
+    bpm->writeBack(index);
   } else {
     GetLeft();
     GetRight();
