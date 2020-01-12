@@ -22,7 +22,7 @@ int main(int args, char **argv) {
         }
     }
     else {
-        freopen("../create.sql", "r", stdin);
+        // freopen("../create.sql", "r", stdin);
         int rc = yyparse();
         while(rc) {
             rc = yyparse();
