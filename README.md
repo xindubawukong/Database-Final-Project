@@ -32,7 +32,7 @@ bazel test bazel_example/main:hello-greet_test --test_output=streamed  # run goo
 python3 test_all.py
 ```
 
-## Run database
+### Run database
 
 ```shell
 bazel run :sql
