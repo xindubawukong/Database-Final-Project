@@ -35,6 +35,10 @@ python3 test_all.py
 ### Run database
 
 ```shell
+cd parser
+cmake .
+make
+cd ..
 bazel run :sql
 ```
 
